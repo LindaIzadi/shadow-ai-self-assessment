@@ -1,0 +1,75 @@
+name: Pipeline
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pipeline-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pruefen:
+    name: Linter und Testläufe
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Quellcode holen
+        uses: actions/checkout@v7
+
+      - name: Node.js einrichten (Version aus .nvmrc)
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Prüfwerkzeuge in den festgeschriebenen Versionen installieren
+        run: npm ci
+
+      - name: Browser für den Browsertest installieren
+        run: npx playwright install --with-deps chromium
+
+      - name: Linter
+        run: npm run lint
+
+      - name: "Testlauf 1: Regelbasis (Testfälle, Einzelprüfungen, Codes, ungültige Eingaben)"
+        run: npm run test:regeln
+
+      - name: "Testlauf 2: Konsistenzprüfung der Regelbasis (Vollständigkeit, Widerspruchsfreiheit, Monotonie)"
+        run: npm run test:konsistenz
+
+      - name: "Testlauf 3: Oberfläche im Browser"
+        run: npm run test:browser
+
+      - name: Statische Seite zusammenstellen (nur die Dateien der Anwendung)
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p _site
+          cp SA-Tool.html _site/
+          cp SA-Tool.html _site/index.html
+          cp -r css js _site/
+
+      - name: Seite für GitHub Pages bereitstellen
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  veroeffentlichen:
+    name: Statische Seite veröffentlichen
+    needs: pruefen
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.seite.outputs.page_url }}
+    steps:
+      - name: Auf GitHub Pages veröffentlichen
+        id: seite
+        uses: actions/deploy-pages@v5

@@ -1,0 +1,646 @@
+[
+ {
+  "nr": "P1",
+  "text": "Grundrechte-Folgenabschaetzung: F9 mit einer Aussage",
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": [
+    7
+   ],
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Ja",
+   "F26": "Ja",
+   "F27": "Ja",
+   "F28": "Ja",
+   "F29": [
+    "Stelle",
+    "Verfahren"
+   ],
+   "F30": "Ja",
+   "F3": "Unternehmen",
+   "F4": "freigegeben",
+   "F12": "Nein",
+   "F18": "oeffentlich",
+   "F20": "gering",
+   "F22": "ja",
+   "F23": "extern ohne",
+   "F8": "Nein",
+   "F9": [
+    3
+   ]
+  },
+  "erwartet": {
+   "gesamt": 3,
+   "R": 3,
+   "regeln_mit": [
+    "R3",
+    "R4",
+    "R4 Zusatz Art. 27"
+   ],
+   "regeln_ohne": [
+    "R3 Zusatz Profiling",
+    "R3 Zusatz Profiling unklar",
+    "R5"
+   ]
+  }
+ },
+ {
+  "nr": "P2",
+  "text": "Gegenprobe zu P1: F9 'Keine'",
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": [
+    7
+   ],
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Ja",
+   "F26": "Ja",
+   "F27": "Ja",
+   "F28": "Ja",
+   "F29": [
+    "Stelle",
+    "Verfahren"
+   ],
+   "F30": "Ja",
+   "F3": "Unternehmen",
+   "F4": "freigegeben",
+   "F12": "Nein",
+   "F18": "oeffentlich",
+   "F20": "gering",
+   "F22": "ja",
+   "F23": "extern ohne",
+   "F8": "Nein",
+   "F9": "Keine"
+  },
+  "erwartet": {
+   "gesamt": 3,
+   "R": 3,
+   "regeln_mit": [
+    "R3",
+    "R4"
+   ],
+   "regeln_ohne": [
+    "R4 Zusatz Art. 27"
+   ]
+  }
+ },
+ {
+  "nr": "P3",
+  "text": "Spaeterer Geltungsbeginn: F6 Nr. 8",
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": [
+    8
+   ],
+   "F7": "Keine",
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Ja",
+   "F26": "Ja",
+   "F27": "Ja",
+   "F28": "Ja",
+   "F29": [
+    "Stelle",
+    "Verfahren"
+   ],
+   "F30": "Ja",
+   "F3": "Unternehmen",
+   "F4": "freigegeben",
+   "F12": "Nein",
+   "F18": "oeffentlich",
+   "F20": "gering",
+   "F22": "ja",
+   "F23": "extern ohne"
+  },
+  "erwartet": {
+   "gesamt": 4,
+   "R": 4,
+   "regeln_mit": [
+    "R2 (Eskalation)",
+    "R2 Zusatz Geltungsbeginn"
+   ]
+  }
+ },
+ {
+  "nr": "P4",
+  "text": "Profiling unklar: F8 'Unklar'",
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": [
+    6
+   ],
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Ja",
+   "F26": "Ja",
+   "F27": "Ja",
+   "F28": "Ja",
+   "F29": [
+    "Stelle",
+    "Verfahren"
+   ],
+   "F30": "Ja",
+   "F3": "Unternehmen",
+   "F4": "freigegeben",
+   "F12": "Nein",
+   "F18": "oeffentlich",
+   "F20": "gering",
+   "F22": "ja",
+   "F23": "extern ohne",
+   "F8": "Unklar",
+   "F9": "Keine"
+  },
+  "erwartet": {
+   "gesamt": 3,
+   "R": 3,
+   "luecken": [
+    "F8"
+   ],
+   "regeln_mit": [
+    "R3",
+    "R3 Zusatz Profiling unklar",
+    "R4"
+   ],
+   "regeln_ohne": [
+    "R3 Zusatz Profiling"
+   ]
+  }
+ },
+ {
+  "nr": "P5",
+  "text": "Zusatz zur Freigabe bei Pruefbedarf allein im S-Pfad",
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": "Keine",
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Ja",
+   "F26": "Ja",
+   "F27": "Ja",
+   "F28": "Ja",
+   "F29": [
+    "Stelle",
+    "Verfahren"
+   ],
+   "F30": "Ja",
+   "F3": "Unternehmen",
+   "F4": "freigegeben",
+   "F12": "Nein",
+   "F18": "vertraulich",
+   "F20": "gering",
+   "F22": "ja",
+   "F23": "extern ohne"
+  },
+  "erwartet": {
+   "gesamt": 3,
+   "R": 1,
+   "D": 1,
+   "S": 3,
+   "freigabezusatz": true,
+   "regeln_mit": [
+    "S1"
+   ],
+   "regeln_ohne": [
+    "K1"
+   ]
+  }
+ },
+ {
+  "nr": "P6",
+  "text": "F29 nur 'Zustaendige Stelle'",
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": "Keine",
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Nein",
+   "F26": "Nein",
+   "F27": "Nein",
+   "F28": "Nein",
+   "F29": [
+    "Stelle"
+   ],
+   "F30": "Nein",
+   "F3": "privat",
+   "F4": "bekannt, nicht freigegeben",
+   "F12": "Ja",
+   "F13": "Nein",
+   "F15": "Ja",
+   "F16": "Unklar",
+   "F17": "Keine",
+   "F18": "intern",
+   "F20": "spuerbar",
+   "F22": "ja",
+   "F23": "extern ohne"
+  },
+  "erwartet": {
+   "gesamt": 3,
+   "empfehlungen_mit": [
+    [
+     "E5a",
+     "vorhanden"
+    ],
+    [
+     "E5b",
+     "fehlt"
+    ]
+   ]
+  }
+ },
+ {
+  "nr": "P7",
+  "text": "F29 nur 'Freigabeverfahren'",
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": "Keine",
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Nein",
+   "F26": "Nein",
+   "F27": "Nein",
+   "F28": "Nein",
+   "F29": [
+    "Verfahren"
+   ],
+   "F30": "Nein",
+   "F3": "privat",
+   "F4": "bekannt, nicht freigegeben",
+   "F12": "Ja",
+   "F13": "Nein",
+   "F15": "Ja",
+   "F16": "Unklar",
+   "F17": "Keine",
+   "F18": "intern",
+   "F20": "spuerbar",
+   "F22": "ja",
+   "F23": "extern ohne"
+  },
+  "erwartet": {
+   "gesamt": 3,
+   "empfehlungen_mit": [
+    [
+     "E5a",
+     "fehlt"
+    ],
+    [
+     "E5b",
+     "vorhanden"
+    ]
+   ]
+  }
+ },
+ {
+  "nr": "P8",
+  "text": "Transparenzpflichten ueber F7: biometrische Kategorisierung",
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": [
+    2
+   ],
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Ja",
+   "F26": "Ja",
+   "F27": "Ja",
+   "F28": "Ja",
+   "F29": [
+    "Stelle",
+    "Verfahren"
+   ],
+   "F30": "Ja",
+   "F3": "Unternehmen",
+   "F4": "freigegeben",
+   "F12": "Nein",
+   "F18": "oeffentlich",
+   "F20": "gering",
+   "F22": "ja",
+   "F23": "extern ohne",
+   "F8": "Nein",
+   "F9": "Keine"
+  },
+  "erwartet": {
+   "gesamt": 3,
+   "R": 3,
+   "regeln_mit": [
+    "R3",
+    "R4",
+    "R5"
+   ]
+  }
+ },
+ {
+  "nr": "P9",
+  "text": "Gegenprobe zu P8: anderer Zweck in F7",
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": [
+    6
+   ],
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Ja",
+   "F26": "Ja",
+   "F27": "Ja",
+   "F28": "Ja",
+   "F29": [
+    "Stelle",
+    "Verfahren"
+   ],
+   "F30": "Ja",
+   "F3": "Unternehmen",
+   "F4": "freigegeben",
+   "F12": "Nein",
+   "F18": "oeffentlich",
+   "F20": "gering",
+   "F22": "ja",
+   "F23": "extern ohne",
+   "F8": "Nein",
+   "F9": "Keine"
+  },
+  "erwartet": {
+   "gesamt": 3,
+   "R": 3,
+   "regeln_mit": [
+    "R3",
+    "R4"
+   ],
+   "regeln_ohne": [
+    "R5"
+   ]
+  }
+ },
+ {
+  "nr": "P10",
+  "text": "Widerspruch W1: keine personenbezogenen Daten (F12), aber Profiling (F8)",
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": [
+    6
+   ],
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Ja",
+   "F26": "Ja",
+   "F27": "Ja",
+   "F28": "Ja",
+   "F29": [
+    "Stelle",
+    "Verfahren"
+   ],
+   "F30": "Ja",
+   "F3": "Unternehmen",
+   "F4": "freigegeben",
+   "F12": "Nein",
+   "F18": "oeffentlich",
+   "F20": "gering",
+   "F22": "ja",
+   "F23": "extern ohne",
+   "F8": "Ja",
+   "F9": "Keine"
+  },
+  "erwartet": {
+   "gesamt": 3,
+   "R": 3,
+   "D": 1,
+   "widersprueche": [
+    "W1"
+   ]
+  }
+ },
+ {
+  "nr": "P11",
+  "text": "Widerspruch W2: Daten verlassen das Unternehmen nicht (F23), aber externe Verarbeitung (F15) und Drittlandbezug (F16)",
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": "Keine",
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Nein",
+   "F26": "Nein",
+   "F27": "Nein",
+   "F28": "Nein",
+   "F29": "Keine",
+   "F30": "Nein",
+   "F3": "privat",
+   "F4": "bekannt, nicht freigegeben",
+   "F12": "Ja",
+   "F13": "Nein",
+   "F15": "Ja",
+   "F16": "Ja",
+   "F17": "Keine",
+   "F18": "intern",
+   "F20": "spuerbar",
+   "F22": "ja",
+   "F23": "lokal"
+  },
+  "erwartet": {
+   "gesamt": 3,
+   "D": 3,
+   "widersprueche": [
+    "W2 (F15)",
+    "W2 (F16)"
+   ],
+   "regeln_mit": [
+    "D3",
+    "D4"
+   ],
+   "regeln_ohne": [
+    "S1",
+    "S4"
+   ]
+  }
+ },
+ {
+  "nr": "P12",
+  "text": "Gegenprobe zu P11: externe Verarbeitung ohne Widerspruch",
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": "Keine",
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Nein",
+   "F26": "Nein",
+   "F27": "Nein",
+   "F28": "Nein",
+   "F29": "Keine",
+   "F30": "Nein",
+   "F3": "privat",
+   "F4": "bekannt, nicht freigegeben",
+   "F12": "Ja",
+   "F13": "Nein",
+   "F15": "Ja",
+   "F16": "Ja",
+   "F17": "Keine",
+   "F18": "intern",
+   "F20": "spuerbar",
+   "F22": "ja",
+   "F23": "extern ohne"
+  },
+  "erwartet": {
+   "gesamt": 3,
+   "D": 3,
+   "widersprueche": []
+  }
+ },
+ {
+  "nr": "P13",
+  "text": "Einordnung 'unklar': berufliche Nutzung, Freigabestand (F4) unklar",
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": "Keine",
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Ja",
+   "F26": "Ja",
+   "F27": "Ja",
+   "F28": "Ja",
+   "F29": [
+    "Stelle",
+    "Verfahren"
+   ],
+   "F30": "Ja",
+   "F3": "Unternehmen",
+   "F4": "Unklar",
+   "F12": "Nein",
+   "F18": "oeffentlich",
+   "F20": "gering",
+   "F22": "ja",
+   "F23": "extern ohne"
+  },
+  "erwartet": {
+   "gesamt": 2,
+   "einordnung": "unklar",
+   "luecken": [
+    "F4"
+   ],
+   "empfehlungen_mit": [
+    [
+     "E1",
+     "vorhanden"
+    ],
+    [
+     "E5a",
+     "vorhanden"
+    ]
+   ]
+  }
+ },
+ {
+  "nr": "P14",
+  "text": "Einordnung 'unklar': berufliche Nutzung (F2) unklar, Nutzung dem Unternehmen nicht bekannt",
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Unklar",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": "Keine",
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Ja",
+   "F26": "Ja",
+   "F27": "Ja",
+   "F28": "Ja",
+   "F29": [
+    "Stelle",
+    "Verfahren"
+   ],
+   "F30": "Ja",
+   "F3": "Unternehmen",
+   "F4": "nicht bekannt",
+   "F12": "Nein",
+   "F18": "oeffentlich",
+   "F20": "gering",
+   "F22": "ja",
+   "F23": "extern ohne"
+  },
+  "erwartet": {
+   "gesamt": 3,
+   "einordnung": "unklar",
+   "luecken": [
+    "F2"
+   ]
+  }
+ }
+]

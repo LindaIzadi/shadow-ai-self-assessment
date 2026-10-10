@@ -1,0 +1,25 @@
+{
+  "name": "shadow-ai-self-assessment",
+  "version": "1.0.0",
+  "description": "Self-Assessment-Tool zur Bewertung von Shadow AI-Risiken unter Berücksichtigung des EU AI Acts (Prototyp zur Masterarbeit)",
+  "private": true,
+  "author": "Linda Izadi",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "test:regeln": "node test/regeln.test.js",
+    "test:konsistenz": "node test/konsistenz.test.js",
+    "test:browser": "node test/browser.test.js",
+    "test": "npm run lint && npm run test:regeln && npm run test:konsistenz && npm run test:browser",
+    "browser:installieren": "playwright install chromium"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.12.0",
+    "globals": "17.13.0",
+    "playwright": "1.56.0"
+  }
+}

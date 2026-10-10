@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>Shadow-AI-Self-Assessment</title>
+  <link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+  <a class="sprung" href="#inhalt">Zum Inhalt springen</a>
+
+  <div class="seite">
+    <header class="leiste" aria-label="Fortschritt">
+      <p class="marke"><button type="button" id="marke" class="marke-knopf" title="Zur Startseite">Shadow-AI-Self-Assessment</button></p>
+      <nav aria-label="Blöcke des Assessments">
+        <ol class="schritte" id="schritte"></ol>
+      </nav>
+      <p class="leiste-fuss" id="leiste-fuss"></p>
+    </header>
+
+    <main id="inhalt" tabindex="-1"></main>
+  </div>
+
+  <noscript>
+    <p class="ohne-skript">Dieses Self-Assessment benötigt JavaScript. Die Auswertung erfolgt vollständig in Ihrem Browser.</p>
+  </noscript>
+
+  <script src="js/inhalte.js" defer></script>
+  <script src="js/regeln.js" defer></script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>

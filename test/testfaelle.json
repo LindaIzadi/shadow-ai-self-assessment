@@ -1,0 +1,695 @@
+{
+ "T1": {
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Nein"
+  },
+  "erwartet": {
+   "gesamt": "Abschluss nach der Vorpruefung"
+  }
+ },
+ "T2": {
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": "Keine",
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Ja",
+   "F26": "Ja",
+   "F27": "Ja",
+   "F28": "Ja",
+   "F29": [
+    "Stelle",
+    "Verfahren"
+   ],
+   "F30": "Ja",
+   "F3": "Unternehmen",
+   "F4": "freigegeben",
+   "F12": "Nein",
+   "F18": "oeffentlich",
+   "F20": "gering",
+   "F22": "ja",
+   "F23": "extern ohne"
+  },
+  "erwartet": {
+   "gesamt": 1,
+   "R": 1,
+   "D": 1,
+   "S": 1,
+   "felder": [
+    1,
+    1,
+    1,
+    1
+   ],
+   "einordnung": "keine Shadow AI",
+   "freigabezusatz": false,
+   "regeln": [],
+   "luecken": [],
+   "empfehlungen": [],
+   "widersprueche": []
+  }
+ },
+ "T3": {
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": "Keine",
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Ja",
+   "F26": "Ja",
+   "F27": "Ja",
+   "F28": "Ja",
+   "F29": [
+    "Stelle",
+    "Verfahren"
+   ],
+   "F30": "Ja",
+   "F3": "Unternehmen",
+   "F4": "in Pruefung",
+   "F12": "Nein",
+   "F18": "intern",
+   "F20": "spuerbar",
+   "F22": "ja",
+   "F23": "extern ohne"
+  },
+  "erwartet": {
+   "gesamt": 2,
+   "R": 1,
+   "D": 1,
+   "S": 2,
+   "felder": [
+    2,
+    1,
+    1,
+    1
+   ],
+   "einordnung": "keine Shadow AI, Freigabe steht aus",
+   "freigabezusatz": false,
+   "regeln": [
+    "S1"
+   ],
+   "luecken": [],
+   "empfehlungen": [
+    [
+     "E1",
+     "vorhanden"
+    ],
+    [
+     "E3",
+     "vorhanden"
+    ]
+   ],
+   "widersprueche": []
+  }
+ },
+ "T4": {
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": "Keine",
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Nein",
+   "F26": "Nein",
+   "F27": "Nein",
+   "F28": "Nein",
+   "F29": "Keine",
+   "F30": "Nein",
+   "F3": "privat",
+   "F4": "bekannt, nicht freigegeben",
+   "F12": "Ja",
+   "F13": "Nein",
+   "F15": "Ja",
+   "F16": "Unklar",
+   "F17": "Keine",
+   "F18": "intern",
+   "F20": "spuerbar",
+   "F22": "ja",
+   "F23": "extern ohne"
+  },
+  "erwartet": {
+   "gesamt": 3,
+   "R": 1,
+   "D": 3,
+   "S": 2,
+   "felder": [
+    2,
+    1,
+    2,
+    1
+   ],
+   "einordnung": "Shadow AI",
+   "freigabezusatz": false,
+   "regeln": [
+    "D1",
+    "D3",
+    "D4",
+    "S1",
+    "S3"
+   ],
+   "luecken": [
+    "F16"
+   ],
+   "empfehlungen": [
+    [
+     "E1",
+     "fehlt"
+    ],
+    [
+     "E2",
+     "fehlt"
+    ],
+    [
+     "E3",
+     "fehlt"
+    ],
+    [
+     "E5a",
+     "fehlt"
+    ],
+    [
+     "E5b",
+     "fehlt"
+    ],
+    [
+     "E6",
+     "fehlt"
+    ],
+    [
+     "E7",
+     "-"
+    ]
+   ],
+   "widersprueche": []
+  }
+ },
+ "T5": {
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": [
+    1
+   ],
+   "F7": [
+    3
+   ],
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "massgeblich",
+   "F21": "teilweise",
+   "F24": "manuell",
+   "F25": "Nein",
+   "F26": "Nein",
+   "F27": "Nein",
+   "F28": "Nein",
+   "F29": "Keine",
+   "F30": "Nein",
+   "F3": "privat",
+   "F4": "nicht bekannt",
+   "F8": "Ja",
+   "F9": "Keine",
+   "F12": "Ja",
+   "F13": "Nein",
+   "F15": "Ja",
+   "F16": "Ja",
+   "F17": [
+    1
+   ],
+   "F18": "intern",
+   "F20": "spuerbar",
+   "F22": "nein",
+   "F23": "extern mit"
+  },
+  "erwartet": {
+   "gesamt": 4,
+   "R": 4,
+   "D": 3,
+   "S": 3,
+   "felder": [
+    2,
+    2,
+    3,
+    2
+   ],
+   "einordnung": "Shadow AI",
+   "freigabezusatz": false,
+   "regeln": [
+    "R2 (Eskalation)",
+    "R3",
+    "R3 Zusatz Profiling",
+    "R4",
+    "R5",
+    "D1",
+    "D3",
+    "D4",
+    "D5",
+    "S1",
+    "S2",
+    "S3",
+    "S4"
+   ],
+   "luecken": [],
+   "empfehlungen": [
+    [
+     "E1",
+     "fehlt"
+    ],
+    [
+     "E2",
+     "fehlt"
+    ],
+    [
+     "E3",
+     "fehlt"
+    ],
+    [
+     "E4",
+     "fehlt"
+    ],
+    [
+     "E4 Zusatz Art. 26 Abs. 2",
+     "fehlt"
+    ],
+    [
+     "E5a",
+     "fehlt"
+    ],
+    [
+     "E5b",
+     "fehlt"
+    ],
+    [
+     "E6",
+     "fehlt"
+    ],
+    [
+     "E7",
+     "-"
+    ]
+   ],
+   "widersprueche": []
+  }
+ },
+ "T6": {
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": "Keine",
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "massgeblich",
+   "F21": "teilweise",
+   "F24": "manuell",
+   "F25": "Nein",
+   "F26": "Nein",
+   "F27": "Nein",
+   "F28": "Nein",
+   "F29": "Keine",
+   "F30": "Nein",
+   "F3": "privat",
+   "F4": "nicht bekannt",
+   "F12": "Nein",
+   "F18": "intern",
+   "F20": "erheblich",
+   "F22": "ja",
+   "F23": "extern ohne"
+  },
+  "erwartet": {
+   "gesamt": 4,
+   "R": 1,
+   "D": 1,
+   "S": 4,
+   "felder": [
+    2,
+    3,
+    3,
+    1
+   ],
+   "einordnung": "Shadow AI",
+   "freigabezusatz": false,
+   "regeln": [
+    "S1",
+    "S2",
+    "S3",
+    "K2"
+   ],
+   "luecken": [],
+   "empfehlungen": [
+    [
+     "E1",
+     "fehlt"
+    ],
+    [
+     "E2",
+     "fehlt"
+    ],
+    [
+     "E3",
+     "fehlt"
+    ],
+    [
+     "E4",
+     "fehlt"
+    ],
+    [
+     "E5a",
+     "fehlt"
+    ],
+    [
+     "E5b",
+     "fehlt"
+    ],
+    [
+     "E6",
+     "fehlt"
+    ],
+    [
+     "E7",
+     "-"
+    ]
+   ],
+   "widersprueche": []
+  }
+ },
+ "T7": {
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Unklar",
+   "F7": "Keine",
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Ja",
+   "F26": "Ja",
+   "F27": "Ja",
+   "F28": "Ja",
+   "F29": [
+    "Stelle",
+    "Verfahren"
+   ],
+   "F30": "Ja",
+   "F3": "Unternehmen",
+   "F4": "freigegeben",
+   "F12": "Nein",
+   "F18": "oeffentlich",
+   "F20": "gering",
+   "F22": "ja",
+   "F23": "extern ohne"
+  },
+  "erwartet": {
+   "gesamt": 3,
+   "R": 3,
+   "D": 1,
+   "S": 1,
+   "felder": [
+    1,
+    1,
+    1,
+    1
+   ],
+   "einordnung": "keine Shadow AI",
+   "freigabezusatz": true,
+   "regeln": [
+    "R2 (Pruefbedarf)"
+   ],
+   "luecken": [
+    "F6"
+   ],
+   "empfehlungen": [
+    [
+     "E1",
+     "vorhanden"
+    ],
+    [
+     "E5a",
+     "vorhanden"
+    ]
+   ],
+   "widersprueche": []
+  }
+ },
+ "T8": {
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": "Keine",
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Ja",
+   "F26": "Ja",
+   "F27": "Ja",
+   "F28": "Ja",
+   "F29": [
+    "Stelle",
+    "Verfahren"
+   ],
+   "F30": "Ja",
+   "F3": "Unternehmen",
+   "F4": "freigegeben",
+   "F12": "Ja",
+   "F13": "Ja",
+   "F14": "Unklar",
+   "F15": "Ja",
+   "F16": "Nein",
+   "F17": "Keine",
+   "F18": "intern",
+   "F20": "spuerbar",
+   "F22": "ja",
+   "F23": "extern ohne"
+  },
+  "erwartet": {
+   "gesamt": 4,
+   "R": 1,
+   "D": 4,
+   "S": 2,
+   "felder": [
+    2,
+    1,
+    1,
+    1
+   ],
+   "einordnung": "keine Shadow AI",
+   "freigabezusatz": true,
+   "regeln": [
+    "D1",
+    "D2 (Eskalation)",
+    "D3",
+    "S1"
+   ],
+   "luecken": [
+    "F14"
+   ],
+   "empfehlungen": [
+    [
+     "E1",
+     "vorhanden"
+    ],
+    [
+     "E3",
+     "vorhanden"
+    ],
+    [
+     "E5a",
+     "vorhanden"
+    ]
+   ],
+   "widersprueche": []
+  }
+ },
+ "T9": {
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": "Keine",
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Nein",
+   "F26": "Nein",
+   "F27": "Nein",
+   "F28": "Nein",
+   "F29": "Keine",
+   "F30": "Nein",
+   "F3": "privat",
+   "F4": "bekannt, nicht freigegeben",
+   "F12": "Nein",
+   "F18": "vertraulich",
+   "F20": "spuerbar",
+   "F22": "ja",
+   "F23": "Unklar"
+  },
+  "erwartet": {
+   "gesamt": 4,
+   "R": 1,
+   "D": 1,
+   "S": 4,
+   "felder": [
+    3,
+    1,
+    2,
+    2
+   ],
+   "einordnung": "Shadow AI",
+   "freigabezusatz": false,
+   "regeln": [
+    "S1",
+    "S3",
+    "S4",
+    "K1"
+   ],
+   "luecken": [
+    "F23"
+   ],
+   "empfehlungen": [
+    [
+     "E1",
+     "fehlt"
+    ],
+    [
+     "E2",
+     "fehlt"
+    ],
+    [
+     "E3",
+     "fehlt"
+    ],
+    [
+     "E5a",
+     "fehlt"
+    ],
+    [
+     "E5b",
+     "fehlt"
+    ],
+    [
+     "E6",
+     "fehlt"
+    ],
+    [
+     "E7",
+     "-"
+    ]
+   ],
+   "widersprueche": []
+  }
+ },
+ "T10": {
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": "Keine",
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Ja",
+   "F26": "Ja",
+   "F27": "Ja",
+   "F28": "Ja",
+   "F29": [
+    "Stelle",
+    "Verfahren"
+   ],
+   "F30": "Ja",
+   "F3": "privat",
+   "F4": "bekannt, nicht freigegeben",
+   "F12": "Ja",
+   "F13": "Nein",
+   "F15": "Ja",
+   "F16": "Unklar",
+   "F17": "Keine",
+   "F18": "intern",
+   "F20": "spuerbar",
+   "F22": "ja",
+   "F23": "extern ohne"
+  },
+  "erwartet": {
+   "gesamt": 3,
+   "R": 1,
+   "D": 3,
+   "S": 2,
+   "felder": [
+    2,
+    1,
+    2,
+    1
+   ],
+   "einordnung": "Shadow AI",
+   "freigabezusatz": false,
+   "regeln": [
+    "D1",
+    "D3",
+    "D4",
+    "S1",
+    "S3"
+   ],
+   "luecken": [
+    "F16"
+   ],
+   "empfehlungen": [
+    [
+     "E1",
+     "vorhanden"
+    ],
+    [
+     "E3",
+     "vorhanden"
+    ],
+    [
+     "E5a",
+     "vorhanden"
+    ],
+    [
+     "E5b",
+     "vorhanden"
+    ],
+    [
+     "E6",
+     "vorhanden"
+    ],
+    [
+     "E7",
+     "-"
+    ]
+   ],
+   "widersprueche": []
+  }
+ }
+}

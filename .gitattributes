@@ -1,0 +1,5 @@
+# Einheitliche Zeilenenden (LF) auf allen Rechnern. Die Pipeline vergleicht die
+# Testdaten zeichengenau mit dem Export aus regelbasis.py.
+* text=auto eol=lf
+*.png binary
+*.pdf binary

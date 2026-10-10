@@ -1,0 +1,17 @@
+# Abhängigkeiten der Prüfwerkzeuge (werden mit "npm ci" wiederhergestellt)
+node_modules/
+
+# Erzeugte Dateien
+_site/
+bilder/
+test-results/
+playwright-report/
+
+# Betriebssystem, Editor, OneDrive
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+~$*
+.vscode/
+.idea/
