@@ -26,7 +26,6 @@
   var erreicht = {};           // bereits besuchte Blöcke, für die Navigation
   var fallDesAssessments = null; // KI-Dienst und Aufgabe, zu denen die Antworten gegeben wurden
 
-  var schliesseHilfe = null;
   var schliesseErlaeuterung = null;   // schließt die geöffnete Erläuterung einer Frage   // schließt den Hilfetext, der per Klick offen gehalten wird
 
   var haupt = document.getElementById("inhalt");
@@ -41,10 +40,6 @@
     if (abgeschlossen || Object.keys(antworten).length === 0) return;
     e.preventDefault();
     e.returnValue = "";
-  });
-  // Ein Klick neben einen offen gehaltenen Hilfetext schließt ihn.
-  document.addEventListener("click", function (e) {
-    if (schliesseHilfe && !e.target.closest(".info-knopf, .hilfe-blase")) schliesseHilfe();
   });
   // Ein Klick auf den Namen führt zur Startseite. Die bisherigen Antworten bleiben erhalten.
   document.getElementById("marke").addEventListener("click", function () { geheZu("start"); });
@@ -82,6 +77,7 @@
     winkel: ["M15 6l-6 6 6 6"],
     rechts: ["M9 6l6 6-6 6"],
     flagge: ["M5 21V4", "M5 4h12l-2.5 4 2.5 4H5"],
+    auge: ["M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z", "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z", "M4 4l16 16"],
     info: ["M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z", "M12 11v5", "M12 8h.01"],
     kreuz: ["M6 6l12 12", "M18 6L6 18"],
     extern: ["M14 4h6v6", "M20 4l-9 9", "M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"],
@@ -218,7 +214,8 @@
       } else {
         inhalt = el("span", "schritt-knopf");
       }
-      var kennung = el("span", "schritt-kennung", fertig ? "" : b.id);
+      // Kreis ohne Nummer, bei abgeschlossenem Block mit Haken
+      var kennung = el("span", "schritt-kennung");
       if (fertig) kennung.appendChild(symbol("haken"));
       var titel = el("span", "schritt-titel", b.titel);
       if (fertig) titel.appendChild(el("span", "nur-vorlesen", " (" + T.blockFertig + ")"));
@@ -256,46 +253,7 @@
     schritteListe.appendChild(li);
   }
 
-  /** Zeitleiste zum Geltungsbeginn. Die Lage von „Heute“ ergibt sich aus dem Tagesdatum. */
-  function zeichneTermine() {
-    var Z = I.TERMINE, jetzt = new Date();
-    var heute = jetzt.getFullYear() + "-" + ("0" + (jetzt.getMonth() + 1)).slice(-2) + "-" + ("0" + jetzt.getDate()).slice(-2);
-    var rahmen = el("div", "termine");
-    var liste = el("ol", "termine-liste");
-    var gesetzt = false;
-    function heuteZeile() {
-      var li = el("li", "termin termin-heute");
-      var datum = jetzt.getDate() + ". " + Z.monate[jetzt.getMonth()] + " " + jetzt.getFullYear();
-      // Datum und Marke „Heute“ in einer Zeile
-      var zeile = el("span", "termin-heute-zeile");
-      anhaengen(zeile, el("span", "termin-heute-datum", datum), el("span", "termin-heute-text", Z.heute));
-      li.appendChild(zeile);
-      liste.appendChild(li);
-      gesetzt = true;
-    }
-    Z.eintraege.forEach(function (t) {
-      if (!gesetzt && t.datum > heute) heuteZeile();
-      var li = el("li", "termin " + (t.datum <= heute ? "termin-gilt" : "termin-kommt"));
-      var name = el("span", "termin-name", t.titel);
-      if (t.zusatz) name.appendChild(el("span", "termin-zusatz", " " + t.zusatz));
-      anhaengen(li, el("span", "termin-datum", t.anzeige), name);
-      liste.appendChild(li);
-    });
-    if (!gesetzt) heuteZeile();
-    // Verweis auf die amtliche Fassung. Die Seite selbst lädt nichts nach.
-    var verweis = el("a", "termine-link");
-    verweis.href = Z.link.adresse;
-    verweis.target = "_blank";
-    verweis.rel = "noopener noreferrer";
-    verweis.setAttribute("aria-label", Z.link.text + " (" + Z.link.hinweis + ")");
-    verweis.setAttribute("title", Z.quelle);
-    anhaengen(verweis, el("span", "", Z.link.text), symbol("rechts"));
-    anhaengen(rahmen, liste, verweis);
-    return rahmen;
-  }
-
   function zeichne() {
-    schliesseHilfe = null;
     schliesseErlaeuterung = null;
     document.body.setAttribute("data-schritt", schritt);
     zeichneSchritte();
@@ -307,8 +265,66 @@
   }
 
   // ------------------------------------------------------------ Startseite
-  // Auf der Startseite ist der regulatorische Hintergrund auf breiten Bildschirmen zunächst ausgeklappt.
-  var hintergrundOffen = !!(window.matchMedia && window.matchMedia("(min-width: 76rem)").matches);
+
+  /** Verweis auf eine externe Seite. Er öffnet sich nur auf Klick in einem neuen Fenster. */
+  function verweisNach(link, klasse) {
+    var a = el("a", klasse);
+    a.href = link.adresse;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.setAttribute("aria-label", link.text + " (" + link.hinweis + ")");
+    anhaengen(a, el("span", "", link.text), symbol("rechts"));
+    return a;
+  }
+
+  /**
+   * Startseite rechts: „Wissenswertes vor dem Start“ mit drei kompakten Themen. Ein Klick öffnet
+   * die kurze Erklärung unter dem Thema. Geöffnete Themen bleiben offen, bis sie erneut angeklickt
+   * werden. Zu Beginn ist keines geöffnet.
+   */
+  var offeneThemen = {};
+  function zeichneWissen() {
+    var W = I.WISSEN;
+    var bereich = el("aside", "hintergrund wissen");
+    bereich.setAttribute("aria-labelledby", "wissen-titel");
+    var titel = el("h2", "wissen-titel", W.titel);
+    titel.id = "wissen-titel";
+    anhaengen(bereich, titel, el("p", "wissen-einleitung", W.einleitung));
+    var symbole = { "shadow-ai": "auge", "eu-ai-act": "waage", "datenschutz": "schild" };
+    var liste = el("div", "wissen-liste");
+    var themen = [];
+    W.themen.forEach(function (t) {
+      var thema = el("section", "wissen-thema");
+      var kopf = el("button", "wissen-kopf");
+      kopf.type = "button";
+      kopf.setAttribute("aria-controls", "wissen-" + t.id);
+      var texte = el("span", "wissen-kopf-text");
+      anhaengen(texte, el("span", "wissen-thema-titel", t.titel), el("span", "wissen-untertitel", t.untertitel));
+      anhaengen(kopf, symbol(symbole[t.id]), texte, symbol("winkel"));
+      var inhalt = el("div", "wissen-inhalt");
+      inhalt.id = "wissen-" + t.id;
+      t.text.forEach(function (absatz) { inhalt.appendChild(el("p", "", absatz)); });
+      if (t.link) inhalt.appendChild(verweisNach(t.link, "wissen-link"));
+      anhaengen(thema, kopf, inhalt);
+      liste.appendChild(thema);
+      themen.push({ id: t.id, thema: thema, kopf: kopf, inhalt: inhalt });
+      kopf.addEventListener("click", function () {
+        offeneThemen[t.id] = !offeneThemen[t.id];
+        setze();
+      });
+    });
+    function setze() {
+      themen.forEach(function (x) {
+        var offen = !!offeneThemen[x.id];
+        x.inhalt.hidden = !offen;
+        x.kopf.setAttribute("aria-expanded", offen ? "true" : "false");
+        x.thema.classList.toggle("offen", offen);
+      });
+    }
+    setze();
+    bereich.appendChild(liste);
+    return bereich;
+  }
 
   function zeichneStart() {
     var Z = T.start;
@@ -319,19 +335,15 @@
     kopfleiste.appendChild(kopfzeile);
 
     var kopf = el("div", "start-kopf");
-    // Hinter dem Einleitungstext erklärt eine Info-Schaltfläche den Begriff Shadow AI.
     var einleitung = el("div", "start-einleitung");
     var einleitungText = el("p", "einleitung", T.startText);
-    var shadowAi = hilfeZu("shadow-ai", T.shadowAi, T.shadowAiFrage);
-    // Der zweite Satz beginnt in einer neuen Zeile, die Info-Schaltfläche steht direkt hinter „Shadow AI“.
-    var zweiterSatz = el("span", "einleitung-zweiter-satz", T.startText2 + "\u00a0");
-    anhaengen(zweiterSatz, shadowAi[0], document.createTextNode(T.startText3));
-    einleitungText.appendChild(zweiterSatz);
-    anhaengen(einleitung, einleitungText, shadowAi[1]);
+    // Der zweite Satz beginnt in einer neuen Zeile.
+    einleitungText.appendChild(el("span", "einleitung-zweiter-satz", T.startText2));
+    einleitung.appendChild(einleitungText);
     // Der letzte Teil der Überschrift ist farbig hervorgehoben, „KI-Nutzung“ wird nicht getrennt.
     var ueberschrift = el("h1", "start-titel", Z.titelAnfang + " ");
     ueberschrift.appendChild(el("span", "start-titel-akzent", Z.titelAkzent.replace("KI-Nutzung", "KI\u2011Nutzung")));
-    anhaengen(kopf, el("p", "start-vorzeile", Z.vorzeile), ueberschrift, einleitung);
+    kopf.appendChild(ueberschrift);
 
     var punkte = el("dl", "start-punkte");
     var punktSymbole = ["dokument", "schild", "schloss"];
@@ -400,6 +412,12 @@
         dienstName, function (w) { dienstName = w; zeigeFallwechsel(); },
         startFehler && dienstWahl === SONSTIGER && !dienstName.trim());
       namensfeld.hidden = dienstWahl !== SONSTIGER;
+      // Das Namensfeld steht ohne eigene Überschrift direkt unter der Auswahl. Beschriftung und
+      // Hinweis bleiben für Bildschirmleser erhalten, das Feld zeigt einen Platzhalter.
+      namensfeld.querySelector(".feld-titel").classList.add("nur-vorlesen");
+      namensfeld.querySelector(".feld-hinweis").classList.add("nur-vorlesen");
+      namensfeld.querySelector("input").placeholder = E.dienstNamePlatzhalter;
+      namensfeld.classList.add("feld-gruppe-name");
 
       auswahl.addEventListener("change", function () {
         dienstWahl = auswahl.value;
@@ -407,10 +425,14 @@
         if (dienstWahl) entferneMarkierung(auswahl);
         zeigeFallwechsel();
       });
-      return [
-        feldgruppe("ki-dienst", E.dienstTitel, auswahl, E.dienstHinweis, E.dienstFehlt, startFehler && !dienstWahl),
-        namensfeld
-      ];
+      var spalte = el("div", "dienst-spalte");
+      var auswahlGruppe = feldgruppe("ki-dienst", E.dienstTitel, auswahl, E.dienstHinweis, E.dienstFehlt, startFehler && !dienstWahl);
+      // Der Hinweis auf „Sonstiger KI-Dienst“ entfällt, sobald dieser Eintrag gewählt ist.
+      var auswahlHinweis = auswahlGruppe.querySelector(".feld-hinweis");
+      auswahlHinweis.hidden = dienstWahl === SONSTIGER;
+      auswahl.addEventListener("change", function () { auswahlHinweis.hidden = dienstWahl === SONSTIGER; });
+      anhaengen(spalte, auswahlGruppe, namensfeld);
+      return [spalte, null];
     }
     /** Ergänzt ein Textfeld um eine Schaltfläche, die die Eingabe löscht. Sie erscheint nur bei Inhalt. */
     function loeschbar(gruppe) {
@@ -442,7 +464,7 @@
     wechsel.setAttribute("role", "status");
     wechsel.hidden = true;
     function zeigeFallwechsel() { wechsel.hidden = !fallGeaendert(); }
-    anhaengen(start, symbol("pfeil"), el("span", "", T.beginnen));
+    anhaengen(start, symbol("pfeil"), el("span", "", T.beginnen), el("span", "start-knopf-zusatz", T.beginnenZusatz));
     var fallHinweis = el("p", "feld-hinweis fall-hinweis");
     anhaengen(fallHinweis, symbol("info"), el("span", "", E.fallHinweis));
     // Kopf der Karte: Symbol, Überschrift und Kurzanleitung
@@ -463,33 +485,12 @@
     zeigeFallwechsel();
     vorab.appendChild(feld);
 
-    // Regulatorischer Hintergrund: Zeitleiste zum Geltungsbeginn, ein- und ausklappbar
-    var hintergrund = el("aside", "hintergrund");
-    hintergrund.setAttribute("aria-label", I.TERMINE.titel);
-    var umschalter = el("button", "hintergrund-knopf");
-    umschalter.type = "button";
-    umschalter.setAttribute("aria-controls", "hintergrund-inhalt");
-    var inhalt = el("div", "hintergrund-inhalt");
-    inhalt.id = "hintergrund-inhalt";
-    anhaengen(inhalt, el("p", "hintergrund-vorzeile", Z.hintergrundVorzeile), el("h2", "hintergrund-titel", I.TERMINE.titel), el("p", "hintergrund-einleitung", I.TERMINE.einleitung), zeichneTermine());
-    var lasche = el("span", "hintergrund-lasche");
-    anhaengen(lasche, symbol("buch"), el("span", "hintergrund-lasche-text", Z.hintergrundVorzeile));
-    anhaengen(umschalter, symbol("winkel"), lasche);
-    function setzeHintergrund() {
-      buehne.classList.toggle("hintergrund-zu", !hintergrundOffen);
-      inhalt.hidden = !hintergrundOffen;
-      umschalter.setAttribute("aria-expanded", hintergrundOffen ? "true" : "false");
-      umschalter.setAttribute("aria-label", hintergrundOffen ? Z.hintergrundZu : Z.hintergrundAuf);
-      umschalter.setAttribute("title", hintergrundOffen ? Z.hintergrundZu : Z.hintergrundAuf);
-    }
-    umschalter.addEventListener("click", function () { hintergrundOffen = !hintergrundOffen; setzeHintergrund(); });
-    anhaengen(hintergrund, umschalter, inhalt);
-
+    // Vorzeile und Überschrift stehen über der linken Spalte. „Wissenswertes vor dem Start“
+    // beginnt rechts auf derselben Höhe wie die Überschrift.
     var spalte = el("div", "start-spalte");
-    anhaengen(spalte, kopf, punkte, vorab);
+    anhaengen(spalte, einleitung, punkte, vorab);
     var buehne = el("div", "start-buehne");
-    anhaengen(buehne, spalte, hintergrund);
-    setzeHintergrund();
+    anhaengen(buehne, el("p", "start-vorzeile", Z.vorzeile), kopf, spalte, zeichneWissen());
 
     // Band mit den Eckdaten des Assessments
     var band = el("ul", "start-band");
@@ -497,7 +498,8 @@
     Z.band.forEach(function (b, i) {
       var li = el("li", "");
       var text = el("span", "start-band-text");
-      anhaengen(text, el("strong", "", b.titel), el("span", "", b.text));
+      text.appendChild(el("strong", "", b.titel));
+      if (b.text) text.appendChild(el("span", "", b.text));
       anhaengen(li, symbol(bandSymbole[i]), text);
       band.appendChild(li);
     });
@@ -664,63 +666,6 @@
       element.addEventListener("keydown", function (e) { if (e.key === "Escape" && !feld.hidden) { setze(false); b.focus(); } });
     });
     return [b, feld];
-  }
-
-  /**
-   * Erklärung als Blase (Begriff Shadow AI auf der Startseite): eine Info-Schaltfläche und
-   * eine Blase mit dem Text. Die Blase
-   * erscheint, solange der Mauszeiger auf der Schaltfläche oder der Blase steht oder die
-   * Schaltfläche den Tastaturfokus hat. Ein Klick hält sie offen, bis erneut geklickt, Escape
-   * gedrückt oder neben die Blase geklickt wird. So ist der Text auch ohne Mauszeiger erreichbar.
-   * bezeichnung: Name der Schaltfläche für Screenreader, sonst „Erläuterung zur Frage“.
-   * Rückgabe: [Schaltfläche, Anker mit der Blase].
-   */
-  function hilfeZu(id, texte, bezeichnung) {
-    var blase = el("div", "hilfe-blase hilfe-inhalt");
-    blase.id = "hilfe-" + id;
-    blase.setAttribute("role", "tooltip");
-    blase.hidden = true;
-    hilfeAbsaetze(blase, texte);
-
-    var b = el("button", "info-knopf", T.infoZeichen);
-    b.type = "button";
-    b.setAttribute("aria-label", bezeichnung || T.erlaeuterung);
-    b.setAttribute("aria-describedby", blase.id);
-    b.setAttribute("aria-expanded", "false");
-
-    var fest = false, zeiger = false, fokus = false, frist = null;
-    function zeige() {
-      blase.hidden = !(fest || zeiger || fokus);
-      b.setAttribute("aria-expanded", blase.hidden ? "false" : "true");
-    }
-    function schliesse() {
-      fest = false; zeiger = false; fokus = false;
-      if (schliesseHilfe === schliesse) schliesseHilfe = null;
-      zeige();
-    }
-    function zeigerDa(da) {
-      window.clearTimeout(frist);
-      if (da) { zeiger = true; zeige(); return; }
-      // kurze Frist, damit der Zeiger von der Schaltfläche in die Blase wechseln kann
-      frist = window.setTimeout(function () { zeiger = false; zeige(); }, 200);
-    }
-    [b, blase].forEach(function (element) {
-      element.addEventListener("mouseenter", function () { zeigerDa(true); });
-      element.addEventListener("mouseleave", function () { zeigerDa(false); });
-    });
-    b.addEventListener("focus", function () { fokus = true; zeige(); });
-    b.addEventListener("blur", function () { fokus = false; zeige(); });
-    b.addEventListener("click", function () {
-      if (fest) { schliesse(); return; }
-      if (schliesseHilfe) schliesseHilfe();
-      fest = true; schliesseHilfe = schliesse;
-      zeige();
-    });
-    b.addEventListener("keydown", function (e) { if (e.key === "Escape") schliesse(); });
-
-    var anker = el("div", "hilfe-anker");
-    anker.appendChild(blase);
-    return [b, anker];
   }
 
   function option(frage, art, wert, text) {

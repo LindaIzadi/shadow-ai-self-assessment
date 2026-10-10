@@ -278,13 +278,15 @@ const EIN = { "keine Shadow AI": "Keine Shadow AI", "keine Shadow AI, Freigabe s
   await page.locator("#frage-F3 .info-knopf").click();
   ok(!(await page.locator("#hilfe-F3").isVisible()), "Info-Schaltfläche schließt den Hilfetext wieder");
 
-  // Erklärung von Shadow AI auf der Startseite
+  // Wissensbereich der Startseite: drei Themen, anfangs geschlossen, mehrere können offen sein
   await page.goto(URL);
-  const sai = page.locator("#hilfe-shadow-ai");
-  ok(!(await sai.isVisible()), "Erklärung Shadow AI anfangs verborgen");
-  await page.locator(".start-einleitung .info-knopf").hover();
-  ok(await sai.isVisible() && (await sai.textContent()).includes("nicht freigegeben ist und sich seiner Steuerung und Aufsicht entzieht"), "Erklärung Shadow AI beim Überfahren");
-  ok((await page.locator(".start-einleitung .info-knopf").getAttribute("aria-label")) === "Was ist Shadow AI?", "Schaltfläche benannt");
+  ok((await page.locator(".wissen-thema").count()) === 3 && (await page.locator(".wissen-inhalt:visible").count()) === 0, "Wissensbereich: drei Themen, anfangs geschlossen");
+  await page.locator(".wissen-kopf", { hasText: "Shadow AI" }).click();
+  ok((await page.locator("#wissen-shadow-ai").textContent()).includes("nicht freigegeben ist und sich seiner Steuerung und Aufsicht entzieht"), "Shadow AI erklärt");
+  await page.locator(".wissen-kopf", { hasText: "Datenschutz" }).click();
+  ok(await page.locator("#wissen-shadow-ai").isVisible() && await page.locator("#wissen-datenschutz").isVisible(), "geöffnete Themen bleiben offen");
+  await page.locator(".wissen-kopf", { hasText: "Shadow AI" }).click();
+  ok(!(await page.locator("#wissen-shadow-ai").isVisible()) && await page.locator("#wissen-datenschutz").isVisible(), "zweiter Klick schließt nur dieses Thema");
 
   console.log("== Auswahl des KI-Dienstes ==");
   await page.goto(URL);

@@ -41,6 +41,7 @@
     dienstHinweis: "Fehlt der KI-Dienst? Wählen Sie „Sonstiger KI-Dienst“.",
     dienstFehlt: "Bitte wählen Sie den KI-Dienst aus.",
     dienstNameTitel: "Name des KI-Dienstes",
+    dienstNamePlatzhalter: "Name des KI-Dienstes eingeben",
     dienstNameHinweis: "Der Name erscheint auf jeder Fragenseite und im Ergebnis.",
     dienstNameFehlt: "Bitte nennen Sie den KI-Dienst.",
     aufgabeTitel: "Wofür nutzen Sie den KI-Dienst?",
@@ -95,7 +96,7 @@
 
   // ------------------------------------------------------------ Tabelle A.1: Fragenkatalog
   // typ: "einfach" (Einfachauswahl) oder "mehrfach" (Mehrfachauswahl)
-  // keine: Wortlaut der ausschließenden Option „Keine“ beziehungsweise „Keiner“
+  // keine: Wortlaut der ausschließenden Option, etwa „Keine der genannten Aussagen trifft zu“
   var FRAGEN = {
     F1: {
       typ: "einfach", frage: "Wobei unterstützt Sie der KI-Dienst?",
@@ -147,7 +148,7 @@
       ]
     },
     F5: {
-      typ: "mehrfach", frage: "Trifft eine der folgenden Aussagen auf Ihr Unternehmen und den KI-Dienst zu?", keine: "Keine",
+      typ: "mehrfach", frage: "Trifft eine der folgenden Aussagen auf Ihr Unternehmen und den KI-Dienst zu?", keine: "Keine der genannten Aussagen trifft zu",
       hilfe: [
         "Mit „Anbieter des KI-Dienstes“ ist die Organisation gemeint, die den Dienst bereitstellt. Ihr Unternehmen kann unter bestimmten Voraussetzungen selbst eine Anbieterrolle übernehmen, etwa wenn es den KI-Dienst unter eigenem Namen anbietet, wesentlich verändert oder für einen anderen als den vorgesehenen Zweck einsetzt.",
         "Anderer Zweck: Eine Verwendung, die der Anbieter in seinen Nutzungsbedingungen oder seiner Beschreibung nicht vorsieht oder ausschließt. Die übliche Nutzung eines allgemeinen Chat-Dienstes für Texte, Übersetzungen oder Recherchen fällt nicht darunter."
@@ -159,14 +160,14 @@
       ])
     },
     F6: {
-      typ: "mehrfach", frage: "Wird der KI-Dienst für einen der folgenden Zwecke eingesetzt?", keine: "Keiner",
+      typ: "mehrfach", frage: "Wird der KI-Dienst für einen der folgenden Zwecke eingesetzt?", keine: "Keiner der genannten Zwecke trifft zu",
       optionen: nummeriert(LISTE_F6)
     },
     F7: {
-      typ: "mehrfach", frage: "Wird der KI-Dienst in einem der folgenden Bereiche für einen der genannten Zwecke eingesetzt?", keine: "Keiner",
+      typ: "mehrfach", frage: "Wird der KI-Dienst in einem der folgenden Bereiche für einen der genannten Zwecke eingesetzt?", keine: "Keiner der genannten Bereiche trifft zu",
       hilfe: [
         "Wählen Sie nur Bereiche aus, in denen der KI-Dienst tatsächlich für einen der genannten Zwecke eingesetzt wird. Die Branche des Unternehmens allein genügt nicht.",
-        "Wenn keiner der Zwecke zutrifft, wählen Sie „Keiner“. Sind Sie unsicher, wählen Sie „Unklar“."
+        "Wenn keiner der Bereiche zutrifft, wählen Sie „Keiner der genannten Bereiche trifft zu“. Sind Sie unsicher, wählen Sie „Unklar“."
       ],
       optionen: nummeriert(LISTE_F7)
     },
@@ -179,7 +180,7 @@
       optionen: JA_NEIN_UNKLAR
     },
     F9: {
-      typ: "mehrfach", frage: "Trifft eine der folgenden Aussagen zu?", keine: "Keine",
+      typ: "mehrfach", frage: "Trifft eine der folgenden Aussagen zu?", keine: "Keine der genannten Aussagen trifft zu",
       optionen: nummeriert([
         "Ihr Unternehmen ist eine öffentliche Einrichtung",
         "Ihr Unternehmen erbringt öffentliche Dienste",
@@ -225,7 +226,7 @@
       optionen: JA_NEIN_UNKLAR
     },
     F17: {
-      typ: "mehrfach", frage: "Trifft eine der folgenden Aussagen auf die Verarbeitung personenbezogener Daten bei dieser Nutzung zu?", keine: "Keine",
+      typ: "mehrfach", frage: "Trifft eine der folgenden Aussagen auf die Verarbeitung personenbezogener Daten bei dieser Nutzung zu?", keine: "Keine der genannten Aussagen trifft zu",
       hilfe: [
         "Die Frage bezieht sich darauf, wofür der KI-Dienst tatsächlich eingesetzt wird, nicht darauf, wie er intern funktioniert.",
         "Systematische Bewertung: Beispielsweise Bewerbungen vorsortieren oder die Leistung von Beschäftigten einschätzen.",
@@ -520,29 +521,22 @@
       vorzeile: "Shadow-AI-Risiken einschätzen",
       titelAnfang: "Wie riskant ist Ihre",
       titelAkzent: "KI-Nutzung?",
-      hintergrundVorzeile: "Regulatorischer Kontext",
-      hintergrundAuf: "Regulatorischen Kontext einblenden",
-      hintergrundZu: "Regulatorischen Kontext ausblenden",
       band: [
-        { titel: "30 Fragen", text: "In fünf Themenbereichen" },
-        { titel: "Drei Bereiche", text: "Shadow AI, EU AI Act und Datenschutz" },
+        { titel: "Bis zu 30 Fragen", text: "" },
+        { titel: "Drei Bereiche", text: "" },
         { titel: "Konkrete Empfehlungen", text: "Für Ihre nächsten Schritte" }
       ]
     },
-    // Einleitung der Startseite: Die Info-Schaltfläche zu Shadow AI steht hinter dem ersten Satz.
-    startText: "Prüfen Sie einen konkreten KI-Nutzungsfall anhand von 30 Fragen in fünf Themenblöcken.",
-    // Die Info-Schaltfläche steht direkt hinter „Shadow AI“.
-    startText2: "Im Mittelpunkt stehen Shadow AI",
-    startText3: ", EU AI Act und Datenschutz.",
-    // Erklärung des Begriffs Shadow AI hinter dem Einleitungstext (Abschnitt 2.1.2, Tabelle 14)
-    shadowAiFrage: "Was ist Shadow AI?",
-    shadowAi: "Shadow AI bezeichnet die berufliche Nutzung von KI-Diensten, die vom Unternehmen nicht freigegeben ist und sich seiner Steuerung und Aufsicht entzieht.",
+    // Einleitung der Startseite
+    startText: "Prüfen Sie einen konkreten KI-Nutzungsfall anhand von bis zu 30 Fragen in fünf Themenblöcken.",
+    startText2: "Im Mittelpunkt stehen Shadow AI, EU AI Act und Datenschutz.",
     startPunkte: [
       { titel: "Nachvollziehbare Bewertung", text: "Mit Begründung und Empfehlungen." },
       { titel: "Orientierung statt Rechtsprüfung", text: "Ein Prüfhinweis, keine Rechtsberatung." },
       { titel: "Keine Speicherung", text: "Ihre Angaben bleiben im Browser." }
     ],
     beginnen: "Assessment beginnen",
+    beginnenZusatz: "Bis zu 30 Fragen",
     weiter: "Weiter",
     zurueck: "Zurück",
     auswerten: "Ergebnis anzeigen",
@@ -609,28 +603,41 @@
 
   // Geltungsbeginn nach Art. 113 KI-VO in der Fassung der Verordnung (EU) 2026/1744.
   // Die Übersicht dient der Orientierung auf der Startseite und geht in keine Regel ein.
-  var TERMINE = {
-    titel: "EU AI Act: wichtige Fristen",
-    einleitung: "Der EU AI Act ist die europäische Verordnung für künstliche Intelligenz. Sie legt Regeln und Pflichten für bestimmte KI-Systeme und ihre Nutzung fest.",
-    monate: ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
-    // Amtliche Fassung der Verordnung (EU) 2024/1689 auf EUR-Lex. Öffnet sich nur auf Klick in einem neuen Fenster.
-    link: { text: "Alle Fristen ansehen", adresse: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj", hinweis: "amtliche Fassung, Art. 113 KI-VO, öffnet EUR-Lex in einem neuen Fenster" },
-    heute: "Heute",
-    quelle: "Art. 113 KI-VO in der Fassung der Verordnung (EU) 2026/1744",
-    eintraege: [
-      // zusatz: Fundstelle, erscheint in normaler Schrift hinter dem Titel
-      { datum: "2024-08-01", anzeige: "1. August 2024", titel: "Inkrafttreten des EU AI Acts", zusatz: "" },
-      { datum: "2025-02-02", anzeige: "2. Februar 2025", titel: "KI-Kompetenz und verbotene Praktiken", zusatz: "(Art. 4 und 5)" },
-      { datum: "2025-08-02", anzeige: "2. August 2025", titel: "Pflichten für KI-Modelle mit allgemeinem Verwendungszweck", zusatz: "" },
-      { datum: "2026-08-02", anzeige: "2. August 2026", titel: "Allgemeiner Geltungsbeginn und Transparenzpflichten", zusatz: "(Art. 50)" },
-      { datum: "2026-12-02", anzeige: "2. Dezember 2026", titel: "Zusätzliche verbotene Praktiken", zusatz: "(Art. 5 Abs. 1 Buchst. ba und bb)" },
-      { datum: "2027-12-02", anzeige: "2. Dezember 2027", titel: "Hochrisiko-KI-Systeme nach Anhang III", zusatz: "" },
-      { datum: "2028-08-02", anzeige: "2. August 2028", titel: "Hochrisiko-KI-Systeme nach Anhang I", zusatz: "" }
+
+  // ------------------------------------------------------------ Startseite: Wissenswertes vor dem Start
+  // Drei aufklappbare Themen. Die Inhalte stammen aus den Hilfetexten und Regelnamen des Tools.
+  var WISSEN = {
+    titel: "Wissenswertes vor dem Start",
+    einleitung: "Die wichtigsten Grundlagen zu den drei Bereichen des Assessments.",
+    themen: [
+      {
+        id: "shadow-ai", titel: "Shadow AI", untertitel: "Ungenehmigte KI-Nutzung erkennen",
+        text: [
+          "Shadow AI bezeichnet die berufliche Nutzung von KI-Diensten, die vom Unternehmen nicht freigegeben ist und sich seiner Steuerung und Aufsicht entzieht.",
+          "Dabei können vertrauliche Informationen an externe Anbieter gelangen. Auch ungeprüfte Ergebnisse und fehlende Regeln im Unternehmen können Risiken verursachen."
+        ],
+        link: null
+      },
+      {
+        id: "eu-ai-act", titel: "EU AI Act", untertitel: "Pflichten und Fristen verstehen",
+        text: [
+          "Der EU AI Act ist die europäische Verordnung für künstliche Intelligenz. Sie legt Regeln und Pflichten für bestimmte KI-Systeme und ihre Nutzung fest.",
+          "Sie gilt schrittweise: Verbote und die Pflicht zur KI-Kompetenz seit Februar 2025, die meisten übrigen Regeln seit August 2026, die Pflichten für Hochrisiko-KI-Systeme nach Anhang III ab Dezember 2027."
+        ],
+        link: { text: "Verordnung auf EUR-Lex", adresse: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj", hinweis: "amtliche Fassung, öffnet EUR-Lex in einem neuen Fenster" }
+      },
+      {
+        id: "datenschutz", titel: "Datenschutz", untertitel: "Personenbezogene Daten schützen",
+        text: [
+          "Personenbezogene Daten sind alle Informationen, die sich einer bestimmten Person zuordnen lassen. Ob und wie sie in einen KI-Dienst eingegeben werden dürfen, regelt die Datenschutz-Grundverordnung (DSGVO)."
+        ],
+        link: { text: "DSGVO auf EUR-Lex", adresse: "https://eur-lex.europa.eu/eli/reg/2016/679/oj", hinweis: "amtliche Fassung, öffnet EUR-Lex in einem neuen Fenster" }
+      }
     ]
   };
 
   var api = {
-    TERMINE: TERMINE,
+    WISSEN: WISSEN,
     STAND: STAND, EINLEITUNG: EINLEITUNG, BLOECKE: BLOECKE, FRAGEN: FRAGEN, STUFEN: STUFEN,
     FEST: FEST, ERKLAERUNG_STELLE: ERKLAERUNG_STELLE, WIDERSPRUECHE: WIDERSPRUECHE, EINORDNUNG: EINORDNUNG, HINWEISE: HINWEISE, REGELNAMEN: REGELNAMEN, PFADE: PFADE, BEREICHE: BEREICHE,
     EMPFEHLUNGEN: EMPFEHLUNGEN, EMPFEHLUNG_TITEL: EMPFEHLUNG_TITEL, EMPFEHLUNG_GRUND: EMPFEHLUNG_GRUND, SACHVERHALT_KURZ: SACHVERHALT_KURZ, EMPFEHLUNG_ERKLAERUNG: EMPFEHLUNG_ERKLAERUNG, MASSNAHMEN: MASSNAHMEN, ZUSTAENDE: ZUSTAENDE, OBERFLAECHE: OBERFLAECHE
