@@ -53,11 +53,17 @@
 
   // ------------------------------------------------------------ Tabelle 7: Blöcke
   var BLOECKE = [
-    { id: "1", titel: "Nutzungsfall und Vorprüfung", fragen: ["F1", "F2", "F3", "F4", "F5"] },
-    { id: "2", titel: "Regulatorische Sachverhalte", fragen: ["F6", "F7", "F8", "F9", "F10", "F11"] },
-    { id: "3", titel: "Datenschutz", fragen: ["F12", "F13", "F14", "F15", "F16", "F17"] },
-    { id: "4", titel: "Shadow-AI-Risikofaktoren", fragen: ["F18", "F19", "F20", "F21", "F22", "F23", "F24"] },
-    { id: "5", titel: "Governance und Schutzmaßnahmen", fragen: ["F25", "F26", "F27", "F28", "F29", "F30"] }
+    // beschreibung: Satz unter der Blocküberschrift
+    { id: "1", titel: "Nutzungsfall und Vorprüfung", fragen: ["F1", "F2", "F3", "F4", "F5"],
+      beschreibung: "Beschreiben Sie, wie und unter welchen Bedingungen Sie den KI-Dienst einsetzen." },
+    { id: "2", titel: "Regulatorische Sachverhalte", fragen: ["F6", "F7", "F8", "F9", "F10", "F11"],
+      beschreibung: "Geben Sie an, ob die Nutzung Sachverhalte berührt, die nach dem EU AI Act zu prüfen sind." },
+    { id: "3", titel: "Datenschutz", fragen: ["F12", "F13", "F14", "F15", "F16", "F17"],
+      beschreibung: "Geben Sie an, ob und wie bei der Nutzung personenbezogene Daten verarbeitet werden." },
+    { id: "4", titel: "Shadow-AI-Risikofaktoren", fragen: ["F18", "F19", "F20", "F21", "F22", "F23", "F24"],
+      beschreibung: "Geben Sie an, welche Informationen Sie eingeben und wie Sie die Ergebnisse verwenden." },
+    { id: "5", titel: "Governance und Schutzmaßnahmen", fragen: ["F25", "F26", "F27", "F28", "F29", "F30"],
+      beschreibung: "Geben Sie an, welche Regeln, Zuständigkeiten und Schutzmaßnahmen es in Ihrem Unternehmen gibt." }
   ];
 
   // ------------------------------------------------------------ Auswahllisten zu F6 und F7
@@ -92,7 +98,7 @@
   // keine: Wortlaut der ausschließenden Option „Keine“ beziehungsweise „Keiner“
   var FRAGEN = {
     F1: {
-      typ: "einfach", frage: "Welcher Kategorie lässt sich diese Nutzung zuordnen?",
+      typ: "einfach", frage: "Wobei unterstützt Sie der KI-Dienst?",
       optionen: [
         { wert: "Texte", text: "Texte erstellen oder überarbeiten" },
         { wert: "Uebersetzen", text: "Übersetzen" },
@@ -554,7 +560,6 @@
       F9: "Prüfen Sie, ob eine oder mehrere der folgenden Aussagen auf Ihren konkreten KI-Nutzungsfall zutreffen.",
       F17: "Prüfen Sie, ob eine oder mehrere der folgenden Aussagen auf Ihren konkreten KI-Nutzungsfall zutreffen."
     },
-    ausschlussHinweis: "Falls keine der Aussagen zutrifft oder Sie unsicher sind:",
     drucken: "Ergebnis drucken oder als PDF sichern",
     aendern: "Antworten ändern",
     neu: "Neues Assessment",
@@ -592,7 +597,9 @@
     sachverhalteAnzahl: "Erfasste Sachverhalte ({anzahl})",
     infoZeichen: "i",
     fortschritt: "{beantwortet} von {gesamt} Fragen beantwortet",
-    fortschrittGesamt: "Insgesamt {prozent} %",
+    fortschrittGesamt: "Gesamtfortschritt {prozent} %",
+    blockZaehler: "Block {aktuell} von {letzter}",
+    fallSchutz: "Ihre Angaben bleiben in Ihrem Browser.",
     blockFertig: "abgeschlossen",
     fallDienst: "KI-Dienst:",
     fallAufgabe: "Nutzung:",

@@ -97,51 +97,47 @@ body[data-schritt="start"] .leiste { display: none; }
 .marke-knopf { all: unset; cursor: pointer; border-radius: .25rem; }
 .marke-knopf:hover { text-decoration: underline; text-underline-offset: .2em; text-decoration-thickness: 1px; }
 .marke-knopf:focus-visible { outline: 3px solid #7da6d8; outline-offset: 3px; }
-.schritte { display: flex; flex-direction: column; counter-reset: block; margin-top: .5rem; }
-/* Fortschritt als Linie mit Haltestellen: ein Halt je Block, das Ergebnis als Ziel */
+.schritte { display: flex; flex-direction: column; gap: .35rem; margin-top: .5rem; }
+/* Schrittfolge: nummerierte Kreise, durch eine Linie verbunden, das Ergebnis als Ziel mit Fahne */
 .schritt { position: relative; }
 .schritt::before {
-  content: ""; position: absolute; left: 1.05rem; top: 1.55rem; bottom: -.55rem; width: 3px; margin-left: -1.5px;
-  background: #3d5471; border-radius: 2px;
+  content: ""; position: absolute; left: 1.55rem; top: 2.6rem; bottom: -1rem; width: 2px; margin-left: -1px;
+  background: #3d5471;
 }
-.schritt.erledigt::before { background: #dfe5ed; }
+.schritt.erledigt::before { background: #6f849d; }
 .schritt-ergebnis::before { display: none; }
-.schritt:not(.schritt-ergebnis) { counter-increment: block; }
 .schritt-knopf {
   position: relative; z-index: 1;
-  display: grid; grid-template-columns: 1.5rem 1fr; gap: .9rem; align-items: start;
-  width: 100%; padding: .55rem .6rem .7rem .3rem; border: 0; border-radius: .375rem;
+  display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto; gap: .9rem; align-items: center;
+  width: 100%; padding: .7rem .75rem .7rem .55rem; border: 0; border-radius: .6rem;
   background: none; color: inherit; font: inherit; font-size: .95rem; text-align: left; line-height: 1.3;
 }
 button.schritt-knopf { cursor: pointer; }
 @media (hover: hover) and (pointer: fine) { button.schritt-knopf:hover { background: rgba(255, 255, 255, .07); } }
 .schritt-kennung {
-  width: 1.5rem; height: 1.5rem; margin-top: .05rem; border-radius: 50%;
-  border: 3px solid #4e6683; background: var(--petrol-tief);
-  font-size: 0; color: transparent; overflow: hidden;
+  display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%;
+  border: 2px solid #ffffff; background: #ffffff; color: var(--petrol-tief);
+  font-size: .9rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums;
 }
-.schritt-titel { color: #b8c5d4; }
-.schritt-titel::before {
-  content: "Block " counter(block); display: block; margin-bottom: .1rem;
-  font-family: var(--schrift-code); font-size: .72rem; font-weight: 600; letter-spacing: .02em; color: #8ea2ba;
-}
-.schritt-ergebnis .schritt-titel::before { content: none; }
-.schritt.erledigt .schritt-kennung { background: #dfe5ed; border-color: #dfe5ed; }
-.schritt.erledigt .schritt-titel { color: #e8edf3; }
-.schritt.aktiv .schritt-kennung { background: var(--petrol-tief); border-color: #f5c518; box-shadow: 0 0 0 4px rgba(245, 197, 24, .2); }
-.schritt.aktiv .schritt-titel { color: #ffffff; font-weight: 700; }
-.schritt.aktiv .schritt-titel::before { color: #ced8e5; }
-.schritt-ergebnis { margin-top: .1rem; }
-.schritt-ergebnis .schritt-kennung { border-radius: .3rem; }
-.schritt-ergebnis .schritt-knopf { align-items: center; }
-.schritt-ergebnis.aktiv .schritt-kennung { background: #f5c518; border-color: #f5c518; }
-/* aktueller Block mit dezenter Fläche, abgeschlossene Blöcke mit Häkchen */
+.schritt-titel { color: #e8edf3; font-weight: 600; }
 .schritt.aktiv .schritt-knopf { background: rgba(255, 255, 255, .09); }
+.schritt.aktiv .schritt-kennung { border-color: #ef7f45; color: #d4581c; box-shadow: 0 0 0 3px rgba(239, 127, 69, .25); }
+.schritt.aktiv .schritt-titel { color: #ffffff; font-weight: 700; }
 .schritt-kennung .symbol { display: grid; place-items: center; width: 100%; height: 100%; background: none; border-radius: 0; color: var(--petrol-tief); }
-.schritt-kennung .symbol svg { width: .85rem; height: .85rem; stroke-width: 3; }
+.schritt-kennung .symbol svg { width: .95rem; height: .95rem; stroke-width: 3; }
+/* Ergebnis: Fahne ohne Kreis */
+.schritt-ergebnis .schritt-kennung { border: 0; background: none; border-radius: 0; }
+.schritt-ergebnis .schritt-kennung .symbol { color: #e8edf3; }
+.schritt-ergebnis .schritt-kennung .symbol svg { width: 1.6rem; height: 1.6rem; stroke-width: 1.8; }
+.schritt-ergebnis.aktiv .schritt-kennung .symbol { color: #ef7f45; }
+/* Stand je Block rechts: beantwortete / gestellte Fragen */
+.schritt-stand { justify-self: end; }
+.schritt-zahl { font-size: .8rem; font-weight: 400; color: #9cabbe; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .leiste-fuss { margin-top: auto; font-size: .8rem; color: #9cabbe; }
-main { padding: 3.25rem clamp(1.25rem, 4vw, 3.5rem) 4rem; }
-main > * { max-width: var(--mass); margin-left: auto; margin-right: auto; }
+main { padding: 3.25rem clamp(1.25rem, 3vw, 2.5rem) 4rem; }
+/* Alle Karten teilen eine Breite und eine linke Kante. Auf breiten Fenstern rückt der Inhalt
+   etwas von der Seitenleiste ab, bleibt aber nah an ihr (höchstens 4rem zusätzlich). */
+main > * { max-width: var(--mass); margin-left: max(0px, min(4rem, calc((100% - var(--mass)) / 2))); margin-right: auto; }
 
 /* ---------------------------------------------------------------- Überschriften */
 .start-titel, .block-titel {
@@ -422,7 +418,7 @@ select.feld-eingabe {
 .frage-kopf > .info-knopf { align-self: start; width: 1.6rem; height: 1.6rem; font-size: .85rem; }
 /* Erläuterung zur Frage: Feld unter der Frage, schiebt die Antworten nach unten */
 .hilfe-feld {
-  clear: both; margin-top: .95rem; padding: .15rem 0 .15rem 1rem; border-left: 3px solid #eab597;
+  clear: both; padding-top: .75rem;
   display: flex; flex-direction: column; gap: .4rem; font-size: .875rem; line-height: 1.55; color: #3a4757; max-width: 62rem;
 }
 .hilfe-feld[hidden] { display: none; }
@@ -475,8 +471,6 @@ select.feld-eingabe {
   display: flex; flex-direction: column; gap: .45rem;
   margin-top: .6rem; padding: .75rem .85rem .85rem; background: #f3f6f9; border-radius: .6rem;
 }
-.ausschluss-hinweis { font-size: .8125rem; color: var(--tinte-leise); }
-.optionen-ausschluss .ausschluss-hinweis { grid-column: 1 / -1; }
 /* lange Mehrfachlisten: großzügigere Felder mit einheitlicher Mindesthöhe */
 .optionen-spalten > .option { min-height: 4.25rem; padding: .9rem 1.05rem; align-items: center; }
 .optionen-spalten > .option input { margin-top: 0; }
@@ -657,12 +651,9 @@ main > .abschluss { margin-top: 0; padding: 2rem 2.25rem 2.25rem; }
   .schritte { flex-direction: row; gap: .35rem; margin-top: 0; }
   .schritt::before { display: none; }
   .schritt-knopf { grid-template-columns: 2rem; padding: .15rem; }
-  .schritt-kennung { display: grid; place-items: center; width: 2rem; height: 2rem; margin: 0; border-width: 1.5px; font-size: .85rem; font-weight: 700; color: #b8c5d4; }
-  .schritt.erledigt .schritt-kennung { background: #2d517e; border-color: #2d517e; color: #ffffff; }
-  .schritt-kennung .symbol { color: #ffffff; }
-  .schritt-kennung .symbol svg { width: 1rem; height: 1rem; }
-  .schritt.aktiv .schritt-kennung { background: #ffffff; color: var(--petrol-tief); box-shadow: none; }
-  .schritt-ergebnis .schritt-kennung { border-radius: 50%; }
+  .schritt-stand { display: none; }
+  .schritt-kennung { width: 2rem; height: 2rem; }
+  .schritt.aktiv .schritt-knopf { background: none; }
   .schritt-titel { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
   .schritt-ergebnis { margin: 0 0 0 .35rem; padding: 0 0 0 .7rem; border-left: 1px solid rgba(255, 255, 255, .2); }
   .leiste-fuss { display: none; }
@@ -719,41 +710,46 @@ main > .abschluss { margin-top: 0; padding: 2rem 2.25rem 2.25rem; }
 /* Nutzungsfall: Zeile über der Abschnittsüberschrift und im Ergebnis */
 .fall-zeile {
   display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem 2.5rem;
-  margin: 0 0 1.4rem; padding: .6rem 1rem;
+  margin-top: 0; margin-bottom: 1.4rem; padding: .6rem 1rem;
   background: #e3e8ef; border-radius: .5rem;
   overflow-wrap: anywhere;
 }
 .fall-text { display: flex; flex-wrap: wrap; align-items: baseline; gap: .1rem .5rem; margin: 0; min-width: 0; }
 .fall-etikett { color: #3c4959; }
 .fall-name { font-weight: 700; color: #0c305c; }
-/* Auf den Fragenseiten haftet die Zeile am oberen Rand des Fensters. */
+/* Auf den Fragenseiten: weiße Karte, haftet beim Scrollen am oberen Rand, rechts der Hinweis zum Datenschutz */
 .fall-haftend {
   position: sticky; top: 0; z-index: 5;
-  margin-left: auto; margin-right: auto;
-  border-radius: 0 0 .5rem .5rem;
-  box-shadow: 0 0 0 .6rem var(--grund, #eef0f3), 0 .9rem .9rem -.6rem rgba(9, 35, 66, .28);
+  align-items: center; padding: .85rem 1.5rem; margin-bottom: 1.1rem;
+  background: var(--flaeche); border: 1px solid var(--linie); border-radius: .625rem;
+  box-shadow: 0 0 0 .6rem var(--grund, #eef0f3), 0 .9rem .9rem -.8rem rgba(9, 35, 66, .22);
 }
-/* Fortschritt in der haftenden Zeile: Balken und Zahl der beantworteten Fragen */
-.fortschritt { flex: 0 0 100%; min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .9rem; margin-top: .3rem; }
-@media (max-width: 48rem) { .fortschritt-text { flex: 1 0 100%; white-space: normal; } }
-.fortschritt-text { font-size: .9rem; font-weight: 600; color: var(--tinte); white-space: nowrap; font-variant-numeric: tabular-nums; }
-.fortschritt-gesamt-rahmen { display: inline-flex; align-items: center; gap: .5rem; padding-left: .9rem; border-left: 1px solid #c3ccd7; }
-.fortschritt-gesamt { font-size: .8rem; color: var(--tinte-leise); white-space: nowrap; font-variant-numeric: tabular-nums; }
-.fortschritt-gesamt-balken {
-  width: 4rem; height: .25rem; -webkit-appearance: none; appearance: none; border: 0; border-radius: 1rem; overflow: hidden;
-  background: #d5dce5; color: #8a97a6;
+.fall-schutz { margin: 0 0 0 auto; display: inline-flex; align-items: center; gap: .5rem; font-size: .85rem; color: var(--tinte-leise); }
+.fall-schutz .symbol { width: 1.1rem; height: 1.1rem; background: none; border-radius: 0; color: var(--tinte-leise); }
+.fall-schutz .symbol svg { width: 1.1rem; height: 1.1rem; }
+
+/* Kopf eines Blocks: Karte mit Überschrift und Beschreibung, rechts der Fortschritt */
+.block-karte {
+  margin-top: 0; margin-bottom: 1.1rem; padding: 1.3rem 1.5rem; display: grid; grid-template-columns: minmax(0, 1fr) minmax(15rem, 24rem);
+  gap: 1rem 2.5rem; align-items: center;
+  background: var(--flaeche); border: 1px solid var(--linie); border-radius: .625rem; box-shadow: var(--schatten);
 }
-.fortschritt-gesamt-balken::-webkit-progress-bar { background: #d5dce5; }
-.fortschritt-gesamt-balken::-webkit-progress-value { background: #8a97a6; }
-.fortschritt-gesamt-balken::-moz-progress-bar { background: #8a97a6; }
+.block-karte .block-titel { font-family: var(--schrift-anzeige); font-size: clamp(1.6rem, 1.2rem + 1.2vw, 2.1rem); letter-spacing: -.015em; text-wrap: wrap; }
+.block-zaehler { margin-bottom: .35rem; font-size: .75rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--tinte-leise); }
+.block-beschreibung { margin-top: .45rem; color: var(--tinte-leise); font-size: .98rem; max-width: 60ch; }
+.fortschritt { min-width: 0; display: flex; flex-direction: column; gap: .55rem; }
+.fortschritt-unten { display: flex; align-items: center; gap: .9rem; }
+.fortschritt-gesamt { font-size: .82rem; color: var(--tinte-leise); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .fortschritt-balken {
   flex: 1 1 0; width: 0; min-width: 3rem; height: .55rem;
   -webkit-appearance: none; appearance: none; border: 0; border-radius: 1rem; overflow: hidden;
-  background: #c7d0da; color: var(--akzent);
+  background: #dfe4ea; color: var(--akzent);
 }
-.fortschritt-balken::-webkit-progress-bar { background: #c7d0da; }
+.fortschritt-balken::-webkit-progress-bar { background: #dfe4ea; }
 .fortschritt-balken::-webkit-progress-value { background: var(--akzent); }
 .fortschritt-balken::-moz-progress-bar { background: var(--akzent); }
+@media (max-width: 52rem) { .block-karte { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 40rem) { .fall-schutz { margin-left: 0; } .block-karte, .fall-haftend { padding: 1rem; } }
 
 /* Einklappbare Sachverhalte im Ergebnis */
 summary.regel-kopf { list-style: none; cursor: pointer; border-radius: .3rem; }

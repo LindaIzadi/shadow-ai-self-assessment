@@ -234,25 +234,25 @@ const EIN = { "keine Shadow AI": "Keine Shadow AI", "keine Shadow AI, Freigabe s
   console.log("== Fortschritt ==");
   // Gezählt werden nur die Fragen, die bei den bisherigen Antworten gestellt werden.
   const fortschritt = async () => (await page.locator("#fortschritt-text").textContent()) + " | " + (await page.locator("#fortschritt").getAttribute("value")) + "/" + (await page.locator("#fortschritt").getAttribute("max"));
-  const gesamt = async () => (await page.locator("#fortschritt-gesamt").textContent()) + " | " + (await page.locator("#fortschritt-gesamt-balken").getAttribute("value")) + "/" + (await page.locator("#fortschritt-gesamt-balken").getAttribute("max"));
+  const gesamt = async () => await page.locator("#fortschritt-gesamt").textContent();
   await page.goto(URL);
   await beginne(page);
-  ok((await fortschritt()) === "0 von 5 Fragen beantwortet | 0/5", "Fortschritt am Anfang: " + (await fortschritt()));
+  ok((await fortschritt()) === "0 von 5 Fragen beantwortet | 0/23", "Fortschritt am Anfang: " + (await fortschritt()));
   await antworte(page, "F1", "Texte"); await antworte(page, "F2", "Ja");
-  ok((await fortschritt()) === "2 von 5 Fragen beantwortet | 2/5", "Fortschritt nach zwei Antworten: " + (await fortschritt()));
+  ok((await fortschritt()) === "2 von 5 Fragen beantwortet | 2/23", "Fortschritt nach zwei Antworten: " + (await fortschritt()));
   await antworte(page, "F2", "Nein");
   ok((await fortschritt()) === "2 von 2 Fragen beantwortet | 2/2", "Fortschritt bei privater Nutzung: " + (await fortschritt()));
   await antworte(page, "F2", "Ja"); await antworte(page, "F3", "privat"); await antworte(page, "F4", "nicht bekannt"); await antworte(page, "F5", "Keine");
   await page.locator("#weiter").click();
-  ok((await fortschritt()) === "0 von 4 Fragen beantwortet | 0/4", "Fortschritt im nächsten Block: " + (await fortschritt()));
-  ok((await page.locator("#fortschritt-gesamt").textContent()) === "Insgesamt 22 %", "Gesamtfortschritt in Prozent");
+  ok((await fortschritt()) === "0 von 4 Fragen beantwortet | 5/23", "Fortschritt im nächsten Block: " + (await fortschritt()));
+  ok((await page.locator("#fortschritt-gesamt").textContent()) === "Gesamtfortschritt 22 %", "Gesamtfortschritt in Prozent");
   ok((await page.locator("#schritte .schritt.fertig").count()) === 1 && (await page.locator("#schritte .schritt.aktiv .schritt-knopf").textContent()).includes("Regulatorische"), "Navigation: Block 1 abgeschlossen, Block 2 aktuell");
   await antworte(page, "F7", [6]);
-  ok((await fortschritt()) === "1 von 6 Fragen beantwortet | 1/6", "bedingte Fragen erhöhen die Gesamtzahl: " + (await fortschritt()));
-  ok((await gesamt()) === "Insgesamt 24 % | 6/25", "Gesamtfortschritt mit bedingten Fragen: " + (await gesamt()));
+  ok((await fortschritt()) === "1 von 6 Fragen beantwortet | 6/25", "bedingte Fragen erhöhen die Gesamtzahl: " + (await fortschritt()));
+  ok((await gesamt()) === "Gesamtfortschritt 24 %", "Gesamtfortschritt mit bedingten Fragen: " + (await gesamt()));
   await antworte(page, "F7", "Keine");
-  ok((await fortschritt()) === "1 von 4 Fragen beantwortet | 1/4", "ausgeblendete Fragen zählen nicht mit: " + (await fortschritt()));
-  ok((await gesamt()) === "Insgesamt 26 % | 6/23", "Gesamtfortschritt ohne ausgeblendete Fragen: " + (await gesamt()));
+  ok((await fortschritt()) === "1 von 4 Fragen beantwortet | 6/23", "ausgeblendete Fragen zählen nicht mit: " + (await fortschritt()));
+  ok((await gesamt()) === "Gesamtfortschritt 26 %", "Gesamtfortschritt ohne ausgeblendete Fragen: " + (await gesamt()));
 
   console.log("== Hilfetexte ==");
   await page.goto(URL);

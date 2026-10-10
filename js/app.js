@@ -81,6 +81,7 @@
     buch: ["M5 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2z", "M5 18a2 2 0 0 1 2-2h11"],
     winkel: ["M15 6l-6 6 6 6"],
     rechts: ["M9 6l6 6-6 6"],
+    flagge: ["M5 21V4", "M5 4h12l-2.5 4 2.5 4H5"],
     info: ["M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z", "M12 11v5", "M12 8h.01"],
     kreuz: ["M6 6l12 12", "M18 6L6 18"],
     extern: ["M14 4h6v6", "M20 4l-9 9", "M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"],
@@ -150,29 +151,17 @@
     anhaengen(zeile, angabe(T.fallDienst, kiDienst().trim()), angabe(T.fallAufgabe, aufgabe.trim()));
     if (mitKategorie) zeile.appendChild(angabe(T.fallKategorie, antwortText("F1")[0]));
     if (haftend) {
-      // Balken und Zahl füllt aktualisiereFortschritt(), sobald die Fragen der Seite stehen.
-      var fortschritt = el("div", "fortschritt");
-      var balken = el("progress", "fortschritt-balken");
-      balken.id = "fortschritt";
-      balken.setAttribute("aria-labelledby", "fortschritt-text");
-      var zahl = el("p", "fortschritt-text");
-      zahl.id = "fortschritt-text";
-      var gesamt = el("span", "fortschritt-gesamt");
-      gesamt.id = "fortschritt-gesamt";
-      var gesamtBalken = el("progress", "fortschritt-gesamt-balken");
-      gesamtBalken.id = "fortschritt-gesamt-balken";
-      gesamtBalken.setAttribute("aria-labelledby", "fortschritt-gesamt");
-      var gesamtRahmen = el("span", "fortschritt-gesamt-rahmen");
-      anhaengen(gesamtRahmen, gesamt, gesamtBalken);
-      anhaengen(fortschritt, zahl, balken, gesamtRahmen);
-      zeile.appendChild(fortschritt);
+      // Hinweis rechts: Die Angaben verlassen den Browser nicht.
+      var schutz = el("p", "fall-schutz");
+      anhaengen(schutz, symbol("schild"), el("span", "", T.fallSchutz));
+      zeile.appendChild(schutz);
     }
     return zeile;
   }
 
   /**
-   * Fortschritt: Text und großer Balken zeigen den aktuellen Block, daneben klein der
-   * Gesamtfortschritt in Prozent. Gezählt werden nur Fragen, die bei den bisherigen Antworten
+   * Fortschritt: Der Balken zeigt den Gesamtfortschritt, daneben in Prozent. Die Zahl der
+   * beantworteten Fragen des Blocks wird vorgelesen und steht sichtbar in der Seitenleiste. Gezählt werden nur Fragen, die bei den bisherigen Antworten
    * gestellt werden. Die Zahlen ändern sich, wenn eine Antwort bedingte Fragen ein- oder ausblendet.
    */
   function aktualisiereFortschritt(sichtbar) {
@@ -181,11 +170,8 @@
     function beantwortet(liste) { return liste.filter(function (f) { return antworten[f] !== undefined; }).length; }
     var block = blockZu(schritt);
     var imBlock = block.fragen.filter(function (f) { return sichtbar.indexOf(f) !== -1; });
-    balken.max = imBlock.length;
-    balken.value = beantwortet(imBlock);
-    var gesamtBalken = document.getElementById("fortschritt-gesamt-balken");
-    gesamtBalken.max = sichtbar.length;
-    gesamtBalken.value = beantwortet(sichtbar);
+    balken.max = sichtbar.length;
+    balken.value = beantwortet(sichtbar);
     document.getElementById("fortschritt-text").textContent =
       fuelle(T.fortschritt, { beantwortet: beantwortet(imBlock), gesamt: imBlock.length });
     document.getElementById("fortschritt-gesamt").textContent =
@@ -212,12 +198,15 @@
   function zeichneSchritte() {
     schritteListe.textContent = "";
     var privat = R.endetNachVorpruefung(antworten);
+    var sichtbar = R.sichtbar(antworten);
+    var alleFertig = !privat;
     I.BLOECKE.forEach(function (b) {
       var li = el("li", "schritt");
       var aktiv = schritt === b.id;
       var erledigt = erreicht[b.id] && !aktiv;
       // abgeschlossen: besucht und alle derzeit gestellten Fragen des Blocks beantwortet
       var fertig = erledigt && !privat && offeneFragen(b).length === 0;
+      if (!(fertig || (aktiv && !privat && offeneFragen(b).length === 0) || schritt === "ergebnis")) alleFertig = false;
       if (aktiv) { li.classList.add("aktiv"); li.setAttribute("aria-current", "step"); }
       if (erledigt) li.classList.add("erledigt");
       if (fertig) li.classList.add("fertig");
@@ -233,14 +222,36 @@
       if (fertig) kennung.appendChild(symbol("haken"));
       var titel = el("span", "schritt-titel", b.titel);
       if (fertig) titel.appendChild(el("span", "nur-vorlesen", " (" + T.blockFertig + ")"));
+      // Stand des Blocks rechts: „beantwortet / gestellt“
+      var stand = null;
+      if (!privat || b.id === ERSTER_BLOCK) {
+        var imBlock = b.fragen.filter(function (f) { return sichtbar.indexOf(f) !== -1; });
+        var beantwortet = imBlock.filter(function (f) { return antworten[f] !== undefined; }).length;
+        stand = el("span", "schritt-stand");
+        var zahl = el("span", "schritt-zahl", beantwortet + " / " + imBlock.length);
+        zahl.setAttribute("aria-label", fuelle(T.fortschritt, { beantwortet: beantwortet, gesamt: imBlock.length }));
+        stand.appendChild(zahl);
+      }
       anhaengen(inhalt, kennung, titel);
+      if (stand) inhalt.appendChild(stand);
       li.appendChild(inhalt);
       schritteListe.appendChild(li);
     });
     var li = el("li", "schritt schritt-ergebnis");
     if (schritt === "ergebnis" || schritt === "abschluss") { li.classList.add("aktiv"); li.setAttribute("aria-current", "step"); }
-    var s = el("span", "schritt-knopf");
-    anhaengen(s, el("span", "schritt-kennung", "✓"), el("span", "schritt-titel", T.ergebnis));
+    // Das Ergebnis ist erreichbar, sobald alle Blöcke besucht und alle gestellten Fragen beantwortet sind.
+    var erreichbar = alleFertig && schritt !== "ergebnis" && I.BLOECKE.every(function (b) { return erreicht[b.id]; });
+    var s;
+    if (erreichbar) {
+      s = el("button", "schritt-knopf");
+      s.type = "button";
+      s.addEventListener("click", function () { geheZu("ergebnis"); });
+    } else {
+      s = el("span", "schritt-knopf");
+    }
+    var ziel = el("span", "schritt-kennung");
+    ziel.appendChild(symbol("flagge"));
+    anhaengen(s, ziel, el("span", "schritt-titel", T.ergebnis));
     li.appendChild(s);
     schritteListe.appendChild(li);
   }
@@ -499,10 +510,28 @@
   // ------------------------------------------------------------ Fragenblock
   function zeichneBlock(block) {
     var pos = I.BLOECKE.indexOf(block);
-    var kopf = el("div", "block-kopf");
     // Der Nutzungsfall steht über jeder Fragenseite und bleibt beim Scrollen sichtbar.
     haupt.appendChild(zeichneFall(true));
-    kopf.appendChild(el("h1", "block-titel", block.titel));
+    // Kopf des Blocks: Überschrift und Beschreibung, rechts der Fortschritt.
+    // Balken und Zahlen füllt aktualisiereFortschritt(), sobald die Fragen der Seite stehen.
+    var kopf = el("div", "block-kopf block-karte");
+    var kopfText = el("div", "block-kopf-text");
+    anhaengen(kopfText,
+      el("p", "block-zaehler", fuelle(T.blockZaehler, { aktuell: block.id, letzter: I.BLOECKE[I.BLOECKE.length - 1].id })),
+      el("h1", "block-titel", block.titel), el("p", "block-beschreibung", block.beschreibung));
+    // Balken: Gesamtfortschritt. Die Zahl des Blocks steht in der Seitenleiste und wird hier nur vorgelesen.
+    var fortschritt = el("div", "fortschritt");
+    var zahl = el("p", "fortschritt-text nur-vorlesen");
+    zahl.id = "fortschritt-text";
+    var unten = el("div", "fortschritt-unten");
+    var balken = el("progress", "fortschritt-balken");
+    balken.id = "fortschritt";
+    balken.setAttribute("aria-labelledby", "fortschritt-gesamt");
+    var gesamt = el("span", "fortschritt-gesamt");
+    gesamt.id = "fortschritt-gesamt";
+    anhaengen(unten, balken, gesamt);
+    anhaengen(fortschritt, zahl, unten);
+    anhaengen(kopf, kopfText, fortschritt);
     haupt.appendChild(kopf);
 
     var meldung = el("p", "sammelmeldung");
@@ -575,8 +604,7 @@
       f.optionen.forEach(function (o) { liste.appendChild(option(id, "checkbox", o.wert, o.text)); });
       // „Keine“ und „Unklar“ in einem eigenen Bereich. Ihre Wahl hebt die übrigen Angaben auf (uebernehme).
       var aus = el("div", "optionen-ausschluss");
-      anhaengen(aus, el("p", "ausschluss-hinweis", T.ausschlussHinweis),
-        option(id, "checkbox", R.KEINE, f.keine), option(id, "checkbox", R.UNKLAR, T.unklar));
+      anhaengen(aus, option(id, "checkbox", R.KEINE, f.keine), option(id, "checkbox", R.UNKLAR, T.unklar));
       liste.appendChild(aus);
     }
     satz.appendChild(liste);
