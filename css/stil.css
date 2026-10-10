@@ -36,6 +36,8 @@
   --schrift-anzeige: "Source Serif", Georgia, serif;   /* Überschriften der Startseite */
   --akzent: #c2541f;        /* Akzent der Startseite, Weiß darauf 4,6 : 1 */
   --akzent-tief: #a94618;
+  --auswahl: #d0700f;       /* gewählte Antwort, gelb-orange, auf Weiß 3,5 : 1 */
+  --auswahl-hell: #fdf3e6;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --schatten: 0 1px 2px rgba(9, 35, 66, .05), 0 6px 18px -10px rgba(9, 35, 66, .22);
   --mass: 72rem;        /* Breite des Inhaltsbereichs, etwa 1150 px */
@@ -133,6 +135,10 @@ button.schritt-knopf { cursor: pointer; }
 .schritt-ergebnis .schritt-kennung { border-radius: .3rem; }
 .schritt-ergebnis .schritt-knopf { align-items: center; }
 .schritt-ergebnis.aktiv .schritt-kennung { background: #f5c518; border-color: #f5c518; }
+/* aktueller Block mit dezenter Fläche, abgeschlossene Blöcke mit Häkchen */
+.schritt.aktiv .schritt-knopf { background: rgba(255, 255, 255, .09); }
+.schritt-kennung .symbol { display: grid; place-items: center; width: 100%; height: 100%; background: none; border-radius: 0; color: var(--petrol-tief); }
+.schritt-kennung .symbol svg { width: .85rem; height: .85rem; stroke-width: 3; }
 .leiste-fuss { margin-top: auto; font-size: .8rem; color: #9cabbe; }
 main { padding: 3.25rem clamp(1.25rem, 4vw, 3.5rem) 4rem; }
 main > * { max-width: var(--mass); margin-left: auto; margin-right: auto; }
@@ -146,8 +152,7 @@ main > * { max-width: var(--mass); margin-left: auto; margin-right: auto; }
   letter-spacing: -.025em;
   text-wrap: balance;
 }
-.block-zaehler { color: var(--tinte-leise); font-size: .92rem; margin-bottom: .45rem; }
-.block-kopf { margin-bottom: 2rem; }
+.block-kopf { margin-top: 1.2rem; margin-bottom: 1.8rem; }
 .einleitung { font-size: 1.12rem; line-height: 1.55; margin-top: 1.25rem; color: #253241; max-width: var(--lesebreite); }
 h2 { font-family: var(--schrift-titel); font-weight: 700; font-size: 1.3rem; line-height: 1.25; letter-spacing: -.012em; }
 
@@ -164,13 +169,18 @@ main > .start { max-width: none; margin: 0; }
     radial-gradient(circle at -6% 100%, rgba(244, 186, 154, .45) 0, rgba(244, 186, 154, 0) 22rem),
     linear-gradient(160deg, #f7f9fc 0%, #eef2f8 100%);
 }
-.start-kopfzeile, .start-buehne { width: 100%; max-width: 82rem; margin: 0 auto; padding-left: 2.5rem; padding-right: 2.5rem; }
-.start-kopfzeile { display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem .9rem; padding-top: 1.6rem; padding-bottom: .5rem; }
-.start-marke { font-weight: 700; font-size: 1.02rem; color: var(--petrol-tief); letter-spacing: -.005em; }
+.start-kopfzeile, .start-buehne { width: 100%; max-width: 88rem; margin: 0 auto; padding-left: 2.5rem; padding-right: 2.5rem; }
+/* Kopfzeile: weiße Leiste über die ganze Breite */
+.start-leiste { background: rgba(255, 255, 255, .82); border-bottom: 1px solid rgba(20, 32, 46, .07); position: relative; z-index: 3; }
+.start-kopfzeile { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .25rem .9rem; padding-top: 1rem; padding-bottom: 1rem; }
+.start-marke { font-family: var(--schrift-anzeige); font-weight: 700; font-size: 1.3rem; color: var(--petrol-tief); letter-spacing: -.01em; }
 
 .start-buehne { flex: 1 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) 23rem; gap: 3rem; align-items: start; padding-top: 2rem; padding-bottom: 3rem; }
 .start-buehne.hintergrund-zu { grid-template-columns: minmax(0, 1fr) 3.25rem; }
-.start-spalte { max-width: 50rem; }
+.start-spalte { max-width: 58rem; container-type: inline-size; }
+/* Die Titel der Eckpunkte stehen einzeilig, sobald die Spalte breit genug ist. */
+@container (min-width: 47rem) { .start-punkt dt { white-space: nowrap; } }
+@container (min-width: 56rem) { .start-punkt dd { white-space: nowrap; } }
 .hintergrund-zu .start-spalte { max-width: 62rem; }
 
 .start-vorzeile {
@@ -184,20 +194,22 @@ main > .start { max-width: none; margin: 0; }
   text-wrap: balance;
 }
 .start-titel-akzent { color: var(--akzent); }
-.start-kopf .einleitung { font-size: 1.1rem; line-height: 1.6; margin-top: 1.1rem; max-width: 60ch; color: #26323f; }
+.start-kopf .einleitung { font-size: 1.1rem; line-height: 1.6; margin-top: 1.1rem; max-width: 72ch; color: #26323f; }
 .einleitung-zweiter-satz { display: block; }
 .start-kopf .hilfe-blase { font-size: .98rem; line-height: 1.5; }
 
 /* Drei Eckpunkte mit Symbol */
-.start-punkte { margin-top: 1.9rem; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .9rem; }
+.start-punkte { margin-top: 1.9rem; display: grid; grid-template-columns: repeat(3, auto); justify-content: start; gap: 0; }
 .start-punkt {
-  display: grid; grid-template-columns: 2.5rem minmax(0, 1fr); grid-template-rows: auto 1fr; column-gap: .8rem; align-items: start;
-  padding: 1rem 1rem 1.05rem; background: rgba(255, 255, 255, .6); border: 1px solid rgba(20, 32, 46, .06); border-radius: .8rem;
+  display: grid; grid-template-columns: auto auto; grid-template-rows: auto auto; column-gap: .9rem; align-content: center;
+  padding: .2rem 1.1rem;
 }
-.start-punkt .symbol { grid-row: span 2; width: 2.5rem; height: 2.5rem; background: #fbe7dc; color: var(--akzent); }
+.start-punkt:first-child { padding-left: 0; }
+.start-punkt + .start-punkt { border-left: 1px solid rgba(20, 32, 46, .14); }
+.start-punkt .symbol { grid-row: span 2; width: 2.75rem; height: 2.75rem; background: #fbe7dc; color: var(--akzent); }
 .start-punkt .symbol svg { width: 1.2rem; height: 1.2rem; }
 .start-punkt dt { font-weight: 700; font-size: .95rem; line-height: 1.35; margin-top: .1rem; }
-.start-punkt dd { margin-top: .15rem; color: var(--tinte-leise); font-size: .88rem; line-height: 1.45; }
+.start-punkt dd { margin-top: .1rem; color: var(--tinte-leise); font-size: .82rem; line-height: 1.4; }
 .symbol { display: grid; place-items: center; flex: none; border-radius: 50%; background: var(--petrol-hell); color: var(--petrol); }
 .symbol svg { display: block; }
 
@@ -208,9 +220,15 @@ main .vorab {
   box-shadow: 0 1px 2px rgba(19, 42, 69, .06), 0 18px 40px -22px rgba(19, 42, 69, .35);
 }
 .vorab-start { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 1.5rem; align-items: start; }
-.vorab-start > .feld-kopf, .vorab-start > .vorab-text, .vorab-start > .fall-hinweis, .vorab-start > .fall-wechsel, .vorab-start > .knopf { grid-column: 1 / -1; }
-.vorab-start > .feld-kopf { font-family: var(--schrift-anzeige); font-size: 1.65rem; letter-spacing: -.01em; margin-bottom: .4rem; }
-.vorab-text { margin: 0 0 1.35rem; color: var(--tinte-leise); font-size: .95rem; max-width: 66ch; }
+.vorab-start > .vorab-kopf, .vorab-start > .fall-hinweis, .vorab-start > .fall-wechsel, .vorab-start > .knopf { grid-column: 1 / -1; }
+.vorab-kopf { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 1.2rem; align-items: center; margin-bottom: 1.5rem; }
+.vorab-kopf .symbol { width: 3.4rem; height: 3.4rem; background: #fbe7dc; color: var(--akzent); }
+.vorab-kopf .symbol svg { width: 1.45rem; height: 1.45rem; }
+.vorab-kopf .feld-kopf { margin-bottom: 0; font-family: var(--schrift-anzeige); font-size: 1.65rem; letter-spacing: -.01em; line-height: 1.2; }
+.vorab-text { margin: .25rem 0 0; color: var(--tinte-leise); font-size: .95rem; max-width: 66ch; }
+.feld-eingabe::placeholder { color: #8a95a3; opacity: 1; }
+/* nur für Bildschirmleser */
+.nur-vorlesen { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .feld-titel { display: block; font-weight: 700; margin-bottom: .45rem; }
 .feld-eingabe {
   width: 100%; font: inherit; color: inherit;
@@ -244,7 +262,7 @@ select.feld-eingabe {
 /* Band mit den Eckdaten am unteren Rand */
 .start-band {
   display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem 2.5rem;
-  padding: 1.6rem max(2.5rem, calc((100% - 82rem) / 2 + 2.5rem));
+  padding: 1.6rem max(2.5rem, calc((100% - 88rem) / 2 + 2.5rem));
   background: var(--petrol-tief); color: #ffffff;
 }
 .start-band li { display: grid; grid-template-columns: 1.9rem minmax(0, 1fr); gap: .85rem; align-items: center; }
@@ -270,16 +288,16 @@ select.feld-eingabe {
 .termin-gilt::after { background: currentColor; }
 .termin-datum { font-size: .8rem; font-variant-numeric: tabular-nums; opacity: .72; }
 .termin-name { font-size: .94rem; font-weight: 600; line-height: 1.3; }
-.termin-text { font-size: .78rem; line-height: 1.4; opacity: .62; margin-top: .1rem; }
+.termin-zusatz { font-weight: 400; }
 /* Nur „Heute“ ist hervorgehoben. */
 .termin-heute { padding-bottom: 1.6rem; }
 .termin-heute::after {
   left: -.06rem; top: .2rem; width: .9rem; height: .9rem; opacity: 1;
   background: var(--heute); border-color: var(--heute); box-shadow: 0 0 0 4px var(--heute-hof);
 }
-.termin-heute-text { font-size: .95rem; font-weight: 700; color: var(--heute); line-height: 1.3; }
+.termin-heute-zeile { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .7rem; }
+.termin-heute-text { font-size: .9rem; font-weight: 700; color: var(--heute); line-height: 1.3; }
 .hintergrund .termin-heute-text { width: fit-content; padding: .15rem .65rem; border-radius: 999px; background: #fbe7dc; }
-.termine-quelle { margin-top: .9rem; padding-top: .8rem; border-top: 1px solid var(--trennlinie); font-size: .75rem; line-height: 1.4; opacity: .75; flex: none; }
 
 /* Regulatorischer Hintergrund: ein- und ausklappbare Spalte neben der Startseite */
 .hintergrund {
@@ -323,7 +341,7 @@ select.feld-eingabe {
   html:has(body[data-schritt="start"]) { font-size: clamp(100%, min(calc(0.55rem + 0.45vw), 1.7vh), 150%); }
   /* Mindestens fensterhoch. Wird die linke Spalte höher (etwa mit Fehlermeldungen), wächst die Seite mit. */
   .start { min-height: 100dvh; }
-  .start-kopfzeile { padding-top: 2.2vh; padding-bottom: .4vh; }
+  .start-kopfzeile { padding-top: 1.5vh; padding-bottom: 1.5vh; }
   /* Die geöffnete Zeitleiste bestimmt die Höhe nicht mit. Sie füllt höchstens die Bühne und scrollt in ihrer Karte. */
   .start-buehne { flex: 1 1 auto; min-height: 0; grid-template-rows: minmax(0, 1fr); align-items: stretch; padding-top: 2.2vh; padding-bottom: 2.6vh; position: relative; }
   .start-buehne:not(.hintergrund-zu) > .hintergrund { position: absolute; top: 2.2vh; right: 2.5rem; width: 23rem; max-height: calc(100% - 4.8vh); }
@@ -333,13 +351,15 @@ select.feld-eingabe {
   .start-vorzeile { font-size: min(.78rem, 1.5vh); }
   .start-titel { margin-top: 1.2vh; font-size: clamp(1.9rem, min(3.6vw, 5.7vh), 3.7rem); }
   .start-kopf .einleitung { margin-top: 1.4vh; font-size: clamp(.95rem, 2vh, 1.1rem); line-height: 1.55; }
-  .start-punkte { margin-top: 2.2vh; }
-  .start-punkt { padding: 1.3vh .9rem 1.4vh; }
-  .start-punkt .symbol { width: min(2.5rem, 4.4vh); height: min(2.5rem, 4.4vh); }
-  .start-punkt dd { font-size: clamp(.8rem, 1.65vh, .88rem); }
-  main .vorab { margin-top: 2.2vh; padding: 2.2vh 2rem 1.9vh; }
-  .vorab-start > .feld-kopf { font-size: clamp(1.25rem, 3vh, 1.65rem); margin-bottom: .6vh; }
-  .vorab-text { margin-bottom: 1.8vh; font-size: clamp(.86rem, 1.75vh, .95rem); }
+  .start-punkte { margin-top: 3.2vh; }
+  .start-punkt { padding-top: .3vh; padding-bottom: .3vh; }
+  .start-punkt .symbol { width: min(2.75rem, 4.6vh); height: min(2.75rem, 4.6vh); }
+  .start-punkt dd { font-size: clamp(.76rem, 1.55vh, .82rem); }
+  main .vorab { margin-top: 4vh; padding: 2.2vh 2rem 1.9vh; }
+  .vorab-kopf { margin-bottom: 2vh; }
+  .vorab-kopf .symbol { width: min(3.4rem, 5.6vh); height: min(3.4rem, 5.6vh); }
+  .vorab-kopf .feld-kopf { font-size: clamp(1.25rem, 3vh, 1.65rem); }
+  .vorab-text { font-size: clamp(.86rem, 1.75vh, .95rem); }
   .vorab-start .feld-gruppe { margin-bottom: 1.4vh; }
   .vorab-start .feld-titel { margin-bottom: .6vh; }
   .vorab-start .feld-eingabe { padding-top: min(.7rem, 1.2vh); padding-bottom: min(.7rem, 1.2vh); }
@@ -360,12 +380,19 @@ select.feld-eingabe {
   .start-titel { font-size: clamp(1.7rem, min(3.4vw, 5.2vh), 3.2rem); }
   .start-punkt dd { line-height: 1.35; }
   .start-kopf .einleitung { font-size: .92rem; }
-  .vorab-text { margin-bottom: 1.2vh; }
+  .vorab-kopf { margin-bottom: 1.4vh; }
   .vorab-start .feld-gruppe { margin-bottom: 1vh; }
+}
+
+/* breite, aber nicht sehr breite Fenster: engere Abstände, damit die Eckpunkte einzeilig bleiben */
+@media (min-width: 76rem) and (max-width: 92rem) {
+  .start-punkt { padding-left: .8rem; padding-right: .8rem; column-gap: .6rem; }
+  .start-punkt .symbol { width: min(2.4rem, 4.4vh); height: min(2.4rem, 4.4vh); }
 }
 
 /* Startseite auf mittleren und schmalen Bildschirmen: alles untereinander */
 @media (max-width: 76rem) {
+  .start-punkte { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .start-buehne, .start-buehne.hintergrund-zu { grid-template-columns: minmax(0, 1fr); gap: 2rem; }
   .hintergrund { position: relative; top: auto; }
   .hintergrund-zu .hintergrund-knopf { flex-direction: row; justify-content: flex-start; padding: .9rem 1.1rem; gap: .8rem; }
@@ -391,15 +418,23 @@ select.feld-eingabe {
   box-shadow: var(--schatten);
 }
 /* float: Die Legende soll im Rahmen stehen und nicht auf der Rahmenlinie. */
-.frage-kopf { float: left; display: grid; grid-template-columns: auto 1fr; gap: .8rem; align-items: baseline; width: 100%; }
+.frage-kopf { float: left; display: grid; grid-template-columns: auto 1fr auto; gap: .8rem; align-items: baseline; width: 100%; }
+.frage-kopf > .info-knopf { align-self: start; width: 1.6rem; height: 1.6rem; font-size: .85rem; }
+/* Erläuterung zur Frage: Feld unter der Frage, schiebt die Antworten nach unten */
+.hilfe-feld {
+  clear: both; margin-top: .95rem; padding: .15rem 0 .15rem 1rem; border-left: 3px solid #eab597;
+  display: flex; flex-direction: column; gap: .4rem; font-size: .875rem; line-height: 1.55; color: #3a4757; max-width: 62rem;
+}
+.hilfe-feld[hidden] { display: none; }
+.hilfe-feld strong { font-weight: 600; color: var(--tinte); }
 .frage-kopf + * { clear: both; }
 .frage-nr {
   font-family: var(--schrift-code); font-size: .8rem; font-weight: 600; color: var(--petrol);
   background: var(--petrol-hell); padding: .12rem .45rem; border-radius: .25rem; white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
-.frage-text { font-size: 1.1rem; font-weight: 700; line-height: 1.38; max-width: 52rem; text-wrap: pretty; }
-.frage-art { padding-top: .5rem; font-size: .9rem; color: var(--tinte-leise); }
+.frage-text { font-size: 1.0625rem; font-weight: 600; line-height: 1.42; max-width: 52rem; text-wrap: pretty; }
+.frage-art { padding-top: .6rem; font-size: .8125rem; color: var(--tinte-leise); }
 /* Hilfetext: Info-Schaltfläche hinter dem Fragetext, Blase darunter. Der Anker hat keine
    Höhe, die Blase liegt über den Antworten und verschiebt sie nicht. */
 .frage-text .info-knopf { margin-left: .15rem; }
@@ -407,16 +442,20 @@ select.feld-eingabe {
 .hilfe-inhalt { padding: .85rem 1.05rem; background: var(--petrol-hell); border-radius: .375rem; color: #1c2939; display: flex; flex-direction: column; gap: .55rem; }
 .hilfe-blase {
   position: absolute; z-index: 2; top: .55rem; left: 0; width: 100%; max-width: 46rem;
-  font-size: .98rem; border: 1px solid #b6c2d0;
+  font-size: .8125rem; line-height: 1.5; border: 1px solid #b6c2d0;
   box-shadow: 0 10px 24px -12px rgba(9, 35, 66, .55);
 }
 .hilfe-inhalt strong { font-weight: 700; color: var(--tinte); }
 .ausloeser-rahmen summary { cursor: pointer; color: var(--petrol); font-weight: 600; width: fit-content; }
 
-.optionen { clear: both; padding-top: 1rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: .5rem; }
-/* kurze Antworten nebeneinander, lange Listen ab mittlerer Breite in zwei Spalten */
-.optionen-reihe { grid-template-columns: repeat(auto-fit, minmax(11.5rem, 1fr)); }
-.optionen-stapel { max-width: 52rem; }
+.optionen { clear: both; padding-top: 1.15rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: .5rem; }
+/* höchstens drei gleich breite Spalten, je nach Länge der Antworten (app.js) */
+.optionen-sp3.optionen-kurz { grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr)); }
+@media (min-width: 40rem) {
+  .optionen-sp2, .optionen-sp3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .optionen-sp3.optionen-kurz { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 60rem) { .optionen-sp3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (min-width: 72rem) {
   .optionen-spalten { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .optionen-spalten .optionen-ausschluss { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
@@ -424,17 +463,23 @@ select.feld-eingabe {
 .option {
   display: grid; grid-template-columns: 1.25rem 1fr; gap: .75rem; align-items: start;
   padding: .7rem .9rem; border: 1.5px solid var(--linie); border-radius: .5rem; cursor: pointer;
-  background: var(--flaeche); height: 100%;
+  background: var(--flaeche); height: 100%; font-size: .9375rem; line-height: 1.45;
 }
 @media (hover: hover) and (pointer: fine) { .option:hover { border-color: #7e8fa4; } }
-.option input { width: 1.2rem; height: 1.2rem; margin: .18rem 0 0; accent-color: var(--petrol); }
-.option:has(input:checked) { border-color: var(--petrol); background: var(--petrol-hell); }
+.option input { width: 1.2rem; height: 1.2rem; margin: .18rem 0 0; accent-color: var(--auswahl); }
+.option:has(input:checked) { border-color: var(--auswahl); background: var(--auswahl-hell); }
 .option:has(input:focus-visible) { outline: 3px solid #18549d; outline-offset: 2px; }
 .option input:focus-visible { outline: none; }
+/* „Keine“ und „Unklar“: eigener, dezent abgesetzter Bereich */
 .optionen-ausschluss {
   display: flex; flex-direction: column; gap: .45rem;
-  margin-top: .55rem; padding-top: 1rem; border-top: 1px dashed var(--linie);
+  margin-top: .6rem; padding: .75rem .85rem .85rem; background: #f3f6f9; border-radius: .6rem;
 }
+.ausschluss-hinweis { font-size: .8125rem; color: var(--tinte-leise); }
+.optionen-ausschluss .ausschluss-hinweis { grid-column: 1 / -1; }
+/* lange Mehrfachlisten: großzügigere Felder mit einheitlicher Mindesthöhe */
+.optionen-spalten > .option { min-height: 4.25rem; padding: .9rem 1.05rem; align-items: center; }
+.optionen-spalten > .option input { margin-top: 0; }
 
 .frage.fehlt { border-color: var(--fehler); box-shadow: 0 0 0 1px var(--fehler), var(--schatten); }
 .fehlertext { margin-top: .8rem; color: var(--fehler); font-weight: 600; font-size: .95rem; }
@@ -474,10 +519,7 @@ select.feld-eingabe {
 
 /* ---------------------------------------------------------------- Ergebnis */
 .datum { margin-top: -1.2rem; margin-bottom: 1.25rem; font-size: .92rem; color: var(--tinte-leise); }
-.vorbehalt {
-  background: #e6eaef; color: #253343;
-  padding: .85rem 1.15rem; border-radius: .5rem; font-size: .98rem;
-}
+.vorbehalt { font-size: .86rem; font-style: italic; color: var(--tinte-leise); }
 main > section { margin-top: 1.5rem; background: var(--flaeche); border: 1px solid var(--linie); border-radius: .625rem; padding: 1.6rem 1.75rem; box-shadow: var(--schatten); }
 
 /* Gesamtergebnis: Karte in der Farbe der Stufe, rechts die Bewertungsmatrix der drei Bereiche */
@@ -524,8 +566,8 @@ main > .gesamt { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.4r
 
 .einordnung p { margin-top: .45rem; }
 
-.pfad h2, .einordnung h2, .luecken h2, .empfehlungen h2 { font-size: 1.4rem; }
-.empfehlungen h2, .einordnung h2, .luecken h2 { font-family: var(--schrift-anzeige); letter-spacing: -.01em; }
+.pfad h2, .einordnung h2, .offene h2, .empfehlungen h2, .warum > h2 { font-size: 1.4rem; }
+.empfehlungen h2, .einordnung h2, .offene h2, .warum > h2 { font-family: var(--schrift-anzeige); letter-spacing: -.01em; }
 .zusatz, .empfehlung-zusatz { margin-top: .7rem !important; padding: .7rem .9rem; background: var(--petrol-hell); border-radius: .375rem; }
 .pfad-kopf { display: flex; flex-wrap: wrap; gap: .6rem 1rem; align-items: center; justify-content: space-between; }
 .pfad-kopf > .stufe { justify-self: start; }
@@ -533,22 +575,21 @@ main > .gesamt { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.4r
 .pfad-kopf h2 { font-family: var(--schrift-anzeige); font-size: 1.3rem !important; letter-spacing: -.01em; }
 .pfad-erklaerung { margin-top: .4rem; color: var(--tinte-leise); font-size: .95rem; max-width: 70ch; }
 /* Shadow AI: der zentrale Bereich, hervorgehoben durch Lage und Größe */
-main > .pfad-s { margin-top: 1.5rem; padding: 2rem 2.1rem 1.9rem; border-color: #c9d3df; box-shadow: 0 1px 2px rgba(19, 42, 69, .06), 0 18px 36px -24px rgba(19, 42, 69, .4); }
-.pfad-s .pfad-kopf h2 { font-size: clamp(1.6rem, 1.3rem + .9vw, 2rem) !important; }
-.pfad-s .pfad-kopf .stufe-zahl { width: 1.8rem; height: 1.8rem; font-size: .95rem; }
-.pfad-s .pfad-erklaerung { font-size: 1.02rem; }
-.pfad-s .einordnung { margin-top: 1.3rem; padding: 1.2rem 1.25rem 1.15rem; background: #f7f9fb; border: 1px solid var(--linie-leise); border-radius: .6rem; }
-.status-titel, .risikofaktoren-titel { font-size: 1.02rem; font-weight: 700; }
-.einordnung .einordnung-titel { display: inline-block; margin-top: .55rem; padding: .18rem .7rem; border-radius: 999px; font-size: .85rem; font-weight: 700; }
-.einordnung-keine .einordnung-titel { background: var(--stufe-1-hell); color: #1c4833; }
+main > .warum { background: none; border: 0; box-shadow: none; padding: 0; margin-top: 2.2rem; }
+.warum > .pfad-s { margin-top: 1rem; padding: 1.5rem 1.6rem; background: var(--flaeche); border: 1px solid var(--linie); border-radius: .625rem; box-shadow: var(--schatten); }
+.einordnung-kopf { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; }
+.einordnung .einordnung-titel { margin-top: 0; padding: .2rem .8rem; border: 1.5px solid currentColor; border-radius: .35rem; font-size: .85rem; font-weight: 700; letter-spacing: .02em; }
+.wichtig { margin-top: .9rem; padding: .75rem .95rem; background: var(--petrol-hell); border-radius: .375rem; }
+.einordnung .wichtig-titel { margin-top: 0; font-weight: 700; }
+.wichtig .zusatz { margin-top: .25rem !important; padding: 0; background: none; }
+.einordnung-keine .einordnung-titel { background: #f1f3f6; color: #2d3440; }
 .einordnung-pruefung .einordnung-titel { background: #e3e9f2; color: var(--petrol-tief); }
 .einordnung-shadow .einordnung-titel { background: var(--stufe-4-hell); color: #6d1323; }
 .einordnung-unklar .einordnung-titel { background: var(--stufe-2-hell); color: #5c4000; }
 .einordnung .einordnung-text { margin-top: .55rem; max-width: 72ch; }
 .einordnung .einordnung-hinweis { margin-top: .45rem; font-size: .85rem; color: var(--tinte-leise); }
-.risikofaktoren-titel { margin-top: 1.5rem; }
 .pfad-s .felder { margin-top: .6rem; }
-.regelbasis-hinweis { margin-top: 1.1rem; padding-top: .8rem; border-top: 1px solid var(--linie-leise); font-size: .85rem; color: var(--tinte-leise); }
+.regelbasis-hinweis { margin-top: .4rem; font-size: .9rem; color: var(--tinte-leise); }
 /* EU AI Act und Datenschutz nebeneinander, gleichwertig und nachgeordnet */
 .nebenbereiche { margin-top: 1.25rem; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; align-items: stretch; }
 .nebenbereiche > section.pfad { margin-top: 0; padding: 1.5rem 1.6rem; background: var(--flaeche); border: 1px solid var(--linie); border-radius: .625rem; box-shadow: var(--schatten); }
@@ -574,12 +615,14 @@ main > .pfad-s { margin-top: 1.5rem; padding: 2rem 2.1rem 1.9rem; border-color: 
 .antwort { font-weight: 600; }
 .leer { margin-top: .8rem; color: var(--tinte-leise); }
 
-.luecken p, .empfehlungen > p { margin-top: .7rem; }
+.offene p, .empfehlungen > p { margin-top: .7rem; }
+.offene h3 { margin-top: 1.1rem; font-size: 1.05rem; font-weight: 700; }
+.offene .widersprueche + .luecken { margin-top: 1.2rem; padding-top: .2rem; border-top: 1px solid var(--linie-leise); }
 .widerspruch-liste { margin-top: .9rem; display: grid; gap: .5rem; }
-main > .widersprueche { background: #fdf7e9; border-color: #ead7a6; }
-.widersprueche h2 { display: flex; align-items: center; gap: .7rem; }
-.widersprueche h2::before {
-  content: "!"; display: grid; place-items: center; flex: none; width: 1.7rem; height: 1.7rem; border-radius: 50%;
+main > .offene { background: #fdf7e9; border-color: #ead7a6; }
+.widersprueche h3 { display: flex; align-items: center; gap: .6rem; }
+.widersprueche h3::before {
+  content: "!"; display: grid; place-items: center; flex: none; width: 1.4rem; height: 1.4rem; border-radius: 50%;
   background: var(--stufe-2); color: #ffffff; font-family: var(--schrift); font-size: 1rem; font-weight: 700;
 }
 .widerspruch { padding: .7rem .9rem; background: rgba(255, 255, 255, .7); border-radius: .5rem; }
@@ -616,6 +659,8 @@ main > .abschluss { margin-top: 0; padding: 2rem 2.25rem 2.25rem; }
   .schritt-knopf { grid-template-columns: 2rem; padding: .15rem; }
   .schritt-kennung { display: grid; place-items: center; width: 2rem; height: 2rem; margin: 0; border-width: 1.5px; font-size: .85rem; font-weight: 700; color: #b8c5d4; }
   .schritt.erledigt .schritt-kennung { background: #2d517e; border-color: #2d517e; color: #ffffff; }
+  .schritt-kennung .symbol { color: #ffffff; }
+  .schritt-kennung .symbol svg { width: 1rem; height: 1rem; }
   .schritt.aktiv .schritt-kennung { background: #ffffff; color: var(--petrol-tief); box-shadow: none; }
   .schritt-ergebnis .schritt-kennung { border-radius: 50%; }
   .schritt-titel { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
@@ -627,10 +672,12 @@ main > .abschluss { margin-top: 0; padding: 2rem 2.25rem 2.25rem; }
 @media (max-width: 40rem) {
   body { font-size: 1rem; }
   .frage { padding: 1.1rem 1rem 1.2rem; }
-  .frage-kopf { grid-template-columns: 1fr; gap: .4rem; }
+  .frage-kopf { grid-template-columns: 1fr auto; gap: .4rem .8rem; }
+  .frage-kopf > .frage-nr, .frage-kopf > .frage-text { grid-column: 1; }
+  .frage-kopf > .info-knopf { grid-column: 2; grid-row: 1; }
   .frage-nr { width: fit-content; }
   .aktionen .knopf { flex: 1 1 auto; }
-  main > .pfad-s { padding: 1.3rem 1.1rem; }
+  .warum > .pfad-s { padding: 1.1rem 1rem; }
   .matrix-ecke { width: 26%; }
   .matrix-stufe { padding: .5rem .1rem !important; font-size: .6rem; overflow-wrap: anywhere; }
   .matrix-bereich { padding: .6rem .5rem !important; font-size: .72rem; white-space: normal; }
@@ -643,6 +690,12 @@ main > .abschluss { margin-top: 0; padding: 2rem 2.25rem 2.25rem; }
   main .vorab { padding: 1.3rem 1.1rem 1.5rem; }
   .vorab-start { grid-template-columns: minmax(0, 1fr); }
   .start-punkte { grid-template-columns: minmax(0, 1fr); gap: .9rem; }
+  .start-marke { font-size: 1.08rem; }
+  .vorab-kopf { column-gap: .9rem; }
+  .vorab-kopf .symbol { width: 2.6rem; height: 2.6rem; }
+  .vorab-kopf .feld-kopf { font-size: 1.35rem; }
+  .start-punkt { padding-left: 0; padding-right: 0; }
+  .start-punkt + .start-punkt { border-left: 0; }
   main > section { padding: 1.1rem 1rem; }
 }
 
@@ -681,16 +734,26 @@ main > .abschluss { margin-top: 0; padding: 2rem 2.25rem 2.25rem; }
   box-shadow: 0 0 0 .6rem var(--grund, #eef0f3), 0 .9rem .9rem -.6rem rgba(9, 35, 66, .28);
 }
 /* Fortschritt in der haftenden Zeile: Balken und Zahl der beantworteten Fragen */
-.fortschritt { flex: 0 0 100%; min-width: 0; display: flex; align-items: center; gap: .9rem; margin-top: .3rem; }
-.fortschritt-text { font-size: .88rem; color: #3c4959; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.fortschritt { flex: 0 0 100%; min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .9rem; margin-top: .3rem; }
+@media (max-width: 48rem) { .fortschritt-text { flex: 1 0 100%; white-space: normal; } }
+.fortschritt-text { font-size: .9rem; font-weight: 600; color: var(--tinte); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.fortschritt-gesamt-rahmen { display: inline-flex; align-items: center; gap: .5rem; padding-left: .9rem; border-left: 1px solid #c3ccd7; }
+.fortschritt-gesamt { font-size: .8rem; color: var(--tinte-leise); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.fortschritt-gesamt-balken {
+  width: 4rem; height: .25rem; -webkit-appearance: none; appearance: none; border: 0; border-radius: 1rem; overflow: hidden;
+  background: #d5dce5; color: #8a97a6;
+}
+.fortschritt-gesamt-balken::-webkit-progress-bar { background: #d5dce5; }
+.fortschritt-gesamt-balken::-webkit-progress-value { background: #8a97a6; }
+.fortschritt-gesamt-balken::-moz-progress-bar { background: #8a97a6; }
 .fortschritt-balken {
-  flex: 1 1 0; width: 0; min-width: 3rem; height: .45rem;
+  flex: 1 1 0; width: 0; min-width: 3rem; height: .55rem;
   -webkit-appearance: none; appearance: none; border: 0; border-radius: 1rem; overflow: hidden;
-  background: #c7d0da; color: var(--petrol);
+  background: #c7d0da; color: var(--akzent);
 }
 .fortschritt-balken::-webkit-progress-bar { background: #c7d0da; }
-.fortschritt-balken::-webkit-progress-value { background: var(--petrol); }
-.fortschritt-balken::-moz-progress-bar { background: var(--petrol); }
+.fortschritt-balken::-webkit-progress-value { background: var(--akzent); }
+.fortschritt-balken::-moz-progress-bar { background: var(--akzent); }
 
 /* Einklappbare Sachverhalte im Ergebnis */
 summary.regel-kopf { list-style: none; cursor: pointer; border-radius: .3rem; }
@@ -716,6 +779,10 @@ summary.regel-kopf .regel-name::after {
   font: 700 .8rem/1 var(--schrift); cursor: pointer;
 }
 .info-knopf:hover, .info-knopf[aria-expanded="true"] { background: var(--petrol); color: #ffffff; }
+/* Info-Zeichen der Fragen: dunkelblau, bei geöffneter Erläuterung dezent orange hervorgehoben */
+.frage .info-knopf { border-color: var(--petrol-tief); color: var(--petrol-tief); }
+.frage .info-knopf:hover { background: var(--petrol-hell); color: var(--petrol-tief); }
+.frage .info-knopf[aria-expanded="true"] { background: #fbe7dc; border-color: var(--akzent); color: var(--petrol-tief); box-shadow: 0 0 0 3px rgba(194, 84, 31, .12); }
 .info-knopf:focus-visible { outline: 2px solid var(--petrol); outline-offset: 3px; }
 .info-text {
   margin-top: .6rem; padding: .7rem .95rem; max-width: 44rem;
@@ -783,16 +850,15 @@ details.empfehlung-grund > p { margin-top: .3rem; padding-left: 1.05rem; color: 
 .hintergrund .termin { padding-bottom: .85rem; }
 .hintergrund .termin-heute { padding-bottom: .85rem; gap: .2rem; }
 .hintergrund .termine-liste { padding-left: .2rem; margin-top: .9rem; }
-.termin-heute-datum { font-size: .8rem; font-variant-numeric: tabular-nums; color: var(--tinte-leise); }
+.termin-heute-datum { font-size: .9rem; font-variant-numeric: tabular-nums; color: var(--heute); }
 .termine-link {
-  display: inline-flex; align-items: center; gap: .45rem; margin-top: .9rem; padding-top: .8rem; width: 100%;
-  border-top: 1px solid var(--trennlinie); color: var(--petrol); font-size: .85rem; font-weight: 600;
-  text-decoration: underline; text-underline-offset: .2em; text-decoration-thickness: 1px;
+  display: flex; align-items: center; justify-content: space-between; gap: .45rem; margin-top: 1rem; padding: .75rem 1rem; width: 100%; flex: none;
+  border: 1px solid var(--linie); border-radius: .5rem; background: var(--flaeche); color: var(--tinte); font-size: .9rem; font-weight: 700;
+  text-decoration: none;
 }
-.termine-link .symbol, .termine-link svg { width: 1rem; height: 1rem; flex: none; }
-.termine-link:hover { color: var(--petrol-tief); text-decoration-thickness: 2px; }
+.termine-link .symbol, .termine-link svg { width: 1rem; height: 1rem; flex: none; background: none; border-radius: 0; color: inherit; }
+.termine-link:hover { background: var(--petrol-hell); }
 .termine-link:focus-visible { outline: 2px solid var(--petrol); outline-offset: 3px; border-radius: .2rem; }
-.termine-link + .termine-quelle { margin-top: .35rem; padding-top: 0; border-top: 0; }
 .feld-loeschbar { position: relative; }
 .feld-loeschbar > .feld-eingabe { width: 100%; padding-right: 2.6rem; }
 .feld-leeren {
@@ -852,11 +918,10 @@ body.druck .seite { display: block; }
 body.druck .leiste, body.druck .aktionen { display: none !important; }
 body.druck main { padding: 0; width: 190mm; }
 body.druck main > * { max-width: none; margin-left: 0; margin-right: 0; }
-body.druck .block-kopf { margin-bottom: 1mm; }
-body.druck .block-zaehler { display: none; }
+body.druck .block-kopf { margin-top: 0; margin-bottom: 1mm; }
 body.druck .block-titel { font-size: 15pt; }
 body.druck .datum { margin: 0 0 1.5mm; font-size: 7.5pt; }
-body.druck .vorbehalt { padding: 1.2mm 2.5mm; font-size: 8pt; }
+body.druck .vorbehalt { font-size: 7pt; }
 body.druck main > section, body.druck .frage { box-shadow: none; }
 body.druck main > section { margin-top: 2mm; padding: 2mm 2.5mm; border-radius: 1.2mm; border-color: #9aa2ab; }
 body.druck h2 { font-size: 9.5pt; }
@@ -868,13 +933,13 @@ body.druck .einordnung p { margin-top: .5mm; }
 body.druck .zusatz, body.druck .empfehlung-zusatz { margin-top: 1mm !important; padding: 1mm 1.5mm; font-size: 7.5pt; }
 body.druck .pfad-kopf h2 { min-width: 0; width: 100%; font-size: 9.5pt !important; }
 /* Im Ausdruck stehen die drei Bereiche nebeneinander: Shadow AI links, die beiden anderen rechts */
-body.druck main > .pfad-s { float: left; width: calc(33.3% - 1.4mm); margin: 2mm 2mm 2mm 0; }
-body.druck .nebenbereiche { margin-top: 2mm; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2mm; }
-body.druck main > .empfehlungen { clear: both; }
-body.druck .nebenbereiche > section.pfad, body.druck main > .pfad-s { padding: 2mm 2.5mm; box-shadow: none; border-color: #9aa7ab; }
-body.druck .pfad-s .pfad-kopf h2 { font-size: 11pt !important; }
+body.druck main > .warum { margin-top: 2mm; padding: 0; border: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); column-gap: 2mm; align-items: stretch; }
+body.druck .warum > h2, body.druck .warum > .regelbasis-hinweis { grid-column: 1 / -1; }
+body.druck .warum > .pfad-s { margin-top: 1mm; }
+body.druck .warum > .nebenbereiche { margin-top: 1mm; }
+body.druck .nebenbereiche { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2mm; }
+body.druck .nebenbereiche > section.pfad, body.druck .warum > .pfad-s { padding: 2mm 2.5mm; box-shadow: none; border-color: #9aa7ab; }
 body.druck .pfad-erklaerung { margin-top: .5mm; font-size: 7.5pt; }
-body.druck .pfad-s .einordnung { margin-top: 1.2mm; padding: 1.2mm 2mm; }
 body.druck .einordnung-titel { font-size: 8.5pt; }
 body.druck .pfad-s .felder { margin-top: 1.5mm; }
 body.druck .pfad-s .pfad-kopf .stufe { font-size: 7pt; padding: .3mm 1.6mm .3mm .4mm; }
@@ -888,8 +953,11 @@ body.druck .matrix-punkt { width: 2.4mm; height: 2.4mm; }
 body.druck .empfehlung-titel { font-size: 8pt; }
 body.druck .empfehlung-grund { margin-top: .5mm; font-size: 6.8pt; }
 body.druck .einordnung .einordnung-titel { margin-top: .5mm; padding: 0 1.5mm; font-size: 7pt; }
-body.druck .status-titel, body.druck .risikofaktoren-titel { font-size: 8pt; }
-body.druck .risikofaktoren-titel { margin-top: 1.5mm; }
+body.druck .wichtig { margin-top: 1mm; padding: 1mm 1.5mm; }
+body.druck .wichtig .zusatz { padding: 0; margin-top: .3mm !important; }
+body.druck .offene h3 { margin-top: 1mm; font-size: 8pt; }
+body.druck .offene .widersprueche + .luecken { margin-top: 1mm; padding-top: 0; }
+body.druck .widersprueche h3::before { width: 3mm; height: 3mm; font-size: 6pt; }
 body.druck .einordnung-hinweis, body.druck .regelbasis-hinweis { font-size: 6.8pt; margin-top: .6mm; padding-top: .6mm; }
 body.druck .ausloeser-rahmen[open] summary { display: none; }
 body.druck .pfad-kopf { display: flex; flex-wrap: wrap; padding: 0 0 .8mm; gap: 1mm; }
@@ -912,7 +980,7 @@ body.druck .ausloeser-zeile { display: grid; grid-template-columns: auto 1fr; ga
 body.druck .ausloeser dd { margin-top: 0; gap: 0; }
 body.druck .frage-nr { font-size: 6.5pt; padding: 0 1mm; }
 body.druck .leer { margin-top: 1mm; }
-body.druck .luecken p, body.druck .empfehlungen > p { margin-top: 1mm; }
+body.druck .offene p, body.druck .empfehlungen > p { margin-top: 1mm; }
 body.druck .widerspruch-liste { margin-top: 1mm; gap: .6mm; }
 body.druck .luecken-liste { margin-top: 1mm; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6mm 4mm; }
 body.druck .empfehlung { padding: 1mm 1.5mm; border-radius: 1mm; break-inside: avoid; }

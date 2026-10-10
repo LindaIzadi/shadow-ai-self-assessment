@@ -26,7 +26,8 @@
   var erreicht = {};           // bereits besuchte Blöcke, für die Navigation
   var fallDesAssessments = null; // KI-Dienst und Aufgabe, zu denen die Antworten gegeben wurden
 
-  var schliesseHilfe = null;   // schließt den Hilfetext, der per Klick offen gehalten wird
+  var schliesseHilfe = null;
+  var schliesseErlaeuterung = null;   // schließt die geöffnete Erläuterung einer Frage   // schließt den Hilfetext, der per Klick offen gehalten wird
 
   var haupt = document.getElementById("inhalt");
   var schritteListe = document.getElementById("schritte");
@@ -79,6 +80,7 @@
     pfeil: ["M5 12h14", "M13 6l6 6-6 6"],
     buch: ["M5 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2z", "M5 18a2 2 0 0 1 2-2h11"],
     winkel: ["M15 6l-6 6 6 6"],
+    rechts: ["M9 6l6 6-6 6"],
     info: ["M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z", "M12 11v5", "M12 8h.01"],
     kreuz: ["M6 6l12 12", "M18 6L6 18"],
     extern: ["M14 4h6v6", "M20 4l-9 9", "M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"],
@@ -155,24 +157,40 @@
       balken.setAttribute("aria-labelledby", "fortschritt-text");
       var zahl = el("p", "fortschritt-text");
       zahl.id = "fortschritt-text";
-      anhaengen(fortschritt, balken, zahl);
+      var gesamt = el("span", "fortschritt-gesamt");
+      gesamt.id = "fortschritt-gesamt";
+      var gesamtBalken = el("progress", "fortschritt-gesamt-balken");
+      gesamtBalken.id = "fortschritt-gesamt-balken";
+      gesamtBalken.setAttribute("aria-labelledby", "fortschritt-gesamt");
+      var gesamtRahmen = el("span", "fortschritt-gesamt-rahmen");
+      anhaengen(gesamtRahmen, gesamt, gesamtBalken);
+      anhaengen(fortschritt, zahl, balken, gesamtRahmen);
       zeile.appendChild(fortschritt);
     }
     return zeile;
   }
 
   /**
-   * Fortschritt: beantwortete Fragen von allen, die bei den bisherigen Antworten gestellt
-   * werden. Die Gesamtzahl ändert sich, wenn eine Antwort bedingte Fragen ein- oder ausblendet.
+   * Fortschritt: Text und großer Balken zeigen den aktuellen Block, daneben klein der
+   * Gesamtfortschritt in Prozent. Gezählt werden nur Fragen, die bei den bisherigen Antworten
+   * gestellt werden. Die Zahlen ändern sich, wenn eine Antwort bedingte Fragen ein- oder ausblendet.
    */
   function aktualisiereFortschritt(sichtbar) {
     var balken = document.getElementById("fortschritt");
     if (!balken) return;
-    var beantwortet = sichtbar.filter(function (f) { return antworten[f] !== undefined; }).length;
-    balken.max = sichtbar.length;
-    balken.value = beantwortet;
+    function beantwortet(liste) { return liste.filter(function (f) { return antworten[f] !== undefined; }).length; }
+    var block = blockZu(schritt);
+    var imBlock = block.fragen.filter(function (f) { return sichtbar.indexOf(f) !== -1; });
+    balken.max = imBlock.length;
+    balken.value = beantwortet(imBlock);
+    var gesamtBalken = document.getElementById("fortschritt-gesamt-balken");
+    gesamtBalken.max = sichtbar.length;
+    gesamtBalken.value = beantwortet(sichtbar);
     document.getElementById("fortschritt-text").textContent =
-      fuelle(T.fortschritt, { beantwortet: beantwortet, gesamt: sichtbar.length });
+      fuelle(T.fortschritt, { beantwortet: beantwortet(imBlock), gesamt: imBlock.length });
+    document.getElementById("fortschritt-gesamt").textContent =
+      fuelle(T.fortschrittGesamt, { prozent: Math.round(100 * beantwortet(sichtbar) / sichtbar.length) });
+    zeichneSchritte();
   }
 
   function geheZu(ziel) {
@@ -198,8 +216,11 @@
       var li = el("li", "schritt");
       var aktiv = schritt === b.id;
       var erledigt = erreicht[b.id] && !aktiv;
+      // abgeschlossen: besucht und alle derzeit gestellten Fragen des Blocks beantwortet
+      var fertig = erledigt && !privat && offeneFragen(b).length === 0;
       if (aktiv) { li.classList.add("aktiv"); li.setAttribute("aria-current", "step"); }
       if (erledigt) li.classList.add("erledigt");
+      if (fertig) li.classList.add("fertig");
       var inhalt;
       if (erledigt && !(privat && b.id !== ERSTER_BLOCK)) {
         inhalt = el("button", "schritt-knopf");
@@ -208,7 +229,11 @@
       } else {
         inhalt = el("span", "schritt-knopf");
       }
-      anhaengen(inhalt, el("span", "schritt-kennung", b.id), el("span", "schritt-titel", b.titel));
+      var kennung = el("span", "schritt-kennung", fertig ? "" : b.id);
+      if (fertig) kennung.appendChild(symbol("haken"));
+      var titel = el("span", "schritt-titel", b.titel);
+      if (fertig) titel.appendChild(el("span", "nur-vorlesen", " (" + T.blockFertig + ")"));
+      anhaengen(inhalt, kennung, titel);
       li.appendChild(inhalt);
       schritteListe.appendChild(li);
     });
@@ -230,14 +255,19 @@
     function heuteZeile() {
       var li = el("li", "termin termin-heute");
       var datum = jetzt.getDate() + ". " + Z.monate[jetzt.getMonth()] + " " + jetzt.getFullYear();
-      anhaengen(li, el("span", "termin-heute-text", Z.heute), el("span", "termin-heute-datum", datum));
+      // Datum und Marke „Heute“ in einer Zeile
+      var zeile = el("span", "termin-heute-zeile");
+      anhaengen(zeile, el("span", "termin-heute-datum", datum), el("span", "termin-heute-text", Z.heute));
+      li.appendChild(zeile);
       liste.appendChild(li);
       gesetzt = true;
     }
     Z.eintraege.forEach(function (t) {
       if (!gesetzt && t.datum > heute) heuteZeile();
       var li = el("li", "termin " + (t.datum <= heute ? "termin-gilt" : "termin-kommt"));
-      anhaengen(li, el("span", "termin-datum", t.anzeige), el("span", "termin-name", t.titel), el("span", "termin-text", t.text));
+      var name = el("span", "termin-name", t.titel);
+      if (t.zusatz) name.appendChild(el("span", "termin-zusatz", " " + t.zusatz));
+      anhaengen(li, el("span", "termin-datum", t.anzeige), name);
       liste.appendChild(li);
     });
     if (!gesetzt) heuteZeile();
@@ -247,13 +277,15 @@
     verweis.target = "_blank";
     verweis.rel = "noopener noreferrer";
     verweis.setAttribute("aria-label", Z.link.text + " (" + Z.link.hinweis + ")");
-    anhaengen(verweis, el("span", "", Z.link.text), symbol("extern"));
-    anhaengen(rahmen, liste, verweis, el("p", "termine-quelle", Z.quelle));
+    verweis.setAttribute("title", Z.quelle);
+    anhaengen(verweis, el("span", "", Z.link.text), symbol("rechts"));
+    anhaengen(rahmen, liste, verweis);
     return rahmen;
   }
 
   function zeichne() {
     schliesseHilfe = null;
+    schliesseErlaeuterung = null;
     document.body.setAttribute("data-schritt", schritt);
     zeichneSchritte();
     haupt.textContent = "";
@@ -270,17 +302,19 @@
   function zeichneStart() {
     var Z = T.start;
     // Kopfzeile mit dem Namen der Anwendung (die Leiste ist auf der Startseite ausgeblendet)
+    var kopfleiste = el("header", "start-leiste");
     var kopfzeile = el("div", "start-kopfzeile");
     kopfzeile.appendChild(el("span", "start-marke", T.titel));
+    kopfleiste.appendChild(kopfzeile);
 
     var kopf = el("div", "start-kopf");
     // Hinter dem Einleitungstext erklärt eine Info-Schaltfläche den Begriff Shadow AI.
     var einleitung = el("div", "start-einleitung");
     var einleitungText = el("p", "einleitung", T.startText);
     var shadowAi = hilfeZu("shadow-ai", T.shadowAi, T.shadowAiFrage);
-    // Der zweite Satz beginnt in einer neuen Zeile, die Info-Schaltfläche steht an seinem Ende.
-    var zweiterSatz = el("span", "einleitung-zweiter-satz", T.startText2 + " ");
-    zweiterSatz.appendChild(shadowAi[0]);
+    // Der zweite Satz beginnt in einer neuen Zeile, die Info-Schaltfläche steht direkt hinter „Shadow AI“.
+    var zweiterSatz = el("span", "einleitung-zweiter-satz", T.startText2 + "\u00a0");
+    anhaengen(zweiterSatz, shadowAi[0], document.createTextNode(T.startText3));
     einleitungText.appendChild(zweiterSatz);
     anhaengen(einleitung, einleitungText, shadowAi[1]);
     // Der letzte Teil der Überschrift ist farbig hervorgehoben, „KI-Nutzung“ wird nicht getrennt.
@@ -400,12 +434,20 @@
     anhaengen(start, symbol("pfeil"), el("span", "", T.beginnen));
     var fallHinweis = el("p", "feld-hinweis fall-hinweis");
     anhaengen(fallHinweis, symbol("info"), el("span", "", E.fallHinweis));
+    // Kopf der Karte: Symbol, Überschrift und Kurzanleitung
+    var kartenKopf = el("div", "vorab-kopf");
+    var kartenText = el("div", "vorab-kopf-text");
+    anhaengen(kartenText, el("h2", "feld-kopf", E.fallTitel), hinweise);
+    anhaengen(kartenKopf, symbol("dokument"), kartenText);
+    var aufgabeFeld = textfeld("aufgabe", E.aufgabeTitel, E.aufgabeHinweis, E.aufgabeFehlt,
+      aufgabe, function (w) { aufgabe = w; zeigeFallwechsel(); }, startFehler && !aufgabe.trim());
+    // Das Beispiel steht als Platzhalter im Feld, der Hinweis darunter wird nur vorgelesen.
+    aufgabeFeld.querySelector("input").placeholder = E.aufgabePlatzhalter;
+    aufgabeFeld.querySelector(".feld-hinweis").className = "feld-hinweis nur-vorlesen";
     anhaengen(feld,
-      el("h2", "feld-kopf", E.fallTitel),
-      hinweise,
+      kartenKopf,
       dienst[0], dienst[1],
-      loeschbar(textfeld("aufgabe", E.aufgabeTitel, E.aufgabeHinweis, E.aufgabeFehlt,
-        aufgabe, function (w) { aufgabe = w; zeigeFallwechsel(); }, startFehler && !aufgabe.trim())),
+      loeschbar(aufgabeFeld),
       wechsel, start, fallHinweis);
     zeigeFallwechsel();
     vorab.appendChild(feld);
@@ -450,7 +492,7 @@
     });
 
     var seite = el("div", "start");
-    anhaengen(seite, kopfzeile, buehne, band);
+    anhaengen(seite, kopfleiste, buehne, band);
     haupt.appendChild(seite);
   }
 
@@ -460,9 +502,7 @@
     var kopf = el("div", "block-kopf");
     // Der Nutzungsfall steht über jeder Fragenseite und bleibt beim Scrollen sichtbar.
     haupt.appendChild(zeichneFall(true));
-    anhaengen(kopf,
-      el("p", "block-zaehler", fuelle(T.blockZaehler, { aktuell: block.id, letzter: I.BLOECKE[I.BLOECKE.length - 1].id })),
-      el("h1", "block-titel", block.titel));
+    kopf.appendChild(el("h1", "block-titel", block.titel));
     haupt.appendChild(kopf);
 
     var meldung = el("p", "sammelmeldung");
@@ -512,25 +552,31 @@
     satz.appendChild(legende);
 
     if (f.hilfe) {
-      // Die Info-Schaltfläche steht hinter dem Fragetext, die Blase mit dem Hilfetext darunter.
-      var hilfe = hilfeZu(id, f.hilfe);
-      anhaengen(fragetext, document.createTextNode(" "), hilfe[0]);
+      // Die Info-Schaltfläche steht rechts im Kopf der Frage. Die Erläuterung erscheint direkt
+      // unter der Frage und schiebt die Antworten nach unten.
+      var hilfe = hilfeFeld(id, f.hilfe);
+      legende.appendChild(hilfe[0]);
       satz.appendChild(hilfe[1]);
     }
-    if (f.typ === "mehrfach") satz.appendChild(el("p", "frage-art", T.mehrfachHinweis));
+    if (f.typ === "mehrfach") satz.appendChild(el("p", "frage-art", T.mehrfachHinweise[id] || T.mehrfachHinweis));
 
-    // Nur Darstellung: kurze Antworten stehen nebeneinander, längere Einfachauswahlen
-    // untereinander (ihre Reihenfolge bleibt so erkennbar), lange Mehrfachlisten in zwei Spalten.
+    // Nur Darstellung: höchstens drei gleich breite Spalten. Kurze Antworten stehen nebeneinander,
+    // längere in zwei Spalten, sehr lange untereinander. Mehrfachlisten stehen in zwei Spalten.
     var liste = el("div", "optionen");
     var laengste = Math.max.apply(null, f.optionen.map(function (o) { return o.text.length; }));
+    var anzahl = f.optionen.length;
     if (f.typ === "einfach") {
-      liste.classList.add(laengste <= 36 ? "optionen-reihe" : "optionen-stapel");
+      var spalten = laengste > 60 ? 1 : laengste > 48 ? 2 : anzahl <= 3 ? anzahl : anzahl === 4 || laengste > 36 ? 2 : 3;
+      liste.classList.add("optionen-sp" + spalten);
+      if (laengste <= 12) liste.classList.add("optionen-kurz");
       f.optionen.forEach(function (o) { liste.appendChild(option(id, "radio", o.wert, o.text)); });
     } else {
       liste.classList.add("optionen-spalten");
       f.optionen.forEach(function (o) { liste.appendChild(option(id, "checkbox", o.wert, o.text)); });
+      // „Keine“ und „Unklar“ in einem eigenen Bereich. Ihre Wahl hebt die übrigen Angaben auf (uebernehme).
       var aus = el("div", "optionen-ausschluss");
-      anhaengen(aus, option(id, "checkbox", R.KEINE, f.keine), option(id, "checkbox", R.UNKLAR, T.unklar));
+      anhaengen(aus, el("p", "ausschluss-hinweis", T.ausschlussHinweis),
+        option(id, "checkbox", R.KEINE, f.keine), option(id, "checkbox", R.UNKLAR, T.unklar));
       liste.appendChild(aus);
     }
     satz.appendChild(liste);
@@ -543,7 +589,58 @@
   }
 
   /**
-   * Hilfetext einer Frage: eine Info-Schaltfläche und eine Blase mit dem Text. Die Blase
+   * Absätze eines Hilfetexts. Mehrere Einträge stehen untereinander. Beginnt ein Eintrag mit
+   * einer Kurzbezeichnung und Doppelpunkt, wird sie hervorgehoben.
+   */
+  function hilfeAbsaetze(ziel, texte) {
+    (Array.isArray(texte) ? texte : [texte]).forEach(function (t) {
+      var absatz = el("p", ""), pos = t.indexOf(": "), punkt = t.indexOf(". ");
+      if (pos > 0 && pos <= 40 && (punkt === -1 || pos < punkt)) {
+        anhaengen(absatz, el("strong", "", t.slice(0, pos + 1)), document.createTextNode(t.slice(pos + 1)));
+      } else {
+        absatz.textContent = t;
+      }
+      ziel.appendChild(absatz);
+    });
+  }
+
+  /**
+   * Erläuterung zu einer Frage: ein Feld unter der Frage, das die Antworten nach unten schiebt
+   * und nichts überdeckt. Die Info-Schaltfläche öffnet und schließt es, Escape schließt es
+   * ebenfalls. Es ist immer nur eine Erläuterung geöffnet.
+   * Rückgabe: [Schaltfläche, Feld].
+   */
+  function hilfeFeld(id, texte) {
+    var feld = el("div", "hilfe-feld");
+    feld.id = "hilfe-" + id;
+    feld.hidden = true;
+    feld.setAttribute("role", "region");
+    feld.setAttribute("aria-label", T.erlaeuterung);
+    hilfeAbsaetze(feld, texte);
+
+    var b = el("button", "info-knopf", T.infoZeichen);
+    b.type = "button";
+    b.setAttribute("aria-label", T.erlaeuterung);
+    b.setAttribute("aria-controls", feld.id);
+    b.setAttribute("aria-expanded", "false");
+    function setze(offen) {
+      if (offen && schliesseErlaeuterung && schliesseErlaeuterung !== schliessen) schliesseErlaeuterung();
+      feld.hidden = !offen;
+      b.setAttribute("aria-expanded", offen ? "true" : "false");
+      if (offen) schliesseErlaeuterung = schliessen;
+      else if (schliesseErlaeuterung === schliessen) schliesseErlaeuterung = null;
+    }
+    function schliessen() { setze(false); }
+    b.addEventListener("click", function () { setze(feld.hidden); });
+    [b, feld].forEach(function (element) {
+      element.addEventListener("keydown", function (e) { if (e.key === "Escape" && !feld.hidden) { setze(false); b.focus(); } });
+    });
+    return [b, feld];
+  }
+
+  /**
+   * Erklärung als Blase (Begriff Shadow AI auf der Startseite): eine Info-Schaltfläche und
+   * eine Blase mit dem Text. Die Blase
    * erscheint, solange der Mauszeiger auf der Schaltfläche oder der Blase steht oder die
    * Schaltfläche den Tastaturfokus hat. Ein Klick hält sie offen, bis erneut geklickt, Escape
    * gedrückt oder neben die Blase geklickt wird. So ist der Text auch ohne Mauszeiger erreichbar.
@@ -555,17 +652,7 @@
     blase.id = "hilfe-" + id;
     blase.setAttribute("role", "tooltip");
     blase.hidden = true;
-    // Mehrere Einträge stehen untereinander. Beginnt ein Eintrag mit einer Kurzbezeichnung
-    // und Doppelpunkt, wird sie hervorgehoben.
-    (Array.isArray(texte) ? texte : [texte]).forEach(function (t) {
-      var absatz = el("p", ""), pos = t.indexOf(": "), punkt = t.indexOf(". ");
-      if (pos > 0 && pos <= 40 && (punkt === -1 || pos < punkt)) {
-        anhaengen(absatz, el("strong", "", t.slice(0, pos + 1)), document.createTextNode(t.slice(pos + 1)));
-      } else {
-        absatz.textContent = t;
-      }
-      blase.appendChild(absatz);
-    });
+    hilfeAbsaetze(blase, texte);
 
     var b = el("button", "info-knopf", T.infoZeichen);
     b.type = "button";
@@ -842,17 +929,15 @@
 
   function zeichnePfad(e, pfad) {
     // Jeder Bereich ist eine Karte: Name, Stufe, Bedeutung der Stufe, darunter die Sachverhalte
-    // zum Aufklappen. Der Bereich Shadow AI enthält zusätzlich die Einordnung als Shadow AI.
+    // zum Aufklappen.
     var abschnitt = el("section", "pfad pfad-" + pfad.toLowerCase());
     abschnitt.setAttribute("data-pfad", pfad);
     var kopf = el("div", "pfad-kopf");
     anhaengen(kopf, el("h2", "", I.PFADE[pfad]), stufenMarke(e[pfad]));
     var erklaerung = pfad === "S" ? T.shadowStufe[e.S] : I.STUFEN[e[pfad]].bedeutung;
     anhaengen(abschnitt, kopf, el("p", "pfad-erklaerung", erklaerung));
-    if (pfad === "S") anhaengen(abschnitt, zeichneEinordnung(e), el("h3", "risikofaktoren-titel", T.risikofaktorenTitel));
     var treffer = e.treffer.filter(function (t) { return t.pfad === pfad; });
     zeichnePfadInhalt(e, pfad, treffer, abschnitt);
-    if (pfad === "S") abschnitt.appendChild(el("p", "regelbasis-hinweis", T.regelbasisHinweis));
     return abschnitt;
   }
 
@@ -945,16 +1030,32 @@
     }
     if (e.abschluss) { geheZu("abschluss"); return; }
 
-    // Shadow AI ist der zentrale Bereich, EU AI Act und Datenschutz folgen nebeneinander.
-    var nebenbereiche = el("div", "nebenbereiche");
-    anhaengen(nebenbereiche, zeichnePfad(e, "R"), zeichnePfad(e, "D"));
-
+    // Reihenfolge: Nutzungsfall, Gesamtergebnis, offene Angaben, nächste Schritte,
+    // organisatorische Einordnung, Begründung je Bewertungspfad, Aktionen
     anhaengen(haupt,
       zeichneErgebnisKopf(), zeichneErgebnisDatum(), el("p", "vorbehalt", I.FEST.kopf),
-      // Reihenfolge: Gesamtergebnis, offene Punkte zu den Angaben, Shadow AI, die beiden weiteren
-      // Bereiche, dann die nächsten Schritte
-      zeichneGesamt(e), zeichneWidersprueche(e), zeichneLuecken(e), zeichnePfad(e, "S"), nebenbereiche, zeichneEmpfehlungen(e),
+      zeichneGesamt(e), zeichneOffeneAngaben(e), zeichneEmpfehlungen(e), zeichneEinordnung(e), zeichneWarum(e),
       zeichneErgebnisAktionen(), el("p", "fuss", T.fuss));
+  }
+
+  /** „Warum dieses Ergebnis?“: die drei Bewertungspfade, Risikofaktoren zuerst. */
+  function zeichneWarum(e) {
+    var warum = el("section", "warum");
+    var nebenbereiche = el("div", "nebenbereiche");
+    anhaengen(nebenbereiche, zeichnePfad(e, "R"), zeichnePfad(e, "D"));
+    anhaengen(warum, el("h2", "", T.warumTitel), el("p", "regelbasis-hinweis", T.regelbasisHinweis),
+      zeichnePfad(e, "S"), nebenbereiche);
+    return warum;
+  }
+
+  /** Widersprüche und Wissenslücken gemeinsam. Ohne beides entfällt der Abschnitt. */
+  function zeichneOffeneAngaben(e) {
+    var teile = [zeichneWidersprueche(e), zeichneLuecken(e)].filter(function (t) { return t; });
+    if (!teile.length) return null;
+    var offen = el("section", "offene" + (e.widersprueche.length ? " mit-widerspruch" : ""));
+    offen.appendChild(el("h2", "", T.offeneTitel));
+    teile.forEach(function (t) { offen.appendChild(t); });
+    return offen;
   }
 
   function zeichneErgebnisKopf() {
@@ -1001,14 +1102,21 @@
   }
 
   function zeichneEinordnung(e) {
-    // Status der KI-Nutzung: Einordnung als Shadow AI als Marke, darunter die Begründung
-    var ein = el("div", "einordnung einordnung-" + ({ "Shadow AI": "shadow", "keine Shadow AI": "keine", "unklar": "unklar" }[e.einordnung] || "pruefung"));
+    // Organisatorische Einordnung: Status als Stempel neben der Überschrift, darunter die Begründung
+    var ein = el("section", "einordnung einordnung-" + ({ "Shadow AI": "shadow", "keine Shadow AI": "keine", "unklar": "unklar" }[e.einordnung] || "pruefung"));
     var text = I.EINORDNUNG[e.einordnung];
-    anhaengen(ein, el("h3", "status-titel", T.statusTitel), el("p", "einordnung-titel", text.titel), el("p", "einordnung-text", text.text));
+    var kopf = el("div", "einordnung-kopf");
+    anhaengen(kopf, el("h2", "", T.einordnungTitel), el("p", "einordnung-titel", text.titel));
+    anhaengen(ein, kopf, el("p", "einordnung-text", text.text));
     if (text.hinweis) ein.appendChild(el("p", "einordnung-hinweis", text.hinweis));
-    if (e.freigabezusatz) ein.appendChild(el("p", "zusatz zusatz-freigabe", I.FEST.freigabezusatz));
-    // Bei jeder Einordnung als Shadow AI: Hinweis, dass die Stufe keine Freigabe ersetzt.
-    if (e.shadowzusatz) ein.appendChild(el("p", "zusatz zusatz-shadow", I.FEST.shadowZusatz));
+    if (e.freigabezusatz || e.shadowzusatz) {
+      var wichtig = el("div", "wichtig");
+      wichtig.appendChild(el("p", "wichtig-titel", T.wichtig));
+      if (e.freigabezusatz) wichtig.appendChild(el("p", "zusatz zusatz-freigabe", I.FEST.freigabezusatz));
+      // Bei jeder Einordnung als Shadow AI: Hinweis, dass die Stufe keine Freigabe ersetzt.
+      if (e.shadowzusatz) wichtig.appendChild(el("p", "zusatz zusatz-shadow", I.FEST.shadowZusatz));
+      ein.appendChild(wichtig);
+    }
     return ein;
   }
 
@@ -1016,7 +1124,7 @@
     // Ohne Wissenslücken entfällt der Abschnitt.
     if (!e.luecken.length) return null;
     var luecken = el("section", "luecken");
-    luecken.appendChild(el("h2", "", T.lueckenTitel));
+    luecken.appendChild(el("h3", "", T.lueckenTitel));
     luecken.appendChild(el("p", "", I.FEST.luecken));
     var ul = el("ul", "luecken-liste");
     e.luecken.forEach(function (f) {
@@ -1031,8 +1139,8 @@
   /** Widersprüchliche Angaben (Abschnitt 5.3.4). Erscheinen nur, wenn welche vorliegen. */
   function zeichneWidersprueche(e) {
     if (!e.widersprueche.length) return null;
-    var abschnitt = el("section", "luecken widersprueche");
-    abschnitt.appendChild(el("h2", "", T.widerspruecheTitel));
+    var abschnitt = el("section", "widersprueche");
+    abschnitt.appendChild(el("h3", "", T.widerspruecheTitel));
     abschnitt.appendChild(el("p", "", I.FEST.widersprueche));
     var ul = el("ul", "widerspruch-liste");
     e.widersprueche.forEach(function (kennung) {

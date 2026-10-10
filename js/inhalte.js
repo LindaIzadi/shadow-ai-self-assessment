@@ -25,12 +25,12 @@
   // ------------------------------------------------------------ Anhang A: Einleitung
   var EINLEITUNG = {
     // Die beiden Angaben legen den Nutzungsfall fest. Sie dienen der Orientierung und gehen in keine Regel ein.
-    fallTitel: "Ihr Nutzungsfall",
+    fallTitel: "Ihr KI-Nutzungsfall",
     // Kurzanleitung im Kasten „Ihr Nutzungsfall“ auf der Startseite
-    fallAnleitung: "Wählen Sie den KI-Dienst und beschreiben Sie kurz, wofür er genutzt wird.",
+    fallAnleitung: "Beschreiben Sie kurz, welche KI Sie wofür einsetzen.",
     // Hinweis, wenn KI-Dienst oder Aufgabe geändert werden, nachdem schon Fragen beantwortet sind
     fallWechsel: "Sie haben den Nutzungsfall geändert. Mit „Assessment beginnen“ startet ein neues Assessment, Ihre bisherigen Antworten werden dabei verworfen.",
-    dienstTitel: "KI-Dienst",
+    dienstTitel: "Welchen KI-Dienst nutzen Sie?",
     // Auswahlliste: Vorschläge in dieser Reihenfolge, danach „Sonstiger KI-Dienst“ mit Textfeld
     dienstBitteWaehlen: "Bitte auswählen",
     dienstVorschlaege: [
@@ -38,15 +38,17 @@
       "Mistral Le Chat", "GitHub Copilot"
     ],
     dienstSonstiger: "Sonstiger KI-Dienst",
-    dienstHinweis: "Fehlt der KI-Dienst in der Liste, wählen Sie „Sonstiger KI-Dienst“.",
+    dienstHinweis: "Fehlt der KI-Dienst? Wählen Sie „Sonstiger KI-Dienst“.",
     dienstFehlt: "Bitte wählen Sie den KI-Dienst aus.",
     dienstNameTitel: "Name des KI-Dienstes",
     dienstNameHinweis: "Der Name erscheint auf jeder Fragenseite und im Ergebnis.",
     dienstNameFehlt: "Bitte nennen Sie den KI-Dienst.",
-    aufgabeTitel: "Konkrete Nutzung",
+    aufgabeTitel: "Wofür nutzen Sie den KI-Dienst?",
+    // Beispiel als Platzhalter im Feld. Der Hinweis wird nur vorgelesen.
+    aufgabePlatzhalter: "z. B. Kundenmails zusammenfassen",
     aufgabeHinweis: "Zum Beispiel: „Kundenmails zusammenfassen“.",
     aufgabeFehlt: "Bitte beschreiben Sie die Nutzung.",
-    fallHinweis: "Beide Angaben dienen nur der Orientierung und gehen nicht in die Bewertung ein."
+    fallHinweis: "Beide Angaben dienen nur der Orientierung und beeinflussen die Bewertung nicht."
   };
 
   // ------------------------------------------------------------ Tabelle 7: Blöcke
@@ -103,7 +105,7 @@
     },
     F2: {
       typ: "einfach", frage: "Wird der KI-Dienst für diese Aufgabe beruflich genutzt?",
-      hilfe: "Gemeint ist der KI-Dienst und die Aufgabe, die Sie für dieses Assessment ausgewählt haben. Eine berufliche Nutzung bleibt beruflich, auch wenn dafür ein privates Konto verwendet wird.",
+      hilfe: "Gemeint ist der KI-Dienst und die Aufgabe, die Sie für dieses Assessment ausgewählt haben. Eine berufliche Nutzung bleibt auch dann beruflich, wenn dafür ein privates Konto verwendet wird.",
       optionen: [
         { wert: "Ja", text: "Ja" },
         { wert: "Nein", text: "Nein, ausschließlich privat" },
@@ -114,8 +116,7 @@
       typ: "einfach", frage: "Mit welchem Konto oder Zugang wird der KI-Dienst genutzt?",
       hilfe: [
         "Unternehmenszugang: Das Unternehmen stellt das Konto oder den Zugriff bereit, zum Beispiel über eine Unternehmenslizenz.",
-        "Privater Zugang: Die Person nutzt ein selbst eingerichtetes Konto oder einen selbst gewählten Zugang.",
-        "Ein eigenständig eingerichtetes Konto, das nicht vom Unternehmen bereitgestellt wird, gilt hier auch dann als privater Zugang, wenn dafür die dienstliche E-Mail-Adresse verwendet wurde.",
+        "Privater Zugang: Die Person nutzt ein selbst eingerichtetes Konto oder einen selbst gewählten Zugang. Das gilt auch dann, wenn dafür die dienstliche E-Mail-Adresse verwendet wurde.",
         "Die Frage betrifft den Zugang zum KI-Dienst, nicht die Internetverbindung."
       ],
       optionen: [
@@ -127,13 +128,13 @@
     F4: {
       typ: "einfach", frage: "Hat Ihr Unternehmen diese Nutzung des KI-Dienstes freigegeben?",
       hilfe: [
-        "Gemeint ist die Nutzung dieses KI-Dienstes für diese Aufgabe mit dem angegebenen Zugang.",
-        "Bekannt: Die zuständige Stelle für KI-Nutzungen oder die Unternehmensleitung wusste schon vor dem Ausfüllen von der Nutzung.",
+        "Gemeint ist die Nutzung des KI-Dienstes für die angegebene Aufgabe mit dem verwendeten Zugang. Die Freigabe eines KI-Dienstes bedeutet nicht automatisch, dass jede Nutzung oder Zugangsform freigegeben ist.",
+        "Bekannt: Die für KI-Nutzungen zuständige Stelle oder die Unternehmensleitung wusste bereits vor dem Ausfüllen des Assessments von dieser Nutzung.",
         "Abgelehnte oder untersagte Nutzungen gelten als bekannt, aber weder freigegeben noch in Prüfung."
       ],
       optionen: [
-        { wert: "freigegeben", text: "Ja – nach einem Prüf- oder Freigabeverfahren" },
-        { wert: "in Pruefung", text: "Noch nicht – Prüfung oder Freigabe läuft" },
+        { wert: "freigegeben", text: "Ja - nach einem Prüf- oder Freigabeverfahren" },
+        { wert: "in Pruefung", text: "Noch nicht - Prüfung oder Freigabe läuft" },
         { wert: "bekannt, nicht freigegeben", text: "Bekannt, aber weder freigegeben noch in Prüfung" },
         { wert: "nicht bekannt", text: "Dem Unternehmen nicht bekannt" },
         { wert: "Unklar", text: "Unklar" }
@@ -142,8 +143,8 @@
     F5: {
       typ: "mehrfach", frage: "Trifft eine der folgenden Aussagen auf Ihr Unternehmen und den KI-Dienst zu?", keine: "Keine",
       hilfe: [
-        "Mit „Anbieter des KI-Dienstes“ ist hier die Organisation gemeint, die den Dienst bereitstellt. Ihr Unternehmen kann durch bestimmte Änderungen oder eine Bereitstellung unter eigenem Namen selbst eine Anbieterrolle übernehmen. Die Frage erfasst Hinweise darauf; sie entscheidet nicht über die rechtliche Rolle.",
-        "„Anderer Zweck“ meint eine Verwendung, die der Anbieter in seinen Nutzungsbedingungen oder seiner Beschreibung nicht vorsieht oder ausschließt. Die übliche Nutzung eines allgemeinen Chat-Dienstes für Texte, Übersetzungen oder Recherchen fällt nicht darunter."
+        "Mit „Anbieter des KI-Dienstes“ ist die Organisation gemeint, die den Dienst bereitstellt. Ihr Unternehmen kann unter bestimmten Voraussetzungen selbst eine Anbieterrolle übernehmen, etwa wenn es den KI-Dienst unter eigenem Namen anbietet, wesentlich verändert oder für einen anderen als den vorgesehenen Zweck einsetzt.",
+        "Anderer Zweck: Eine Verwendung, die der Anbieter in seinen Nutzungsbedingungen oder seiner Beschreibung nicht vorsieht oder ausschließt. Die übliche Nutzung eines allgemeinen Chat-Dienstes für Texte, Übersetzungen oder Recherchen fällt nicht darunter."
       ],
       optionen: nummeriert([
         "Ihr Unternehmen bietet den KI-Dienst unter eigenem Namen an oder hat ihn in ein eigenes Angebot eingebaut",
@@ -157,12 +158,18 @@
     },
     F7: {
       typ: "mehrfach", frage: "Wird der KI-Dienst in einem der folgenden Bereiche für einen der genannten Zwecke eingesetzt?", keine: "Keiner",
-      hilfe: "Wählen Sie nur Bereiche aus, in denen der KI-Dienst tatsächlich für einen der genannten Zwecke eingesetzt wird. Die Branche des Unternehmens allein genügt nicht. Wenn keiner der Zwecke zutrifft, wählen Sie „Keiner“. Sind Sie unsicher, wählen Sie „Unklar“.",
+      hilfe: [
+        "Wählen Sie nur Bereiche aus, in denen der KI-Dienst tatsächlich für einen der genannten Zwecke eingesetzt wird. Die Branche des Unternehmens allein genügt nicht.",
+        "Wenn keiner der Zwecke zutrifft, wählen Sie „Keiner“. Sind Sie unsicher, wählen Sie „Unklar“."
+      ],
       optionen: nummeriert(LISTE_F7)
     },
     F8: {
       typ: "einfach", frage: "Werden dabei personenbezogene Daten automatisiert ausgewertet, um persönliche Aspekte einer Person zu bewerten?",
-      hilfe: "Gemeint ist, dass der KI-Dienst Daten über eine Person auswertet, um etwa ihre Arbeitsleistung, wirtschaftliche Lage, Gesundheit, Interessen, Zuverlässigkeit oder ihr Verhalten einzuschätzen.",
+      hilfe: [
+        "Gemeint ist, dass der KI-Dienst personenbezogene Daten automatisiert auswertet, um persönliche Aspekte einer Person einzuschätzen.",
+        "Dazu gehören beispielsweise ihre Arbeitsleistung, wirtschaftliche Lage, Gesundheit, Interessen, Zuverlässigkeit oder ihr Verhalten."
+      ],
       optionen: JA_NEIN_UNKLAR
     },
     F9: {
@@ -177,12 +184,18 @@
     F10: { typ: "einfach", frage: "Werden Bild-, Ton- oder Videoinhalte erzeugt oder verändert, die täuschend echt wirken?", optionen: JA_NEIN_UNKLAR },
     F11: {
       typ: "einfach", frage: "Werden mit dem KI-Dienst erstellte Texte veröffentlicht, um die Öffentlichkeit über Angelegenheiten von öffentlichem Interesse zu informieren?",
-      hilfe: "Gemeint sind Texte, die sich an die Allgemeinheit richten, zum Beispiel auf der Website, in sozialen Medien oder in Pressemitteilungen. Ob eine Meldung Ihres Unternehmens ein Thema von öffentlichem Interesse betrifft, ist eine Rechtsfrage. Wählen Sie im Zweifel „Unklar“.",
+      hilfe: [
+        "Gemeint sind KI-erstellte Texte, die sich an die Allgemeinheit richten, zum Beispiel auf Websites, in sozialen Medien oder in Pressemitteilungen.",
+        "Ob ein Thema von öffentlichem Interesse ist, kann eine rechtliche Prüfung erfordern. Wählen Sie im Zweifel „Unklar“."
+      ],
       optionen: JA_NEIN_UNKLAR
     },
     F12: {
       typ: "einfach", frage: "Werden personenbezogene Daten in den KI-Dienst eingegeben oder von ihm verarbeitet?",
-      hilfe: "Personenbezogen sind alle Angaben, die sich einer bestimmten Person zuordnen lassen, zum Beispiel Namen, Kontaktdaten, Kundennummern, Bewerbungsunterlagen oder E-Mails mit Absender.",
+      hilfe: [
+        "Personenbezogene Daten sind alle Informationen, die sich einer bestimmten Person zuordnen lassen.",
+        "Dazu gehören beispielsweise Namen, Kontaktdaten, Kundennummern, Bewerbungsunterlagen oder E-Mails mit Angaben zu Absendern und anderen Personen."
+      ],
       optionen: JA_NEIN_UNKLAR
     },
     F13: {
@@ -199,16 +212,18 @@
     F16: {
       typ: "einfach", frage: "Können die personenbezogenen Daten bei dieser Nutzung außerhalb der EU oder des Europäischen Wirtschaftsraums verarbeitet oder zugänglich gemacht werden?",
       hilfe: [
-        "Daten können etwa auf Servern in einem anderen Land verarbeitet werden oder von dort zugänglich sein. Entscheidend ist daher nicht nur, wo die nutzende Person sitzt. Hinweise finden sich in den Datenschutzbedingungen und Vereinbarungen mit dem Anbieter. Kennen Sie die Verarbeitungsorte oder Zugriffsmöglichkeiten nicht, wählen Sie „Unklar“."
+        "Personenbezogene Daten können außerhalb der EU oder des Europäischen Wirtschaftsraums (EWR) verarbeitet oder von dort zugänglich gemacht werden, beispielsweise durch Server oder Zugriffe aus anderen Ländern.",
+        "Entscheidend ist daher nicht nur, wo sich die nutzende Person befindet.",
+        "Hinweise finden Sie in den Datenschutzbedingungen und Vereinbarungen mit dem Anbieter. Sind die Verarbeitungsorte oder Zugriffsmöglichkeiten unbekannt, wählen Sie „Unklar“."
       ],
       optionen: JA_NEIN_UNKLAR
     },
     F17: {
       typ: "mehrfach", frage: "Trifft eine der folgenden Aussagen auf die Verarbeitung personenbezogener Daten bei dieser Nutzung zu?", keine: "Keine",
       hilfe: [
-        "Gemeint ist, wofür Sie den KI-Dienst einsetzen, nicht wie er intern arbeitet.",
-        "Systematische Bewertung: zum Beispiel Bewerbungen vorsortieren oder die Leistung von Beschäftigten einschätzen.",
-        "Großer Umfang: zum Beispiel regelmäßig Gesundheitsdaten vieler Personen eingeben.",
+        "Die Frage bezieht sich darauf, wofür der KI-Dienst tatsächlich eingesetzt wird, nicht darauf, wie er intern funktioniert.",
+        "Systematische Bewertung: Beispielsweise Bewerbungen vorsortieren oder die Leistung von Beschäftigten einschätzen.",
+        "Großer Umfang: Beispielsweise regelmäßig Gesundheitsdaten vieler Personen verarbeiten.",
         "Sind Sie unsicher, wählen Sie „Unklar“."
       ],
       optionen: nummeriert([
@@ -221,8 +236,8 @@
       hilfe: [
         "Öffentlich: Informationen, die bereits veröffentlicht oder zur Veröffentlichung bestimmt sind.",
         "Intern: Informationen, die nur für Beschäftigte bestimmt sind und keinen besonderen Schutzbedarf haben.",
-        "Vertraulich oder geschäftskritisch: Informationen mit besonderem Schutzbedarf, zum Beispiel Verträge, Kalkulationen, Quellcode, Kundendaten oder Strategiepapiere.",
-        "Die Einordnung bezieht sich auf die konkreten Inhalte, nicht allein auf den Dateityp."
+        "Vertraulich oder geschäftskritisch: Informationen mit besonderem Schutzbedarf, beispielsweise Verträge, Kalkulationen, Quellcode, Kundendaten oder Strategiepapiere.",
+        "Entscheidend ist der tatsächliche Inhalt der Informationen, nicht allein der Dateityp."
       ],
       optionen: [
         { wert: "oeffentlich", text: "Öffentliche Informationen" },
@@ -245,9 +260,9 @@
       typ: "einfach", frage: "Welche Folgen hätte ein fehlerhaftes Ergebnis des KI-Dienstes?",
       // Liste: jeder Eintrag wird als eigener Punkt gezeigt
       hilfe: [
-        "Gering: Der Fehler hätte keine Folgen über die eigene Arbeit hinaus. Beispiel: ein interner Textentwurf.",
-        "Spürbar für Ihr Unternehmen: Der Fehler hätte Nachteile für Ihr Unternehmen, etwa Mehraufwand, Verzögerungen oder begrenzte Kosten, ohne einzelne Personen oder Vertragspartner zu treffen. Beispiel: eine fehlerhafte interne Auswertung.",
-        "Erheblich: Der Fehler kann einzelne Personen benachteiligen, rechtliche oder vertragliche Folgen haben, hohen finanziellen Schaden verursachen oder die Sicherheit gefährden. Beispiel: eine Absage an eine Bewerberin, ein fehlerhaftes Angebot an einen Kunden."
+        "Gering: Der Fehler hätte keine Folgen über die eigene Arbeit hinaus. Beispiel: Ein fehlerhafter interner Textentwurf.",
+        "Spürbar für das Unternehmen: Der Fehler könnte Mehraufwand, Verzögerungen oder begrenzte Kosten verursachen, ohne einzelne Personen oder Vertragspartner zu treffen. Beispiel: Eine fehlerhafte interne Auswertung.",
+        "Erheblich: Der Fehler könnte Personen benachteiligen, rechtliche oder vertragliche Folgen haben, hohe finanzielle Schäden verursachen oder die Sicherheit gefährden. Beispiel: Eine ungerechtfertigte Bewerbungsabsage oder ein fehlerhaftes Kundenangebot."
       ],
       optionen: [
         { wert: "gering", text: "Gering" },
@@ -258,7 +273,10 @@
     },
     F21: {
       typ: "einfach", frage: "Prüft eine fachkundige Person vor der Verwendung, ob die Ergebnisse des KI-Dienstes inhaltlich richtig und für die Aufgabe geeignet sind?",
-      hilfe: "Fachlich prüfen bedeutet, dass eine Person mit den erforderlichen Kenntnissen das Ergebnis auf inhaltliche Richtigkeit und Eignung für die Aufgabe kontrolliert. Bloßes Lesen oder eine Kontrolle von Rechtschreibung und Format genügt dafür nicht.",
+      hilfe: [
+        "Eine fachkundige Person prüft vor der Verwendung, ob das KI-Ergebnis inhaltlich richtig und für die konkrete Aufgabe geeignet ist.",
+        "Bloßes Lesen oder die Kontrolle von Rechtschreibung und Format genügt dafür nicht."
+      ],
       optionen: [
         { wert: "immer", text: "Immer" },
         { wert: "teilweise", text: "Teilweise" },
@@ -288,9 +306,9 @@
     F24: {
       typ: "einfach", frage: "Wie ist der KI-Dienst technisch in die Arbeitsabläufe eingebunden?",
       hilfe: [
-        "Manuelle Eingabe: Inhalte werden einzeln eingetippt oder eingefügt.",
-        "Erweiterung: zum Beispiel ein Browser-Plugin oder ein Assistent mit Zugriff auf Postfach, Kalender oder Dateien.",
-        "Automatisierte Anbindung: Daten werden ohne einzelne Eingabeentscheidung über eine Schnittstelle übertragen."
+        "Manuelle Eingabe: Inhalte werden einzeln in den KI-Dienst eingegeben oder eingefügt.",
+        "Erweiterung: Ein Plugin oder Assistent hat beispielsweise Zugriff auf E-Mails, Kalender oder Dateien.",
+        "Automatisierte Anbindung: Daten werden über eine Schnittstelle übertragen, ohne dass jede einzelne Eingabe manuell ausgelöst wird."
       ],
       optionen: [
         { wert: "manuell", text: "Manuelle Eingabe" },
@@ -396,16 +414,16 @@
     D1: "Verarbeitung personenbezogener Daten", D2: "Besondere Kategorien personenbezogener Daten",
     D3: "Verarbeitung durch einen externen Anbieter", D4: "Mögliche Drittlandübermittlung",
     D5: "Datenschutz-Folgenabschätzung",
-    S1: "Externalisierung sensibler Informationen", S2: "Integrität und Verlässlichkeit der Ergebnisse",
+    S1: "Weitergabe sensibler Informationen", S2: "Integrität und Verlässlichkeit der Ergebnisse",
     S3: "Transparenz und Nachvollziehbarkeit", S4: "Abhängigkeit von den Bedingungen externer Anbieter",
-    K1: "Kombinationsregel K1", K2: "Kombinationsregel K2"
+    K1: "Vertrauliche Informationen beim Anbieter", K2: "Folgenreiche Ergebnisse ohne ausreichende Prüfung"
   };
   // Kurznamen der drei Bereiche in der Übersicht des Gesamtergebnisses
   var BEREICHE = { R: "EU AI Act", D: "Datenschutz", S: "Shadow AI" };
   var PFADE = {
     R: "Regulatorische Einordnung (EU AI Act)",
     D: "Datenschutzrechtliche Einordnung",
-    S: "Shadow-AI-Risikobewertung"
+    S: "Risikofaktoren der KI-Nutzung"
   };
 
   // ------------------------------------------------------------ Tabelle B.5: Handlungsempfehlungen
@@ -420,7 +438,7 @@
   // vorhanden: Maßnahme vorhanden. fehlt: Maßnahme fehlt oder ist unklar.
   // text: Empfehlung ohne Schutzmaßnahme, die unabhängig von einem Stand gilt.
   var EMPFEHLUNGEN = {
-    "E1": { vorhanden: "Prüfen Sie, ob die KI-Richtlinie Ihres Unternehmens diesen KI-Dienst und diese Aufgabe abdeckt, und halten Sie sich an ihre Vorgaben.", fehlt: "Fragen Sie Ihre Führungskraft oder die zuständige Stelle, welche Regeln für diesen KI-Dienst gelten. Gibt es keine, regen Sie solche Regeln an." },
+    "E1": { vorhanden: "Prüfen Sie, ob die KI-Richtlinie Ihres Unternehmens diesen KI-Dienst und diese Aufgabe abdeckt, und halten Sie sich an ihre Vorgaben.", fehlt: "Fragen Sie Ihre Führungskraft oder die zuständige Stelle, welche Regeln für diesen KI-Dienst gelten." },
     "E2": { fehlt: "Fragen Sie nach einer Schulung zum Umgang mit KI. Nach Art. 4 KI-VO unterstützen Unternehmen den Aufbau der KI-Kompetenz ihres Personals." },
     "E3": { vorhanden: "Fragen Sie bei Ihrer IT nach, ob die vorhandenen technischen Schutzmaßnahmen auch diesen KI-Dienst erfassen.", fehlt: "Lassen Sie von Ihrer IT prüfen, welche technischen Schutzmaßnahmen für diesen KI-Dienst nötig sind." },
     "E4": { vorhanden: "Lassen Sie die Ergebnisse in diesem Nutzungsfall wie vorgeschrieben fachlich prüfen, bevor Sie sie verwenden.", fehlt: "Legen Sie mit Ihrer Führungskraft fest, wer die Ergebnisse vor der Verwendung fachlich prüft." },
@@ -500,24 +518,23 @@
       hintergrundAuf: "Regulatorischen Kontext einblenden",
       hintergrundZu: "Regulatorischen Kontext ausblenden",
       band: [
-        { titel: "30 Fragen", text: "In fünf Blöcken" },
+        { titel: "30 Fragen", text: "In fünf Themenbereichen" },
         { titel: "Drei Bereiche", text: "Shadow AI, EU AI Act und Datenschutz" },
         { titel: "Konkrete Empfehlungen", text: "Für Ihre nächsten Schritte" }
       ]
     },
     // Einleitung der Startseite: Die Info-Schaltfläche zu Shadow AI steht hinter dem ersten Satz.
-    startText: "Bewerten Sie in 30 Fragen einen konkreten KI-Nutzungsfall.",
-    startText2: "Im Mittelpunkt steht Shadow AI, ergänzt um EU AI Act und Datenschutz.",
+    startText: "Prüfen Sie einen konkreten KI-Nutzungsfall anhand von 30 Fragen in fünf Themenblöcken.",
+    // Die Info-Schaltfläche steht direkt hinter „Shadow AI“.
+    startText2: "Im Mittelpunkt stehen Shadow AI",
+    startText3: ", EU AI Act und Datenschutz.",
     // Erklärung des Begriffs Shadow AI hinter dem Einleitungstext (Abschnitt 2.1.2, Tabelle 14)
     shadowAiFrage: "Was ist Shadow AI?",
-    shadowAi: [
-      "Shadow AI bezeichnet die berufliche Nutzung von KI-Diensten, die vom Unternehmen nicht freigegeben ist und sich seiner Steuerung und Aufsicht entzieht. Läuft für die Nutzung bereits ein Prüf- oder Freigabeverfahren, gilt sie hier nicht als Shadow AI. Weiß das Unternehmen von der Nutzung, ohne sie freigegeben zu haben, gilt sie dagegen als Shadow AI. Ob dafür ein privates Konto oder ein Zugang des Unternehmens verwendet wird, ist für die Einordnung nicht entscheidend.",
-      "Das Self-Assessment lässt sich auch für freigegebene Nutzungen verwenden. Das Ergebnis weist dann aus, dass keine Shadow AI vorliegt."
-    ],
+    shadowAi: "Shadow AI bezeichnet die berufliche Nutzung von KI-Diensten, die vom Unternehmen nicht freigegeben ist und sich seiner Steuerung und Aufsicht entzieht.",
     startPunkte: [
-      { titel: "Nachvollziehbare Risikobewertung", text: "Reaktionsstufe mit Begründung und Empfehlungen." },
-      { titel: "Orientierung statt Rechtsprüfung", text: "Ein Prüfhinweis, keine Aussage zur Rechtskonformität." },
-      { titel: "Keine Speicherung Ihrer Angaben", text: "Ihre Angaben bleiben in diesem Browserfenster und werden nicht gespeichert." }
+      { titel: "Nachvollziehbare Bewertung", text: "Mit Begründung und Empfehlungen." },
+      { titel: "Orientierung statt Rechtsprüfung", text: "Ein Prüfhinweis, keine Rechtsberatung." },
+      { titel: "Keine Speicherung", text: "Ihre Angaben bleiben im Browser." }
     ],
     beginnen: "Assessment beginnen",
     weiter: "Weiter",
@@ -529,13 +546,21 @@
     erlaeuterung: "Erläuterung zur Frage",
     infoStelle: "Was ist die zuständige Stelle?",
     mehrfachHinweis: "Mehrere Angaben möglich",
+    // Hinweis unter der Frage bei Mehrfachauswahl, je Frage. Fehlt ein Eintrag, gilt mehrfachHinweis.
+    mehrfachHinweise: {
+      F5: "Prüfen Sie, ob eine oder mehrere der folgenden Aussagen auf Ihren konkreten KI-Nutzungsfall zutreffen.",
+      F6: "Prüfen Sie, ob eine oder mehrere der folgenden Verwendungen auf Ihren konkreten KI-Nutzungsfall zutreffen.",
+      F7: "Prüfen Sie, ob eine oder mehrere der folgenden Verwendungen auf Ihren konkreten KI-Nutzungsfall zutreffen.",
+      F9: "Prüfen Sie, ob eine oder mehrere der folgenden Aussagen auf Ihren konkreten KI-Nutzungsfall zutreffen.",
+      F17: "Prüfen Sie, ob eine oder mehrere der folgenden Aussagen auf Ihren konkreten KI-Nutzungsfall zutreffen."
+    },
+    ausschlussHinweis: "Falls keine der Aussagen zutrifft oder Sie unsicher sind:",
     drucken: "Ergebnis drucken oder als PDF sichern",
     aendern: "Antworten ändern",
     neu: "Neues Assessment",
     ergebnis: "Ergebnis",
     unklar: "Unklar",
     standRegelbasis: "Stand der Regelbasis: {stand}",
-    blockZaehler: "Block {aktuell} von {letzter}",
     abschlussTitel: "Abschluss nach der Vorprüfung",
     abschlussFrage: "Warum endet das Assessment hier?",
     ergebnisTitel: "Ergebnis des Self-Assessments",
@@ -545,18 +570,20 @@
     matrixBeschreibung: "Gesamtergebnis Stufe {gesamt} von 4, {name}. Regulatorischer Pfad Stufe {R}, Datenschutz Stufe {D}, Shadow-AI-Pfad Stufe {S}.",
     ausloeser: "Auslösende Antworten",
     lueckenTitel: "Wissenslücken",
-    statusTitel: "Status der KI-Nutzung",
-    risikofaktorenTitel: "Bewertung einzelner Risikofaktoren",
+    einordnungTitel: "Organisatorische Einordnung",
+    wichtig: "Wichtig:",
+    offeneTitel: "Offene Angaben",
+    warumTitel: "Warum dieses Ergebnis?",
     regelbasisHinweis: "Die Einstufung beruht ausschließlich auf den abgefragten Sachverhalten und den hinterlegten Bewertungsregeln.",
     warum: "Warum diese Empfehlung?",
     // Erklärung der Stufe im Bereich Shadow AI, je Stufe
     shadowStufe: {
       1: "Die erfassten Risikofaktoren haben nach den hinterlegten Bewertungsregeln keine erhöhte Reaktionsstufe ausgelöst.",
-      2: "Mindestens ein Risikofaktor hat die Stufe „Handlungsbedarf“ ausgelöst. Der Fachbereich kann ihm mit Schutzmaßnahmen begegnen.",
+      2: "Der Fachbereich kann den markierten Risikofaktoren mit Schutzmaßnahmen begegnen.",
       3: "Mindestens ein Risikofaktor hat die Stufe „Prüfbedarf“ ausgelöst. Eine zuständige Stelle sollte den Fall prüfen.",
       4: "Eine Kombination von Risikofaktoren hat die Stufe „Eskalation“ ausgelöst. Der Fall sollte der zuständigen Stelle vorrangig vorgelegt werden."
     },
-    widerspruecheTitel: "Widersprüchliche Angaben erkannt",
+    widerspruecheTitel: "Widersprüchliche Angaben",
     empfehlungenTitel: "Empfohlene nächste Schritte",
     keineEmpfehlungen: "Aus Ihren Angaben ergeben sich keine Handlungsempfehlungen.",
     etikett: "{massnahme}: {zustand}",
@@ -565,6 +592,8 @@
     sachverhalteAnzahl: "Erfasste Sachverhalte ({anzahl})",
     infoZeichen: "i",
     fortschritt: "{beantwortet} von {gesamt} Fragen beantwortet",
+    fortschrittGesamt: "Insgesamt {prozent} %",
+    blockFertig: "abgeschlossen",
     fallDienst: "KI-Dienst:",
     fallAufgabe: "Nutzung:",
     fallKategorie: "Kategorie:",
@@ -574,20 +603,22 @@
   // Geltungsbeginn nach Art. 113 KI-VO in der Fassung der Verordnung (EU) 2026/1744.
   // Die Übersicht dient der Orientierung auf der Startseite und geht in keine Regel ein.
   var TERMINE = {
-    titel: "Wichtige Meilensteine des EU AI Acts",
-    einleitung: "Der EU AI Act gilt schrittweise. Hier finden Sie die wichtigsten bisherigen und kommenden Termine.",
+    titel: "EU AI Act: wichtige Fristen",
+    einleitung: "Der EU AI Act ist die europäische Verordnung für künstliche Intelligenz. Sie legt Regeln und Pflichten für bestimmte KI-Systeme und ihre Nutzung fest.",
     monate: ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
     // Amtliche Fassung der Verordnung (EU) 2024/1689 auf EUR-Lex. Öffnet sich nur auf Klick in einem neuen Fenster.
-    link: { text: "Weitere Informationen zum EU AI Act", adresse: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj", hinweis: "öffnet EUR-Lex in einem neuen Fenster" },
+    link: { text: "Alle Fristen ansehen", adresse: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj", hinweis: "amtliche Fassung, Art. 113 KI-VO, öffnet EUR-Lex in einem neuen Fenster" },
     heute: "Heute",
     quelle: "Art. 113 KI-VO in der Fassung der Verordnung (EU) 2026/1744",
     eintraege: [
-      { datum: "2025-02-02", anzeige: "2. Februar 2025", titel: "Verbotene Praktiken und KI-Kompetenz", text: "Kapitel I und II, darunter Art. 4 und Art. 5" },
-      { datum: "2025-08-02", anzeige: "2. August 2025", titel: "KI-Modelle mit allgemeinem Verwendungszweck", text: "Pflichten der Anbieter solcher Modelle" },
-      { datum: "2026-08-02", anzeige: "2. August 2026", titel: "Allgemeiner Geltungsbeginn", text: "Darunter die Transparenzpflichten nach Art. 50" },
-      { datum: "2026-12-02", anzeige: "2. Dezember 2026", titel: "Weitere verbotene Praktiken", text: "Art. 5 Abs. 1 Buchst. ba und bb" },
-      { datum: "2027-12-02", anzeige: "2. Dezember 2027", titel: "Hochrisiko-KI-Systeme nach Anhang III", text: "Zum Beispiel Beschäftigung, Bildung, grundlegende Dienste" },
-      { datum: "2028-08-02", anzeige: "2. August 2028", titel: "Hochrisiko-KI-Systeme nach Anhang I", text: "KI in Produkten, die unter Harmonisierungsvorschriften fallen" }
+      // zusatz: Fundstelle, erscheint in normaler Schrift hinter dem Titel
+      { datum: "2024-08-01", anzeige: "1. August 2024", titel: "Inkrafttreten des EU AI Acts", zusatz: "" },
+      { datum: "2025-02-02", anzeige: "2. Februar 2025", titel: "KI-Kompetenz und verbotene Praktiken", zusatz: "(Art. 4 und 5)" },
+      { datum: "2025-08-02", anzeige: "2. August 2025", titel: "Pflichten für KI-Modelle mit allgemeinem Verwendungszweck", zusatz: "" },
+      { datum: "2026-08-02", anzeige: "2. August 2026", titel: "Allgemeiner Geltungsbeginn und Transparenzpflichten", zusatz: "(Art. 50)" },
+      { datum: "2026-12-02", anzeige: "2. Dezember 2026", titel: "Zusätzliche verbotene Praktiken", zusatz: "(Art. 5 Abs. 1 Buchst. ba und bb)" },
+      { datum: "2027-12-02", anzeige: "2. Dezember 2027", titel: "Hochrisiko-KI-Systeme nach Anhang III", zusatz: "" },
+      { datum: "2028-08-02", anzeige: "2. August 2028", titel: "Hochrisiko-KI-Systeme nach Anhang I", zusatz: "" }
     ]
   };
 

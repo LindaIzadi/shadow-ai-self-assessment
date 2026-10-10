@@ -234,20 +234,25 @@ const EIN = { "keine Shadow AI": "Keine Shadow AI", "keine Shadow AI, Freigabe s
   console.log("== Fortschritt ==");
   // Gezählt werden nur die Fragen, die bei den bisherigen Antworten gestellt werden.
   const fortschritt = async () => (await page.locator("#fortschritt-text").textContent()) + " | " + (await page.locator("#fortschritt").getAttribute("value")) + "/" + (await page.locator("#fortschritt").getAttribute("max"));
+  const gesamt = async () => (await page.locator("#fortschritt-gesamt").textContent()) + " | " + (await page.locator("#fortschritt-gesamt-balken").getAttribute("value")) + "/" + (await page.locator("#fortschritt-gesamt-balken").getAttribute("max"));
   await page.goto(URL);
   await beginne(page);
-  ok((await fortschritt()) === "0 von 23 Fragen beantwortet | 0/23", "Fortschritt am Anfang: " + (await fortschritt()));
+  ok((await fortschritt()) === "0 von 5 Fragen beantwortet | 0/5", "Fortschritt am Anfang: " + (await fortschritt()));
   await antworte(page, "F1", "Texte"); await antworte(page, "F2", "Ja");
-  ok((await fortschritt()) === "2 von 23 Fragen beantwortet | 2/23", "Fortschritt nach zwei Antworten: " + (await fortschritt()));
+  ok((await fortschritt()) === "2 von 5 Fragen beantwortet | 2/5", "Fortschritt nach zwei Antworten: " + (await fortschritt()));
   await antworte(page, "F2", "Nein");
   ok((await fortschritt()) === "2 von 2 Fragen beantwortet | 2/2", "Fortschritt bei privater Nutzung: " + (await fortschritt()));
   await antworte(page, "F2", "Ja"); await antworte(page, "F3", "privat"); await antworte(page, "F4", "nicht bekannt"); await antworte(page, "F5", "Keine");
   await page.locator("#weiter").click();
-  ok((await fortschritt()) === "5 von 23 Fragen beantwortet | 5/23", "Fortschritt im nächsten Block: " + (await fortschritt()));
+  ok((await fortschritt()) === "0 von 4 Fragen beantwortet | 0/4", "Fortschritt im nächsten Block: " + (await fortschritt()));
+  ok((await page.locator("#fortschritt-gesamt").textContent()) === "Insgesamt 22 %", "Gesamtfortschritt in Prozent");
+  ok((await page.locator("#schritte .schritt.fertig").count()) === 1 && (await page.locator("#schritte .schritt.aktiv .schritt-knopf").textContent()).includes("Regulatorische"), "Navigation: Block 1 abgeschlossen, Block 2 aktuell");
   await antworte(page, "F7", [6]);
-  ok((await fortschritt()) === "6 von 25 Fragen beantwortet | 6/25", "bedingte Fragen erhöhen die Gesamtzahl: " + (await fortschritt()));
+  ok((await fortschritt()) === "1 von 6 Fragen beantwortet | 1/6", "bedingte Fragen erhöhen die Gesamtzahl: " + (await fortschritt()));
+  ok((await gesamt()) === "Insgesamt 24 % | 6/25", "Gesamtfortschritt mit bedingten Fragen: " + (await gesamt()));
   await antworte(page, "F7", "Keine");
-  ok((await fortschritt()) === "6 von 23 Fragen beantwortet | 6/23", "ausgeblendete Fragen zählen nicht mit: " + (await fortschritt()));
+  ok((await fortschritt()) === "1 von 4 Fragen beantwortet | 1/4", "ausgeblendete Fragen zählen nicht mit: " + (await fortschritt()));
+  ok((await gesamt()) === "Insgesamt 26 % | 6/23", "Gesamtfortschritt ohne ausgeblendete Fragen: " + (await gesamt()));
 
   console.log("== Hilfetexte ==");
   await page.goto(URL);
@@ -257,20 +262,21 @@ const EIN = { "keine Shadow AI": "Keine Shadow AI", "keine Shadow AI, Freigabe s
   ok((await page.locator(".frage .info-knopf").count()) === inBlockA && inBlockA > 0, "jede Frage mit Hilfetext hat eine Info-Schaltfläche");
   const info = page.locator("#frage-F2 .info-knopf"), blase = page.locator("#hilfe-F2");
   ok(!(await blase.isVisible()), "Hilfetext anfangs verborgen");
-  await info.hover();
-  ok(await blase.isVisible() && (await blase.textContent()).includes("privates Konto"), "Hilfetext erscheint beim Überfahren");
-  await page.mouse.move(5, 5); await page.waitForTimeout(400);
-  ok(!(await blase.isVisible()), "Hilfetext verschwindet nach dem Verlassen");
-  await info.focus();
-  ok(await blase.isVisible(), "Hilfetext erscheint bei Tastaturfokus");
-  await page.keyboard.press("Escape");
+  await info.click(); await page.mouse.move(5, 5); await page.waitForTimeout(300);
+  ok(await blase.isVisible() && (await blase.textContent()).includes("privates Konto"), "Klick öffnet den Hilfetext, er bleibt offen");
+  ok((await info.getAttribute("aria-expanded")) === "true", "Schaltfläche meldet den geöffneten Zustand");
+  const lage = await page.evaluate(() => ({ feld: document.getElementById("hilfe-F2").getBoundingClientRect().bottom, antworten: document.querySelector("#frage-F2 .optionen").getBoundingClientRect().top }));
+  ok(lage.antworten >= lage.feld, "Hilfetext schiebt die Antworten nach unten und überdeckt nichts");
+  await info.focus(); await page.keyboard.press("Escape");
   ok(!(await blase.isVisible()), "Escape schließt den Hilfetext");
-  await info.click(); await page.mouse.move(5, 5); await page.waitForTimeout(400);
-  ok(await blase.isVisible(), "Klick hält den Hilfetext offen");
+  await info.click(); await info.click();
+  ok(!(await blase.isVisible()), "zweiter Klick schließt den Hilfetext");
   await page.locator("#frage-F3 .info-knopf").click();
-  ok(!(await blase.isVisible()) && await page.locator("#hilfe-F3").isVisible(), "nur ein Hilfetext bleibt offen");
-  await antworte(page, "F1", "Texte");
-  ok(!(await page.locator("#hilfe-F3").isVisible()), "Klick daneben schließt den Hilfetext");
+  await info.click();
+  await page.locator("#frage-F3 .info-knopf").click();
+  ok(await page.locator("#hilfe-F3").isVisible() && !(await blase.isVisible()), "nur ein Hilfetext ist geöffnet");
+  await page.locator("#frage-F3 .info-knopf").click();
+  ok(!(await page.locator("#hilfe-F3").isVisible()), "Info-Schaltfläche schließt den Hilfetext wieder");
 
   // Erklärung von Shadow AI auf der Startseite
   await page.goto(URL);
