@@ -104,10 +104,6 @@
    "luecken": [],
    "empfehlungen": [
     [
-     "E1",
-     "vorhanden"
-    ],
-    [
      "E3",
      "vorhanden"
     ]
@@ -290,6 +286,10 @@
      "fehlt"
     ],
     [
+     "E8",
+     "-"
+    ],
+    [
      "E5a",
      "fehlt"
     ],
@@ -442,10 +442,6 @@
    ],
    "empfehlungen": [
     [
-     "E1",
-     "vorhanden"
-    ],
-    [
      "E5a",
      "vorhanden"
     ]
@@ -510,10 +506,6 @@
     "F14"
    ],
    "empfehlungen": [
-    [
-     "E1",
-     "vorhanden"
-    ],
     [
      "E3",
      "vorhanden"
@@ -690,6 +682,212 @@
     ]
    ],
    "widersprueche": []
+  }
+ },
+ "T11": {
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": [
+    1
+   ],
+   "F6": "Keine",
+   "F7": "Keine",
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "teilweise",
+   "F24": "manuell",
+   "F25": "Ja",
+   "F26": "Ja",
+   "F27": "Ja",
+   "F28": "Ja",
+   "F29": [
+    "Stelle",
+    "Verfahren"
+   ],
+   "F30": "Ja",
+   "F3": "Unternehmen",
+   "F4": "freigegeben",
+   "F12": "Nein",
+   "F18": "oeffentlich",
+   "F20": "spuerbar",
+   "F22": "ja",
+   "F23": "extern ohne"
+  },
+  "erwartet": {
+   "gesamt": 3,
+   "R": 3,
+   "D": 1,
+   "S": 2,
+   "felder": [
+    1,
+    2,
+    1,
+    1
+   ],
+   "einordnung": "keine Shadow AI",
+   "freigabezusatz": true,
+   "regeln": [
+    "R1",
+    "S2"
+   ],
+   "luecken": [],
+   "empfehlungen": [
+    [
+     "E4",
+     "vorhanden"
+    ],
+    [
+     "E5a",
+     "vorhanden"
+    ]
+   ],
+   "widersprueche": []
+  }
+ },
+ "T12": {
+  "antworten": {
+   "F1": "Recherchieren",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": "Keine",
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Unklar",
+   "F26": "Nein",
+   "F27": "Ja",
+   "F28": "Ja",
+   "F29": "Unklar",
+   "F30": "Unklar",
+   "F3": "Unklar",
+   "F4": "Unklar",
+   "F12": "Nein",
+   "F18": "Unklar",
+   "F20": "gering",
+   "F22": "ja",
+   "F23": "extern ohne"
+  },
+  "erwartet": {
+   "gesamt": 2,
+   "R": 1,
+   "D": 1,
+   "S": 2,
+   "felder": [
+    2,
+    1,
+    2,
+    1
+   ],
+   "einordnung": "unklar",
+   "freigabezusatz": false,
+   "regeln": [
+    "S1",
+    "S3"
+   ],
+   "luecken": [
+    "F3",
+    "F4",
+    "F18",
+    "F25",
+    "F29",
+    "F30"
+   ],
+   "empfehlungen": [
+    [
+     "E1",
+     "unklar"
+    ],
+    [
+     "E2",
+     "fehlt"
+    ],
+    [
+     "E3",
+     "vorhanden"
+    ],
+    [
+     "E5a",
+     "unklar"
+    ],
+    [
+     "E5b",
+     "unklar"
+    ],
+    [
+     "E6",
+     "unklar"
+    ]
+   ],
+   "widersprueche": []
+  }
+ },
+ "T13": {
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": "Keine",
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Ja",
+   "F26": "Ja",
+   "F27": "Ja",
+   "F28": "Ja",
+   "F29": [
+    "Stelle",
+    "Verfahren"
+   ],
+   "F30": "Ja",
+   "F3": "Unternehmen",
+   "F4": "freigegeben",
+   "F12": "Ja",
+   "F18": "intern",
+   "F20": "spuerbar",
+   "F22": "ja",
+   "F23": "lokal",
+   "F13": "Nein",
+   "F15": "Ja",
+   "F16": "Ja",
+   "F17": "Keine"
+  },
+  "erwartet": {
+   "gesamt": 3,
+   "R": 1,
+   "D": 3,
+   "S": 1,
+   "felder": [
+    1,
+    1,
+    1,
+    1
+   ],
+   "einordnung": "keine Shadow AI",
+   "freigabezusatz": true,
+   "regeln": [
+    "D1",
+    "D3",
+    "D4"
+   ],
+   "luecken": [],
+   "empfehlungen": [
+    [
+     "E5a",
+     "vorhanden"
+    ]
+   ],
+   "widersprueche": [
+    "W2 (F15)",
+    "W2 (F16)"
+   ]
   }
  }
 }

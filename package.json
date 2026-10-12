@@ -12,9 +12,12 @@
     "lint": "eslint .",
     "test:regeln": "node test/regeln.test.js",
     "test:konsistenz": "node test/konsistenz.test.js",
-    "test:browser": "node test/browser.test.js",
+    "test:browser": "node test/browser.test.js chromium",
+    "test:browser:firefox": "node test/browser.test.js firefox",
+    "test:browser:webkit": "node test/browser.test.js webkit",
+    "test:browser:alle": "npm run test:browser && npm run test:browser:firefox && npm run test:browser:webkit",
     "test": "npm run lint && npm run test:regeln && npm run test:konsistenz && npm run test:browser",
-    "browser:installieren": "playwright install chromium"
+    "browser:installieren": "playwright install chromium firefox webkit"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

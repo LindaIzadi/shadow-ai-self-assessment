@@ -29,8 +29,8 @@ jobs:
       - name: Prüfwerkzeuge in den festgeschriebenen Versionen installieren
         run: npm ci
 
-      - name: Browser für den Browsertest installieren
-        run: npx playwright install --with-deps chromium
+      - name: Browser für den Browsertest installieren (Chromium, Firefox, WebKit)
+        run: npx playwright install --with-deps chromium firefox webkit
 
       - name: Linter
         run: npm run lint
@@ -41,8 +41,14 @@ jobs:
       - name: "Testlauf 2: Konsistenzprüfung der Regelbasis (Vollständigkeit, Widerspruchsfreiheit, Monotonie)"
         run: npm run test:konsistenz
 
-      - name: "Testlauf 3: Oberfläche im Browser"
+      - name: "Testlauf 3: Oberfläche im Browser (Chromium, Engine von Chrome und Edge)"
         run: npm run test:browser
+
+      - name: "Testlauf 3: Oberfläche im Browser (Firefox)"
+        run: npm run test:browser:firefox
+
+      - name: "Testlauf 3: Oberfläche im Browser (WebKit, Engine von Safari)"
+        run: npm run test:browser:webkit
 
       - name: Statische Seite zusammenstellen (nur die Dateien der Anwendung)
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'

@@ -61,7 +61,7 @@
   var ANTWORTEN = {
     F1: einfach(["Texte", "Uebersetzen", "Recherchieren", "Programmcode", "Daten", "Medien", "Sonstiges"]),
     F2: einfach(JA_NEIN_UNKLAR),
-    F3: einfach(["Unternehmen", "privat", UNKLAR]),
+    F3: einfach(["Unternehmen", "privat", "ohne Anmeldung", UNKLAR]),
     F4: einfach(["freigegeben", "in Pruefung", "bekannt, nicht freigegeben", "nicht bekannt", UNKLAR]),
     F5: mehrfach(nummern(3)),
     F6: mehrfach(nummern(8)),
@@ -329,7 +329,7 @@
   /**
    * Handlungsempfehlungen in der Form { kennung, zustand, zusaetze, anlass }.
    * zustand  Stand der zugehörigen Schutzmaßnahme. null bei einer Empfehlung ohne
-   *          Schutzmaßnahme (E7).
+   *          Schutzmaßnahme (E7, E8).
    * zusaetze Namen ergänzender Empfehlungstexte (Tabelle B.5)
    * anlass   Warum die Empfehlung ausgegeben wird: { grund, sachverhalte }.
    *          grund nennt den Anlass nach Tabelle 18 (Schlüssel der Texte in inhalte.js),
@@ -362,8 +362,16 @@
     function empfiehl(kennung, stand, anlass, zusaetze) {
       liste.push({ kennung: kennung, zustand: stand, zusaetze: zusaetze || [], anlass: anlass });
     }
-    if (gesamt >= 2 || anlassEinordnung) {
-      empfiehl("E1", zustand(a.F25, "F25"),
+    // E1: Fehlt eine KI-Richtlinie oder ist sie unklar, wird sie ab Handlungsbedarf oder bei
+    // möglicher Shadow AI empfohlen. Besteht bereits eine Richtlinie, wird ihre Anwendung nur
+    // empfohlen, wenn die Nutzung Shadow AI sein kann. Dann ist zu klären, ob die Richtlinie
+    // diese Nutzung zulässt. Bei freigegebener Nutzung trägt der Verweis auf die bestehende
+    // Richtlinie nichts zu den festgestellten Sachverhalten bei und entfällt.
+    var richtlinie = zustand(a.F25, "F25");
+    if (richtlinie === ZUSTAND.VORHANDEN) {
+      if (anlassEinordnung) empfiehl("E1", richtlinie, grundEinordnung);
+    } else if (gesamt >= 2 || anlassEinordnung) {
+      empfiehl("E1", richtlinie,
         gesamt >= 2 ? { grund: "gesamt", sachverhalte: mitStufe(gesamt) } : grundEinordnung);
     }
     if (a.F26 !== JA) {
@@ -377,6 +385,13 @@
       empfiehl("E4", pruefung, { grund: "sachverhalteRisiko", sachverhalte: risiken(["S2"], "K2") },
         r3 && pruefung !== ZUSTAND.VORHANDEN ? ["E4 Zusatz Art. 26 Abs. 2"] : []);
     }
+    // E8: Maßnahme zum Risikofaktor Transparenz und Nachvollziehbarkeit (S3). Sie entfällt nur,
+    // wenn S3 allein aus der fehlenden Freigabe folgt und die Nutzung nachvollziehbar ist. Diesen
+    // Teil decken E5b und E6 ab. So bleibt bei Handlungsbedarf nie eine Empfehlungsliste leer.
+    var nichtNachvollziehbar = a.F22 !== "ja";
+    if (felder.S3 >= 2 && (nichtNachvollziehbar || !nichtFrei)) {
+      empfiehl("E8", null, { grund: "sachverhalteRisiko", sachverhalte: risiken(["S3"], "K2") });
+    }
     if (gesamt >= 3 || anlassEinordnung) {
       empfiehl("E5a", teil29("Stelle"),
         gesamt >= 3 ? { grund: "stelle", sachverhalte: mitStufe(gesamt) } : grundEinordnung);
@@ -385,7 +400,9 @@
       empfiehl("E5b", teil29("Verfahren"), grundFreigabe);
       empfiehl("E6", zustand(a.F30, "F30"), grundFreigabe);
     }
+    // E7 bei selbst eingerichtetem Zugang und bei Nutzung ohne Anmeldung, der Anlass nennt die Angabe
     if (a.F3 === "privat") empfiehl("E7", null, { grund: "privat", sachverhalte: [] });
+    if (a.F3 === "ohne Anmeldung") empfiehl("E7", null, { grund: "ohneAnmeldung", sachverhalte: [] });
     return liste;
   }
 
@@ -412,9 +429,9 @@
    *   { abschluss: false, gesamt, R, D, S,         Reaktionsstufen 1 bis 4
    *     felder: { S1, S2, S3, S4 },                Stufen der Risikofelder
    *     bestimmend: ["D"],                         Pfade mit der höchsten Stufe, leer bei Stufe 1
-   *     einordnung, freigabezusatz, shadowzusatz,  Einordnung als Shadow AI und ihre Zusätze
+   *     einordnung, freigabezusatz,                Einordnung als Shadow AI und Zusatz zur Freigabe
    *     treffer, luecken, widersprueche,           widersprueche: Kennungen, ohne Wirkung auf die Stufe
- *     empfehlungen }
+   *     empfehlungen }
    */
   function auswerten(a) {
     pruefeEingabe(a);
@@ -434,7 +451,6 @@
       bestimmend: gesamt > 1 ? PFADE.filter(function (p) { return stufen[p] === gesamt; }) : [],
       einordnung: einordn,
       freigabezusatz: a.F4 === "freigegeben" && gesamt >= 3,
-      shadowzusatz: einordn === EINORDNUNG.SHADOW_AI,
       treffer: treffer,
       luecken: REIHENFOLGE.filter(function (f) { return a[f] === UNKLAR; }),
       widersprueche: widersprueche(a),

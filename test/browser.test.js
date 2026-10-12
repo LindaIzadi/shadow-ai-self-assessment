@@ -1,14 +1,22 @@
 /*
- * Prüft den Prototyp im Browser: Die zehn Testfälle aus Anhang C werden über die
+ * Prüft den Prototyp im Browser: Die dreizehn Testfälle aus Anhang C werden über die
  * Oberfläche eingegeben und das angezeigte Ergebnis wird mit testfaelle.json
  * verglichen. Zusätzlich werden Fragenführung, Pflichtfelder, ausschließende
  * Optionen, widersprüchliche Angaben, die Einordnung „Shadow AI nicht ausgeschlossen“, Fortschrittsanzeige, Hilfetexte, die Auswahl des KI-Dienstes, die Nachfrage vor
  * dem Verlassen der Seite, Netzwerkzugriffe und Browserspeicher geprüft.
  *
- * Benötigt Node.js und Playwright (npm install playwright).
- * Aufruf im Projektordner:  node test/browser.test.js
+ * Benötigt Node.js und Playwright (npm install playwright) sowie die Browser
+ * (npx playwright install chromium firefox webkit).
+ * Aufruf im Projektordner:  node test/browser.test.js [chromium|firefox|webkit]
+ * Ohne Angabe läuft der Test in Chromium. WebKit ist die Browser-Engine von Safari.
  */
-const { chromium } = require("playwright");
+const playwright = require("playwright");
+const ENGINES = ["chromium", "firefox", "webkit"];
+const ENGINE = process.argv[2] || "chromium";
+if (!ENGINES.includes(ENGINE)) {
+  console.error("Unbekannter Browser: " + ENGINE + ". Zulässig: " + ENGINES.join(", "));
+  process.exit(2);
+}
 const path = require("path");
 const ROOT = path.join(__dirname, "..");
 const faelle = require(ROOT + "/test/testfaelle.json");
@@ -37,6 +45,13 @@ async function durchlauf(page, a) {
       ok(sichtbar === (a[f] !== undefined), `${f} sichtbar=${sichtbar}, erwartet ${a[f] !== undefined}`);
       if (sichtbar && a[f] !== undefined) await antworte(page, f, a[f]);
     }
+    // Hinweis auf entfallende Fragen erscheint genau dann, wenn die abhängigen Fragen ausgeblendet sind
+    const entfaellt = { F7: a.F7 === "Keine", F12: a.F12 === "Nein", F13: a.F13 !== undefined && a.F13 !== "Ja" };
+    for (const [k, soll] of Object.entries(entfaellt)) {
+      if (!BLOECKE[b].includes(Number(k.slice(1)))) continue;
+      const ist = await page.locator("#entfaellt-" + k).isVisible();
+      ok(ist === soll, `Hinweis entfallende Fragen nach ${k}: ${ist}, erwartet ${soll}`);
+    }
     await page.locator("#weiter").click();
     if (a.F2 === "Nein") return;
   }
@@ -50,7 +65,7 @@ async function lies(page) {
     return {
       gesamt: document.querySelector(".gesamt-stufe").textContent,
       herkunft: (document.querySelector(".gesamt-regel") || {}).textContent,
-      pfade: pfad, felder: t(".felder .stufe-zahl"),
+      pfade: pfad, felder: t(".pfad-s .felder .stufe-zahl"),
       einordnung: document.querySelector(".einordnung-titel").textContent,
       zusatz: !!document.querySelector(".einordnung .zusatz-freigabe"),
       shadowZusatz: !!document.querySelector(".einordnung .zusatz-shadow"),
@@ -62,10 +77,11 @@ async function lies(page) {
     };
   });
 }
-const EIN = { "keine Shadow AI": "Keine Shadow AI", "keine Shadow AI, Freigabe steht aus": "Freigabe in Prüfung", "Shadow AI": "Shadow AI", "unklar": "Shadow AI nicht ausgeschlossen" };
+const EIN = { "keine Shadow AI": "Keine Shadow AI laut Angaben", "keine Shadow AI, Freigabe steht aus": "Freigabe in Prüfung", "Shadow AI": "Shadow AI laut Angaben", "unklar": "Shadow AI nicht ausgeschlossen" };
 
 (async () => {
-  const browser = await chromium.launch();
+  const browser = await playwright[ENGINE].launch();
+  console.log("Browser: " + ENGINE + " " + browser.version());
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const page = await ctx.newPage();
   const anfragen = [], konsole = [];
@@ -73,7 +89,7 @@ const EIN = { "keine Shadow AI": "Keine Shadow AI", "keine Shadow AI, Freigabe s
   page.on("console", (m) => { if (m.type() === "error" || m.type() === "warning") konsole.push(m.text()); });
   page.on("pageerror", (e) => konsole.push("pageerror: " + e.message));
 
-  console.log("== Zehn Testfälle im Browser ==");
+  console.log("== Testfälle im Browser ==");
   for (const [name, f] of Object.entries(faelle)) {
     const vorher = fehler;
     await durchlauf(page, f.antworten);
@@ -81,15 +97,21 @@ const EIN = { "keine Shadow AI": "Keine Shadow AI", "keine Shadow AI, Freigabe s
     if (e.gesamt === "Abschluss nach der Vorpruefung") {
       const txt = await page.locator("main").textContent();
       ok(txt.includes("Abschluss nach der Vorprüfung") && txt.includes("ausschließlich privat"), name + " Abschluss");
+      ok(txt.includes(I.DEFINITION_SHADOW_AI), name + " Definition von Shadow AI auf der Abschlussseite");
+      const art2 = await page.evaluate(() => (document.querySelector(".abschluss-grund a.norm-link") || {}).hash);
+      ok(art2 === "#art_2", name + " Verweis Art. 2 Abs. 10 KI-VO: " + art2);
     } else {
       const r = await lies(page);
       ok(r.gesamt.startsWith("Stufe " + e.gesamt + " von 4"), name + " gesamt " + r.gesamt);
-      if (e.gesamt === 1) ok(r.herkunft === I.FEST.gesamtKeinBereich, name + " Satz zu Stufe 1");
+      if (e.gesamt === 1) ok(r.herkunft === undefined, name + " kein Satz zur Herkunft bei Stufe 1");
+      ok((await page.locator("section.empfehlungen").count()) === (e.empfehlungen.length ? 1 : 0), name + " Maßnahmen nur, wenn es welche gibt");
       ok(JSON.stringify(r.pfade) === JSON.stringify([e.R, e.D, e.S].map(String)), name + " pfade " + r.pfade);
       ok(JSON.stringify(r.felder) === JSON.stringify(e.felder.map(String)), name + " felder " + r.felder);
       ok(r.einordnung === EIN[e.einordnung], name + " einordnung " + r.einordnung);
       ok(r.zusatz === e.freigabezusatz, name + " freigabezusatz");
-      ok(r.shadowZusatz === (e.einordnung === "Shadow AI"), name + " Zusatz bei Shadow AI");
+      if (e.einordnung === "keine Shadow AI") ok((await page.locator(".einordnung .einordnung-hinweis").count()) === (e.freigabezusatz ? 1 : 0), name + " Hinweis zur Freigabe nur mit Freigabezusatz");
+      // Der Zusatz zur Reaktionsstufe wird nicht mehr angezeigt (Entscheidung vom 11.10.2026).
+      ok(!r.shadowZusatz, name + " kein Zusatz zur Reaktionsstufe");
       // Regeln: Kennungen ohne Zusätze, Reihenfolge wie erwartet
       const basis = []; const texte = {};
       e.regeln.forEach((x) => { const k = x.split(" ")[0]; if (!basis.includes(k)) basis.push(k); texte[k] = (texte[k] || 0) + 1; });
@@ -101,6 +123,8 @@ const EIN = { "keine Shadow AI": "Keine Shadow AI", "keine Shadow AI, Freigabe s
       ok(JSON.stringify(r.wider) === JSON.stringify(e.widersprueche), name + " widersprueche " + r.wider);
       const empSoll = []; e.empfehlungen.forEach(([n, z]) => { if (n.includes("Zusatz")) { const l = empSoll[empSoll.length - 1].split("|"); l[2] = "1"; empSoll[empSoll.length - 1] = l.join("|"); } else empSoll.push(n + "|" + (z === "-" ? "-" : "Maßnahme " + z) + "|0"); });
       ok(JSON.stringify(r.emp) === JSON.stringify(empSoll), name + " empfehlungen " + r.emp + " soll " + empSoll);
+      const e6 = page.locator('.empfehlung[data-kennung="E6"]');
+      if (await e6.count()) ok((await e6.locator(".empfehlung-erklaerung").count()) === (e.empfehlungen.some(([k, z]) => k === "E6" && z === "vorhanden") ? 1 : 0), name + " Erklärung der Alternative nur, wenn eine vorhanden ist");
       ok(r.kopf.includes("Prüfhinweis") && r.kopf.includes("keine Aussage über die Rechtskonformität"), name + " Kopftext");
       if (name === "T5" && SHOTS) await page.screenshot({ path: path.join(SHOTS, "ergebnis_T5.png"), fullPage: true });
       if (name === "T8" && SHOTS) await page.screenshot({ path: path.join(SHOTS, "ergebnis_T8.png"), fullPage: true });
@@ -124,6 +148,14 @@ const EIN = { "keine Shadow AI": "Keine Shadow AI", "keine Shadow AI, Freigabe s
       ok(text.includes(I.FEST.widersprueche) && p.erwartet.widersprueche.every((k) => text.includes(I.WIDERSPRUECHE[k].text)), p.nr + " Wortlaut nach Anhang B");
     }
     if (p.nr === "P11" && SHOTS) await page.screenshot({ path: path.join(SHOTS, "ergebnis_P11.png"), fullPage: true });
+    if (p.erwartet.widersprueche.length) {
+      // „Zur Frage“ führt zur ersten Frage des Widerspruchs, ihre Antwort erhält den Fokus.
+      const erste = await page.locator(".widerspruch .frage-nr").first().textContent();
+      ok(!(await page.locator(".widerspruch").first().isVisible()), p.nr + " Widersprüche anfangs eingeklappt");
+      await page.locator("section.widersprueche summary").click();
+      await page.locator(".widerspruch .zur-frage").first().click();
+      ok((await page.evaluate(() => document.activeElement.name)) === erste, p.nr + " Zur Frage führt zu " + erste);
+    }
     console.log("  " + p.nr + ": " + (fehler === vorher ? "stimmt" : "ABWEICHUNG"));
   }
 
@@ -136,6 +168,11 @@ const EIN = { "keine Shadow AI": "Keine Shadow AI", "keine Shadow AI, Freigabe s
     const text = await page.locator(".einordnung").textContent();
     ok(r.einordnung === I.EINORDNUNG[p.erwartet.einordnung].titel, p.nr + " einordnung " + r.einordnung);
     ok(text.includes(I.EINORDNUNG[p.erwartet.einordnung].text), p.nr + " Wortlaut nach Anhang B");
+    if (/Shadow AI/.test(I.EINORDNUNG[p.erwartet.einordnung].text)) {
+      // Das Info-Symbol neben der Überschrift blendet die Erklärung zu Shadow AI ein.
+      await page.locator(".einordnung .info-knopf").click();
+      ok(await page.locator(".einordnung .info-text").isVisible(), p.nr + " Erklärung zu Shadow AI erscheint");
+    }
     ok(r.gesamt.startsWith("Stufe " + p.erwartet.gesamt + " von 4"), p.nr + " Gesamtstufe " + r.gesamt);
     ok(JSON.stringify(r.luecken) === JSON.stringify(p.erwartet.luecken), p.nr + " luecken " + r.luecken);
     console.log("  " + p.nr + ": " + (fehler === vorher ? "stimmt" : "ABWEICHUNG"));
@@ -197,6 +234,8 @@ const EIN = { "keine Shadow AI": "Keine Shadow AI", "keine Shadow AI, Freigabe s
   ok(!(await page.locator("#frage-F13").isVisible()), "F13 anfangs verborgen");
   await antworte(page, "F12", "Unklar");
   ok(await page.locator("#frage-F13").isVisible() && await page.locator("#frage-F17").isVisible() && !(await page.locator("#frage-F14").isVisible()), "F13, F15-F17 bei F12 Unklar, F14 nicht");
+  const verweis = await page.evaluate(() => ["F15", "F16"].map((f) => { const p = document.querySelectorAll("#hilfe-" + f + " p"); const l = p[p.length - 1]; return l.className + "|" + l.textContent; }));
+  ok(verweis[0] === "hilfe-zusatz|Die Frage bezieht sich auf die personenbezogenen Daten aus F12. Wo die Daten verarbeitet werden, fragt F16." && verweis[1] === "hilfe-zusatz|Wer die Daten verarbeitet, fragt F15.", "Querverweise F15/F16 kursiv ohne Markierungszeichen");
   await antworte(page, "F13", "Ja");
   ok(await page.locator("#frage-F14").isVisible(), "F14 bei F13 Ja");
   await antworte(page, "F13", "Unklar");
@@ -218,6 +257,24 @@ const EIN = { "keine Shadow AI": "Keine Shadow AI", "keine Shadow AI, Freigabe s
   await antworte(page, "F8", "Nein"); await antworte(page, "F9", "Keine");
   for (let i = 0; i < 4; i++) await page.locator("#weiter").click();
   const r = await lies(page);
+  // Ergebnisseite: Matrix und „Alle Bereiche öffnen“
+  ok((await page.locator(".matrix tbody tr").count()) === 3 && (await page.locator("details.pfad-detail[open]").count()) === 0, "Matrix mit drei Bereichen, Details anfangs geschlossen");
+  await page.locator(".alle-oeffnen").click();
+  ok((await page.locator("details.pfad-detail[open]").count()) === 3 && (await page.locator(".alle-oeffnen").textContent()) === "Alle Bereiche schließen", "Alle Bereiche öffnen");
+  await page.locator(".alle-oeffnen").click();
+  ok((await page.locator("details.pfad-detail[open]").count()) === 0, "Alle Bereiche schließen");
+  // Empfohlene Maßnahmen: eine Spalte, der Pfeil öffnet die Begründung als zusammenhängenden Text.
+  const spalten = await page.evaluate(() => { const k = [...document.querySelectorAll(".empfehlung")].map((e) => e.getBoundingClientRect()); return k.length > 1 && Math.abs(k[0].width - k[1].width) < 2 && k[1].left > k[0].right; });
+  ok(spalten, "Mehrere Maßnahmen in zwei gleich breiten Spalten");
+  const karte = async (i) => page.locator(".empfehlung").nth(i).evaluate((e) => { const b = e.getBoundingClientRect(); return Math.round(b.height) + "|" + Math.round(b.top - e.parentElement.getBoundingClientRect().top); });
+  const daneben = await karte(1);
+  ok(!(await page.locator(".empfehlung .grund-text").first().isVisible()), "Begründung anfangs geschlossen");
+  await page.locator(".empfehlung details summary").first().click();
+  ok(await page.locator(".empfehlung .grund-text").first().isVisible(), "Pfeil öffnet die Begründung");
+  const danebenNachher = await karte(1);
+  ok(danebenNachher === daneben, "Begründung öffnen verändert die Karte daneben nicht " + daneben + " -> " + danebenNachher);
+  ok((await page.locator(".empfehlung .grund-text").first().textContent()).length > 20 && !(await page.locator(".empfehlung").first().textContent()).includes("Festgestellt wurde"), "Begründung als Satz ohne Vorspann");
+  await page.locator(".empfehlung details summary").first().click();
   ok((await page.locator(".fall-zeile").first().textContent()) === "KI-Dienst: ChatGPTNutzung: Kundenmails zusammenfassenKategorie: Texte erstellen oder überarbeiten", "Nutzungsfall mit Kategorie im Ergebnis");
   ok(r.emp.some((x) => x.startsWith("E5a|Maßnahme vorhanden")) && r.emp.some((x) => x.startsWith("E5b|Maßnahme fehlt")), "F29 nur Stelle: E5a vorhanden, E5b fehlt: " + r.emp);
   // Antworten ändern, neues Assessment
@@ -342,7 +399,16 @@ const EIN = { "keine Shadow AI": "Keine Shadow AI", "keine Shadow AI, Freigabe s
   await page.reload();
   ok(nachfragen.length === 1 && nachfragen[0] === "beforeunload", "Nachfrage beim Neuladen mit Antworten: " + nachfragen);
   ok(await page.getByRole("button", { name: "Assessment beginnen" }).isVisible(), "nach bestätigter Nachfrage Startseite");
-  await durchlauf(page, faelle.T2.antworten);
+  // T2 mit F3 „Ohne Anmeldung“ und F26 „Nein“: E7 nennt im Etikett die Angabe aus F3, E2 verweist auf Art. 4
+  await durchlauf(page, Object.assign({}, faelle.T2.antworten, { F3: "ohne Anmeldung", F26: "Nein" }));
+  const marke = await page.evaluate(() => (document.querySelector('.empfehlung[data-kennung="E7"] .anlass-marke') || {}).textContent);
+  ok(marke === "Ihre Angabe: Ohne Anmeldung oder Benutzerkonto", "Etikett E7 bei F3 ohne Anmeldung: " + marke);
+  // Art. 4 KI-VO in E2 verweist auf die konsolidierte Fassung und öffnet ein neues Fenster
+  const norm = await page.evaluate(() => { const l = document.querySelector('.empfehlung[data-kennung="E2"] a.norm-link'); return l ? [l.textContent, l.getAttribute("href"), l.target, l.rel].join("|") : ""; });
+  ok(norm === "Art. 4 KI-VO|https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:02024R1689-20260727#art_4|_blank|noopener noreferrer", "Verweis Art. 4 KI-VO in E2: " + norm);
+  // „Was ist Shadow AI?“ zeigt die Definition aus inhalte.js, unabhängig von der Reihenfolge der Themen
+  const definition = await page.evaluate(() => (document.querySelector(".einordnung .info-text") || {}).textContent);
+  ok(definition === I.DEFINITION_SHADOW_AI, "Erklärung „Was ist Shadow AI?“: " + definition);
   await page.reload();
   ok(nachfragen.length === 1, "keine Nachfrage auf der Ergebnisseite: " + nachfragen);
   await durchlauf(page, faelle.T1.antworten);
@@ -353,6 +419,10 @@ const EIN = { "keine Shadow AI": "Keine Shadow AI", "keine Shadow AI, Freigabe s
   const fremd = [...new Set(anfragen)].filter((u) => !u.startsWith(require("url").pathToFileURL(ROOT).href));
   console.log("  Anfragen gesamt:", anfragen.length, "| verschiedene Dateien:", [...new Set(anfragen)].map((u) => path.basename(u)).join(", "));
   ok(fremd.length === 0, "fremde Anfragen: " + fremd);
+  // Firefox meldet Playwright keine Anfragen auf lokale Dateien (file://). Dort entfällt
+  // die Prüfung, in Chromium und WebKit muss mindestens die Seite selbst erfasst sein.
+  if (ENGINE === "firefox") console.log("  Hinweis: Firefox meldet keine Anfragen auf lokale Dateien, die Netzwerkprüfung erfolgt in Chromium und WebKit.");
+  else ok(anfragen.length > 0, "Netzwerkanfragen wurden erfasst");
   ok(konsole.length === 0, "Konsolenmeldungen: " + konsole.join(" || "));
 
   // Mobilansicht

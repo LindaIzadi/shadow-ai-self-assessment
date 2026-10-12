@@ -1,6 +1,6 @@
 /*
  * Prüft regeln.js in vier Schritten:
- *   1. gegen die zehn Testfälle aus Anhang C (testfaelle.json)
+ *   1. gegen die dreizehn Testfälle aus Anhang C (testfaelle.json)
  *   2. gegen die Einzelprüfungen (einzelpruefungen.json)
  *   3. Abgleich der internen Codes zwischen regeln.js und inhalte.js
  *   4. Zurückweisung ungültiger Eingaben
@@ -34,7 +34,7 @@ for (const [name, f] of Object.entries(faelle)) {
 console.log("Abweichungen: " + abweichungen);
 
 // ---------------------------------------------------------------- 2. Einzelprüfungen
-// Varianten der Regeln, Hinweise und Empfehlungen, die in den zehn Testfällen nicht
+// Varianten der Regeln, Hinweise und Empfehlungen, die in den Testfällen nicht
 // vorkommen (einzelpruefungen.json). Die erwarteten Ergebnisse sind dort von Hand festgelegt.
 const einzel = require(path.join(__dirname, "einzelpruefungen.json"));
 let abweichungenEinzel = 0;
@@ -97,6 +97,22 @@ for (const antworten of alleEingaben) {
       pruefe(typeof text === "string", "Empfehlungstext fehlt: " + name + " (" + m.zustand + ")");
     });
   }
+}
+// F3: Selbst eingerichteter Zugang und Nutzung ohne Anmeldung lösen E7 aus, jeweils mit eigenem Anlass und Etikett.
+for (const [wert, grund] of [["privat", "privat"], ["ohne Anmeldung", "ohneAnmeldung"]]) {
+  const e7 = R.auswerten(Object.assign({}, faelle.T2.antworten, { F3: wert })).empfehlungen.filter((m) => m.kennung === "E7");
+  pruefe(e7.length === 1 && e7[0].anlass.grund === grund, "E7 bei F3 " + wert + " fehlt oder hat einen falschen Anlass");
+  pruefe(typeof I.EMPFEHLUNG_GRUND[grund] === "string" && typeof I.ANLASS_MARKE[grund] === "string", "Texte zu E7 bei F3 " + wert + " fehlen");
+}
+pruefe(!R.auswerten(Object.assign({}, faelle.T2.antworten, { F3: "Unternehmen" })).empfehlungen.some((m) => m.kennung === "E7"), "E7 bei F3 Unternehmen");
+// Normverweise: Jede Normangabe in Hinweisen und Empfehlungen ist verlinkt, und jeder Verweis kommt vor.
+const ergebnisTexte = Object.values(I.HINWEISE).concat(Object.values(I.EMPFEHLUNGEN).flatMap((t) => Object.values(t)), I.FEST.abschlussGrund.map((g) => g.text));
+for (const text of ergebnisTexte) {
+  for (const norm of text.match(/Art\. \d+[^()]*?(KI-VO|DSGVO)/g) || []) pruefe(I.NORMVERWEISE[norm], "Normangabe ohne Verweis: " + norm);
+}
+for (const [norm, ziel] of Object.entries(I.NORMVERWEISE)) {
+  pruefe(ergebnisTexte.some((t) => t.includes(norm)), "Verweis wird nicht verwendet: " + norm);
+  pruefe(/^https:\/\/eur-lex\.europa\.eu\//.test(ziel.adresse) && typeof ziel.hinweis === "string", "Verweis unvollständig: " + norm);
 }
 fehlerCodes.forEach((z) => console.log("   " + z));
 console.log("Abweichungen zwischen regeln.js und inhalte.js: " + fehlerCodes.length);

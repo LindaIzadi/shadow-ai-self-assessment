@@ -16,15 +16,14 @@ Das Ergebnis dient der ersten Orientierung und trifft keine Aussage über die Re
 - **Sprache:** Oberfläche, Bezeichner und Kommentare auf Deutsch
 - **Wissenschaftliche Methode:** Design Science Research. Das Artefakt umfasst das Bewertungsmodell und dessen Umsetzung als webbasierten Prototyp. 
   Fragenkatalog und Regelbasis werden in Kapitel 5 hergeleitet.
-- **Forschungsdaten:** Das Repository enthält keine empirisch erhobenen Forschungsdaten.Die Testfälle in `test/`
-  sind konstruierte Nutzungsfälle und in Anhang C dokumentiert.
+- **Forschungsdaten:** Das Repository enthält keine empirisch erhobenen Forschungsdaten. Die Testfälle in `test/`
+  sind konstruierte Nutzungsfälle und in Anhang C sowie im Begleitdokument zur Testdokumentation dokumentiert.
 
 ## 2 Urheberschaft (Wer?)
 
 - **Autorin:** Linda Izadi, Masterstudiengang Wirtschaftsinformatik, HTW Berlin
 - **Erstgutachterin:** Prof. Dr. Olga Willner
 - **Zweitgutachter:** Mattheo Brajko
-- **Methode:** Design Science Research. Das Artefakt umfasst das Bewertungsmodell und den webbasierten Prototyp. Fragenkatalog und Regelbasis werden in Kapitel 5 hergeleitet.
 - **Hilfsmittel:** Der Programmcode wurde mit Unterstützung eines KI-Werkzeugs (Claude,
   Anthropic) erstellt. Art und Umfang sind im KI-Verzeichnis der Arbeit angegeben.
 
@@ -33,15 +32,19 @@ Das Ergebnis dient der ersten Orientierung und trifft keine Aussage über die Re
 - **Stand der Regelbasis:** Oktober 2026 (Verordnung (EU) 2024/1689 in der Fassung der
   Verordnung (EU) 2026/1744)
 
-## 4 Anwendung Starten
+## 4 Anwendung starten
 
 Doppelklick auf `SA-Tool.html`. Die Seite öffnet sich im Browser und funktioniert ohne
 Internetverbindung. Es ist keine Installation nötig.
 
+Online ist der Prototyp über GitHub Pages abrufbar:
+https://lindaizadi.github.io/shadow-ai-self-assessment/
+
+
 ## 5 Ablage und Ordnerstruktur
 
 Die Anwendung ist in drei Schichten getrennt. `regeln.js` enthält ausschließlich die
-Bewertungslogik und kennt weder Texte noch Oberfläche. `inhalte.js` enthält die Fragen, Antwortmöglichkeiten, Hilfetexte und Ausgabetexte.
+Bewertungslogik. `inhalte.js` enthält die Fragen, Antwortmöglichkeiten, Hilfetexte und Ausgabetexte.
 `app.js` verarbeitet die Eingaben, steuert die Navigation und stellt die Ergebnisse dar. Die fachliche Bewertung erfolgt über die Regelbasis.
 
 | Datei oder Ordner | Aufgabe |
@@ -52,11 +55,11 @@ Bewertungslogik und kennt weder Texte noch Oberfläche. `inhalte.js` enthält di
 | `js/app.js` | Eingaben, Navigation, Ergebnisdarstellung und Druck |
 | `css/stil.css` | Gestaltung für Bildschirm und Druck |
 | `css/schriften/` | Lokale Schriftdateien und Lizenztexte |
-| `test/testfaelle.json` | Zehn Testfälle mit unabhängig festgelegten Erwartungswerten |
+| `test/testfaelle.json` | Dreizehn Testfälle mit unabhängig festgelegten Erwartungswerten |
 | `test/einzelpruefungen.json` | 14 ergänzende Einzelprüfungen |
 | `test/regeln.test.js` | Regeltests, Abgleich der Antwortcodes und ungültige Eingaben |
 | `test/konsistenz.test.js` | Systematische Prüfung der Bewertungslogik |
-| `test/browser.test.js` | Prüfung der Anwendung über die Browseroberfläche |
+| `test/browser.test.js` | Prüfung der Anwendung über die Browseroberfläche in Chromium, Firefox und WebKit |
 | `package.json`, `package-lock.json` | Prüfabhängigkeiten und Testbefehle |
 | `.nvmrc`, `eslint.config.js` | Node.js-Hauptversion und Linter-Konfiguration |
 | `.github/workflows/pipeline.yml` | Automatische Prüfung und Veröffentlichung |
@@ -70,7 +73,7 @@ Für die Anwendung genügt ein aktueller Webbrowser. Die folgenden Werkzeuge die
 | Zweck | Werkzeug | Version oder Festlegung |
 |---|---|---|
 | Laufzeit der Prüfskripte | Node.js | 22 laut `.nvmrc`, mindestens 22.13.0 laut `package.json` |
-| Browsertests | Playwright mit Chromium | Playwright 1.56.0 |
+| Browsertests | Playwright mit Chromium, Firefox und WebKit (Engine von Safari) | Playwright 1.56.0 |
 | Statische Codeprüfung | ESLint | 10.12.0 |
 | Linter-Regelsatz | `@eslint/js` | 10.0.1 |
 | Globale Namen für den Linter | `globals` | 17.13.0 |
@@ -85,25 +88,10 @@ Für die Anwendung genügt ein aktueller Webbrowser. Die folgenden Werkzeuge die
 - Die Seite lädt nur ihre eigenen Dateien: fünf Dateien der Anwendung und die Schriften aus
   `css/schriften/`. Eine Sicherheitsrichtlinie in `SA-Tool.html` (Content Security Policy)
   untersagt Verbindungen zu anderen Adressen.
-- Ein Verweis auf der Startseite führt zur amtlichen Fassung des EU AI Acts (EUR-Lex). Er
-  öffnet sich nur auf Klick in einem neuen Fenster.
+- Verweise auf der Startseite und im Ergebnis führen zu externen Seiten, vor allem zu den
+  Rechtstexten auf EUR-Lex. Sie öffnen sich nur auf Klick in einem neuen Fenster.
 - Das Repository enthält keine personenbezogenen Daten. Unterlagen der Evaluation
   (Interviewaufzeichnung, Transkript) gehören nicht zum Repository.
-- Bei der veröffentlichten Seite kann der Betreiber der Plattform (GitHub Pages) Zugriffe
-  protokollieren, etwa IP-Adressen. Die Eingaben in das Assessment sind davon nicht betroffen.
 
-## 8 Texte und Regeln ändern
 
-Jeder Wortlaut steht in `js/inhalte.js`. Die Logik in `js/regeln.js` bleibt davon
-unberührt. Nach einer Änderung an den Regeln sind die Testläufe erneut auszuführen.
 
-## 9 Lizenz
-
-© 2026 Linda Izadi. Alle Rechte vorbehalten. Der Code darf eingesehen und zur Begutachtung der
-Masterarbeit ausgeführt werden. Eine Weiterverwendung, Veränderung oder Weitergabe bedarf der
-Zustimmung der Autorin (siehe `LICENSE`).
-
-Ausgenommen sind die Schriften in `css/schriften/`. Sie stehen unter der SIL Open Font License
-1.1 (`OFL.txt`, `OFL-Source-Serif-4.txt`).
-
-Stand der Regelbasis: Oktober 2026
