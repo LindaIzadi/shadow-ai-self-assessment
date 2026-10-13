@@ -262,6 +262,7 @@
    "F4": "bekannt, nicht freigegeben",
    "F12": "Ja",
    "F13": "Nein",
+   "F14": "Nein",
    "F15": "Ja",
    "F16": "Unklar",
    "F17": "Keine",
@@ -310,6 +311,7 @@
    "F4": "bekannt, nicht freigegeben",
    "F12": "Ja",
    "F13": "Nein",
+   "F14": "Nein",
    "F15": "Ja",
    "F16": "Unklar",
    "F17": "Keine",
@@ -492,6 +494,7 @@
    "F4": "bekannt, nicht freigegeben",
    "F12": "Ja",
    "F13": "Nein",
+   "F14": "Nein",
    "F15": "Ja",
    "F16": "Ja",
    "F17": "Keine",
@@ -541,6 +544,7 @@
    "F4": "bekannt, nicht freigegeben",
    "F12": "Ja",
    "F13": "Nein",
+   "F14": "Nein",
    "F15": "Ja",
    "F16": "Ja",
    "F17": "Keine",
@@ -640,6 +644,110 @@
    "einordnung": "unklar",
    "luecken": [
     "F2"
+   ]
+  }
+ },
+ {
+  "nr": "P15",
+  "text": "Nutzung abgelehnt (F4): Nutzung einstellen statt Weg zur Freigabe; ohne E3 und E7",
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": "Keine",
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Nein",
+   "F26": "Nein",
+   "F27": "Nein",
+   "F28": "Nein",
+   "F29": "Keine",
+   "F30": "Nein",
+   "F3": "privat",
+   "F4": "abgelehnt",
+   "F12": "Ja",
+   "F13": "Nein",
+   "F14": "Nein",
+   "F15": "Ja",
+   "F16": "Unklar",
+   "F17": "Keine",
+   "F18": "intern",
+   "F20": "spuerbar",
+   "F22": "ja",
+   "F23": "extern ohne"
+  },
+  "erwartet": {
+   "gesamt": 3,
+   "einordnung": "Shadow AI",
+   "luecken": [
+    "F16"
+   ],
+   "empfehlungen": [
+    [
+     "E1",
+     "fehlt"
+    ],
+    [
+     "E2",
+     "fehlt"
+    ],
+    [
+     "E5a",
+     "fehlt"
+    ],
+    [
+     "E9",
+     "-"
+    ],
+    [
+     "E6",
+     "fehlt"
+    ]
+   ]
+  }
+ },
+ {
+  "nr": "P16",
+  "text": "Widerspruch W3: personenbezogene Daten (F12) und Eingaben beim externen Anbieter (F23), aber keine externe Verarbeitung (F15)",
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": "Keine",
+   "F10": "Nein",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Nein",
+   "F26": "Nein",
+   "F27": "Nein",
+   "F28": "Nein",
+   "F29": "Keine",
+   "F30": "Nein",
+   "F3": "privat",
+   "F4": "bekannt, nicht freigegeben",
+   "F12": "Ja",
+   "F13": "Nein",
+   "F14": "Nein",
+   "F15": "Nein",
+   "F16": "Nein",
+   "F17": "Keine",
+   "F18": "intern",
+   "F20": "spuerbar",
+   "F22": "ja",
+   "F23": "extern ohne"
+  },
+  "erwartet": {
+   "gesamt": 3,
+   "D": 3,
+   "widersprueche": [
+    "W3"
    ]
   }
  }

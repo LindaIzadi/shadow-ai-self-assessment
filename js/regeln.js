@@ -62,7 +62,7 @@
     F1: einfach(["Texte", "Uebersetzen", "Recherchieren", "Programmcode", "Daten", "Medien", "Sonstiges"]),
     F2: einfach(JA_NEIN_UNKLAR),
     F3: einfach(["Unternehmen", "privat", "ohne Anmeldung", UNKLAR]),
-    F4: einfach(["freigegeben", "in Pruefung", "bekannt, nicht freigegeben", "nicht bekannt", UNKLAR]),
+    F4: einfach(["freigegeben", "in Pruefung", "bekannt, nicht freigegeben", "abgelehnt", "nicht bekannt", UNKLAR]),
     F5: mehrfach(nummern(3)),
     F6: mehrfach(nummern(8)),
     F7: mehrfach(nummern(10)),
@@ -75,7 +75,7 @@
     F14: einfach(JA_NEIN_UNKLAR),
     F15: einfach(JA_NEIN_UNKLAR),
     F16: einfach(JA_NEIN_UNKLAR),
-    F17: mehrfach(nummern(2)),
+    F17: mehrfach(nummern(3)),
     F18: einfach(["oeffentlich", "intern", "vertraulich", UNKLAR]),
     F19: einfach(["Information", "Vorschlag", "massgeblich", "automatisch", UNKLAR]),
     F20: einfach(["gering", "spuerbar", "erheblich", UNKLAR]),
@@ -95,6 +95,10 @@
   var F6_SPAETERER_GELTUNGSBEGINN = 8;   // Art. 5 Abs. 1 Buchst. ba und bb KI-VO
   var F7_KATEGORISIERUNG = 2;            // Art. 50 Abs. 3 KI-VO
   var F7_EMOTIONSERKENNUNG = 3;          // Art. 50 Abs. 3 KI-VO
+  var F7_KRITIS = 4;                     // Anhang III Nr. 2, bei Art. 27 Abs. 1 ausgenommen
+  var F7_GRUNDLEGENDE_DIENSTE = 7;       // Anhang III Nr. 5, darunter Buchst. b und c
+  var F9_OEFFENTLICH = [1, 2];           // öffentliche Einrichtung, öffentliche Dienste
+  var F9_KREDIT_VERSICHERUNG = [3, 4];   // Anhang III Nr. 5 Buchst. b und c
 
   // ---------------------------------------------------------------- Hilfen
   var AUSWAHL = "Auswahl";
@@ -131,7 +135,8 @@
     fr.push("F10", "F11", "F12");
     if (a.F12 !== undefined && a.F12 !== NEIN) {
       fr.push("F13");
-      if (a.F13 === JA) fr.push("F14");
+      // F14 bei sicherem Personenbezug und bei besonderen Kategorien
+      if (a.F12 === JA || a.F13 === JA) fr.push("F14");
       fr.push("F15", "F16", "F17");
     }
     for (var n = 18; n <= 30; n++) fr.push("F" + n);
@@ -205,10 +210,28 @@
     treffer.zusaetze.push({ name: name, hinweis: name, fragen: fragen });
   }
 
+  /**
+   * Zusatz zu Art. 27 KI-VO (Grundrechte-Folgenabschätzung). Art. 27 Abs. 1 erfasst
+   *   öffentliche Einrichtungen und Erbringer öffentlicher Dienste bei Hochrisiko-KI-Systemen
+   *   nach Anhang III außer Nr. 2 (F9 Nr. 1, 2 und F7 nicht nur kritische Infrastruktur) sowie
+   *   Kreditwürdigkeit und Lebens- und Krankenversicherungen nach Anhang III Nr. 5 Buchst. b, c
+   *   (F9 Nr. 3, 4 und F7 grundlegende Dienste oder „Unklar“). F9 „Unklar“ führt zur Prüfung,
+   *   außer F7 nennt nur kritische Infrastruktur. Dann kann Art. 27 nicht greifen.
+   */
+  function grundrechteFolgenabschaetzung(a) {
+    var nurKritis = Array.isArray(a.F7) && a.F7.length === 1 && a.F7[0] === F7_KRITIS;
+    if (a.F9 === UNKLAR) return !nurKritis;
+    if (!Array.isArray(a.F9)) return false;
+    var oeffentlich = a.F9.some(function (w) { return F9_OEFFENTLICH.indexOf(w) !== -1; }) && !nurKritis;
+    var kreditVersicherung = a.F9.some(function (w) { return F9_KREDIT_VERSICHERUNG.indexOf(w) !== -1; }) &&
+      (a.F7 === UNKLAR || enthaelt(a.F7, F7_GRUNDLEGENDE_DIENSTE));
+    return oeffentlich || kreditVersicherung;
+  }
+
   // ---------------------------------------------------------------- Tabelle 15
   function rPfad(a) {
     var p = neuerPfad("R");
-    if (a.F5 !== KEINE) p.greift("R1", 3, ["F5"]);
+    if (a.F5 !== KEINE) p.greift("R1", 3, ["F5"], "R1", a.F5 === UNKLAR ? "R1 bei F5 Unklar" : "R1");
     if (klasse(a.F6) === AUSWAHL) {
       var r2 = p.greift("R2", 4, ["F6"], "R2 (Eskalation)");
       if (enthaelt(a.F6, F6_SPAETERER_GELTUNGSBEGINN)) zusatz(r2, "R2 Zusatz Geltungsbeginn", []);
@@ -217,11 +240,12 @@
     }
     var r3 = a.F7 !== KEINE;
     if (r3) {
-      var treffer3 = p.greift("R3", 3, ["F7"]);
+      // Bei F7 „Unklar“ nennt der Hinweis den ungeklärten Bereich, sonst die Angabe.
+      var treffer3 = p.greift("R3", 3, ["F7"], "R3", a.F7 === UNKLAR ? "R3 bei F7 Unklar" : "R3");
       if (a.F8 === JA) zusatz(treffer3, "R3 Zusatz Profiling", ["F8"]);
       else if (a.F8 === UNKLAR) zusatz(treffer3, "R3 Zusatz Profiling unklar", ["F8"]);
       var treffer4 = p.greift("R4", 3, ["F7"]);
-      if (a.F9 !== KEINE) zusatz(treffer4, "R4 Zusatz Art. 27", ["F9"]);
+      if (grundrechteFolgenabschaetzung(a)) zusatz(treffer4, "R4 Zusatz Art. 27", ["F9"]);
     }
     var r5 = [];
     if (a.F10 !== NEIN) r5.push("F10");
@@ -235,7 +259,13 @@
   function dPfad(a) {
     var p = neuerPfad("D");
     if (a.F12 === NEIN) return { stufe: p.stufe, treffer: p.treffer };
-    p.greift("D1", 3, ["F12"]);
+    // D1: Bei F12 „Unklar“ nennt der Hinweis den ungeklärten Personenbezug, bei F12 „Ja“ richtet er
+    // sich nach F14. Prüfbedarf bei F14 „Ja“ bedeutet nicht, dass die Freigabe fehlt. Die Stufe
+    // beschreibt einen Sachverhalt, den das Assessment nicht abschließend prüfen kann, der Hinweis
+    // erkennt die angegebene Freigabe ausdrücklich an. Bei F14 „Nein“ und „Unklar“ sagt der Hinweis
+    // nur, dass eine Prüfung und Freigabe nicht bestätigt ist.
+    var hinweisD1 = a.F12 === UNKLAR ? "D1 bei F12 Unklar" : a.F14 === JA ? "D1 bei F14 Ja" : "D1 bei F14 Nein oder Unklar";
+    p.greift("D1", 3, ["F12"], "D1", hinweisD1);
     if (a.F13 === JA) {
       // Tabelle B.3 nennt für D2 mit Prüfbedarf zwei Hinweise, je nach auslösender Antwort.
       if (a.F14 === JA) p.greift("D2", 3, ["F13", "F14"], "D2 (Pruefbedarf)", "D2 (Pruefbedarf) bei F14 Ja");
@@ -243,9 +273,12 @@
     } else if (a.F13 === UNKLAR) {
       p.greift("D2", 3, ["F13"], "D2 (Pruefbedarf)", "D2 (Pruefbedarf) bei F13 Unklar");
     }
-    if (a.F15 !== NEIN) p.greift("D3", 3, ["F15"]);
-    if (a.F16 !== NEIN) p.greift("D4", 3, ["F16"]);
-    if (a.F17 !== KEINE) p.greift("D5", 3, ["F17"]);
+    // D3 bis D5: Bei „Unklar“ nennt der Hinweis die ungeklärte Angabe, sonst den angegebenen Sachverhalt.
+    // F17 „Keine“ löst D5 nicht aus. Das Assessment schließt damit nicht aus, dass eine
+    // Datenschutz-Folgenabschätzung erforderlich ist (siehe Hilfetext zu F17).
+    if (a.F15 !== NEIN) p.greift("D3", 3, ["F15"], "D3", a.F15 === UNKLAR ? "D3 bei F15 Unklar" : "D3");
+    if (a.F16 !== NEIN) p.greift("D4", 3, ["F16"], "D4", a.F16 === UNKLAR ? "D4 bei F16 Unklar" : "D4");
+    if (a.F17 !== KEINE) p.greift("D5", 3, ["F17"], "D5", a.F17 === UNKLAR ? "D5 bei F17 Unklar" : "D5");
     return { stufe: p.stufe, treffer: p.treffer };
   }
 
@@ -256,16 +289,18 @@
     F21: "teilweise", F22: "teilweise", F23: "extern mit", F24: "Erweiterung"
   };
   // Ausprägungen je Frage, geordnet von günstig (1) nach ungünstig
-  var FREIGABE = { "freigegeben": 1, "in Pruefung": 1, "bekannt, nicht freigegeben": 2, "nicht bekannt": 3 };   // F4
+  var FREIGABE = { "freigegeben": 1, "in Pruefung": 1, "bekannt, nicht freigegeben": 2, "abgelehnt": 2, "nicht bekannt": 3 };   // F4
   var SENSITIVITAET = { oeffentlich: 1, intern: 2, vertraulich: 3 };                                           // F18
   var EINFLUSS = { Information: 1, Vorschlag: 1, massgeblich: 2, automatisch: 3 };                              // F19
   var FOLGEN = { gering: 1, spuerbar: 2, erheblich: 3 };                                                        // F20
   var PRUEFUNG = { immer: 1, teilweise: 2, nie: 3 };                                                            // F21
   var NACHVOLLZIEHBARKEIT = { ja: 1, teilweise: 2, nein: 3 };                                                   // F22
+  // F23 unterscheidet externe Verarbeitung ohne und mit Nutzung zum Training. Eine Speicherung ohne
+  // Training, etwa für Sicherheitsprüfungen, gehört zu „extern ohne“. Die Antwortcodes sind unverändert.
   var VERARBEITUNG = {                                                                                          // F23
-    "lokal": { extern: false, speicherungMoeglich: false },
-    "extern ohne": { extern: true, speicherungMoeglich: false },
-    "extern mit": { extern: true, speicherungMoeglich: true }
+    "lokal": { extern: false, trainingMoeglich: false },
+    "extern ohne": { extern: true, trainingMoeglich: false },
+    "extern mit": { extern: true, trainingMoeglich: true }
   };
   // Stufe des Risikofelds S4 je Verarbeitung (F23) und Einbindung (F24)
   var S4_STUFE = {
@@ -312,12 +347,26 @@
       S3: s3(w.F4, w.F22), S4: s4(w.F23, w.F24)
     };
     var p = neuerPfad("S");
+    // Hinweistexte: Ein angegebener Sachverhalt wird als Angabe genannt („Nach Ihren Angaben …“),
+    // ein nur angenommener („Unklar“ mit Ersatzwert) als Möglichkeit. Die Stufen bleiben gleich.
+    // S1: Bei sicher externer Verarbeitung (F23) richtet sich der Hinweis nach F18. Bei F23 „Unklar“
+    // bleibt der allgemeine Hinweis, denn die externe Verarbeitung ist dort nur angenommen.
+    var extern = a.F23 === "extern ohne" || a.F23 === "extern mit";
+    var hinweise = {
+      S1: extern && a.F18 !== UNKLAR ? "S1 bei F18 " + a.F18 : extern ? "S1 bei F18 Unklar" : "S1",
+      // S2: Ist eine der auslösenden Fragen „Unklar“, ist der Sachverhalt nur angenommen.
+      S2: [a.F19, a.F20, a.F21].indexOf(UNKLAR) !== -1 ? "S2 bei Unklar" : "S2",
+      // S3: je Freigabestand (F4) und Nachvollziehbarkeit (F22) ein eigener Hinweis
+      S3: "S3 bei F4 " + a.F4 + " und F22 " + a.F22,
+      // S4: je Verarbeitung (F23) und Einbindung (F24) ein eigener Hinweis
+      S4: "S4 bei F23 " + a.F23 + " und F24 " + a.F24
+    };
     FELDER.forEach(function (f) {
-      if (felder[f] >= 2) p.greift(f, felder[f], FELD_FRAGEN[f]);
+      if (felder[f] >= 2) p.greift(f, felder[f], FELD_FRAGEN[f], f, hinweise[f]);
     });
     // Kombinationsregeln
-    if (felder.S1 === 3 && nachschlagen(VERARBEITUNG, w.F23, "F23").speicherungMoeglich) {
-      p.greift("K1", 4, ["F18", "F23"]);
+    if (felder.S1 === 3 && nachschlagen(VERARBEITUNG, w.F23, "F23").trainingMoeglich) {
+      p.greift("K1", 4, ["F18", "F23"], "K1", a.F23 === UNKLAR ? "K1 bei F23 Unklar" : "K1");
     }
     if (felder.S2 === 3 && felder.S3 === 3) {
       p.greift("K2", 4, ["F19", "F20", "F21", "F4", "F22"]);
@@ -351,8 +400,9 @@
       return kennungen.indexOf(kombination) !== -1 ? feld.concat(kombination) : feld;
     }
     var grundEinordnung = { grund: einordn === EINORDNUNG.UNKLAR ? "unklar" : "shadow", sachverhalte: [] };
-    var grundFreigabe = { grund: a.F4 === UNKLAR ? "freigabeUnklar" : "nichtFrei", sachverhalte: [] };
-    var nichtFrei = ["bekannt, nicht freigegeben", "nicht bekannt", UNKLAR].indexOf(a.F4) !== -1;
+    var abgelehnt = a.F4 === "abgelehnt";
+    var grundFreigabe = { grund: a.F4 === UNKLAR ? "freigabeUnklar" : abgelehnt ? "abgelehnt" : "nichtFrei", sachverhalte: [] };
+    var nichtFrei = ["bekannt, nicht freigegeben", "abgelehnt", "nicht bekannt", UNKLAR].indexOf(a.F4) !== -1;
     function teil29(name) {
       if (a.F29 === UNKLAR) return ZUSTAND.UNKLAR;
       if (a.F29 === KEINE) return ZUSTAND.FEHLT;
@@ -362,22 +412,37 @@
     function empfiehl(kennung, stand, anlass, zusaetze) {
       liste.push({ kennung: kennung, zustand: stand, zusaetze: zusaetze || [], anlass: anlass });
     }
+    // Informationen verlassen das Unternehmen (S1) oder unterliegen den Bedingungen des Anbieters (S4).
+    var datenAbfluss = felder.S1 >= 2 || felder.S4 >= 2;
     // E1: Fehlt eine KI-Richtlinie oder ist sie unklar, wird sie ab Handlungsbedarf oder bei
-    // möglicher Shadow AI empfohlen. Besteht bereits eine Richtlinie, wird ihre Anwendung nur
-    // empfohlen, wenn die Nutzung Shadow AI sein kann. Dann ist zu klären, ob die Richtlinie
-    // diese Nutzung zulässt. Bei freigegebener Nutzung trägt der Verweis auf die bestehende
-    // Richtlinie nichts zu den festgestellten Sachverhalten bei und entfällt.
+    // möglicher Shadow AI empfohlen. Besteht bereits eine Richtlinie, wird ihre Anwendung
+    // empfohlen, wenn die Nutzung Shadow AI sein kann oder Informationen das Unternehmen verlassen.
+    // Dann ist zu klären, ob die Richtlinie diese Nutzung und diese Eingaben zulässt.
+    // Die Begründung von E1 nennt beide Anlässe, wenn beide vorliegen: die nicht bestätigte oder
+    // abgelehnte Freigabe (Einordnung) und die mögliche Weitergabe an einen Anbieter (S1, S4).
+    // Liegt keiner davor, nennt sie wie bisher die Regeln mit der Gesamtstufe.
     var richtlinie = zustand(a.F25, "F25");
+    var grundRichtlinie = {
+      grund: "richtlinie", richtlinie: richtlinie,
+      freigabe: anlassEinordnung ? (abgelehnt ? "abgelehnt" : "offen") : null,
+      abfluss: datenAbfluss,
+      sachverhalte: datenAbfluss ? risiken(["S1", "S4"], "K1") : []
+    };
     if (richtlinie === ZUSTAND.VORHANDEN) {
-      if (anlassEinordnung) empfiehl("E1", richtlinie, grundEinordnung);
+      if (anlassEinordnung || datenAbfluss) empfiehl("E1", richtlinie, grundRichtlinie);
     } else if (gesamt >= 2 || anlassEinordnung) {
       empfiehl("E1", richtlinie,
-        gesamt >= 2 ? { grund: "gesamt", sachverhalte: mitStufe(gesamt) } : grundEinordnung);
+        anlassEinordnung || datenAbfluss ? grundRichtlinie : { grund: "gesamt", sachverhalte: mitStufe(gesamt) });
     }
     if (a.F26 !== JA) {
       empfiehl("E2", zustand(a.F26, "F26"), { grund: a.F26 === UNKLAR ? "schulungUnklar" : "schulungNein", sachverhalte: [] });
     }
-    if (felder.S1 >= 2 || felder.S4 >= 2) {
+    // E3: nur bei fehlenden oder unklaren technischen Schutzmaßnahmen. Sind sie vorhanden, kann
+    // die nutzende Person an ihnen nichts ändern. Für sie gilt dann E1.
+    // E3 und E7 entfallen bei ausdrücklich abgelehnter Nutzung. Dann gelten E9 (Nutzung einstellen)
+    // und E6 (freigegebene Alternative). Schutzmaßnahmen oder ein Unternehmenszugang für den
+    // abgelehnten Dienst könnten sonst als Weg zur weiteren Nutzung verstanden werden.
+    if (datenAbfluss && a.F27 !== JA && !abgelehnt) {
       empfiehl("E3", zustand(a.F27, "F27"), { grund: "sachverhalteRisiko", sachverhalte: risiken(["S1", "S4"], "K1") });
     }
     if (felder.S2 >= 2) {
@@ -390,19 +455,23 @@
     // Teil decken E5b und E6 ab. So bleibt bei Handlungsbedarf nie eine Empfehlungsliste leer.
     var nichtNachvollziehbar = a.F22 !== "ja";
     if (felder.S3 >= 2 && (nichtNachvollziehbar || !nichtFrei)) {
-      empfiehl("E8", null, { grund: "sachverhalteRisiko", sachverhalte: risiken(["S3"], "K2") });
+      // fassung: Der Text richtet sich nach der Antwort auf F22.
+      empfiehl("E8", null, { grund: "sachverhalteRisiko", fassung: a.F22, sachverhalte: risiken(["S3"], "K2") });
     }
     if (gesamt >= 3 || anlassEinordnung) {
       empfiehl("E5a", teil29("Stelle"),
         gesamt >= 3 ? { grund: "stelle", sachverhalte: mitStufe(gesamt) } : grundEinordnung);
     }
+    // Nach einer ausdrücklichen Ablehnung entfällt der Weg zur Freigabe (E5b). An seine Stelle
+    // tritt E9: die Nutzung einstellen. Die freigegebene Alternative (E6) bleibt.
     if (nichtFrei) {
-      empfiehl("E5b", teil29("Verfahren"), grundFreigabe);
+      if (abgelehnt) empfiehl("E9", null, grundFreigabe);
+      else empfiehl("E5b", teil29("Verfahren"), grundFreigabe);
       empfiehl("E6", zustand(a.F30, "F30"), grundFreigabe);
     }
     // E7 bei selbst eingerichtetem Zugang und bei Nutzung ohne Anmeldung, der Anlass nennt die Angabe
-    if (a.F3 === "privat") empfiehl("E7", null, { grund: "privat", sachverhalte: [] });
-    if (a.F3 === "ohne Anmeldung") empfiehl("E7", null, { grund: "ohneAnmeldung", sachverhalte: [] });
+    if (a.F3 === "privat" && !abgelehnt) empfiehl("E7", null, { grund: "privat", sachverhalte: [] });
+    if (a.F3 === "ohne Anmeldung" && !abgelehnt) empfiehl("E7", null, { grund: "ohneAnmeldung", sachverhalte: [] });
     return liste;
   }
 
@@ -411,14 +480,18 @@
    * Angaben, die einander nach ihrem Wortlaut ausschließen (Abschnitt 5.3.4).
    * Sie werden im Ergebnis ausgewiesen und verändern keine Reaktionsstufe.
    *   W1        keine personenbezogenen Daten (F12), aber Profiling (F8)
-   *   W2 (F15)  Daten verlassen das Unternehmen nicht (F23), aber externe Verarbeitung (F15)
-   *   W2 (F16)  Daten verlassen das Unternehmen nicht (F23), aber Drittlandbezug (F16)
+   *   W2 (F15)  Verarbeitung nur auf eigenen Systemen (F23), aber externe Verarbeitung (F15)
+   *   W2 (F16)  Verarbeitung nur auf eigenen Systemen (F23), aber Drittlandbezug (F16)
+   *   W3        personenbezogene Daten (F12) und Eingaben beim externen Anbieter (F23),
+   *             aber keine externe Verarbeitung personenbezogener Daten (F15). Bei F12 „Unklar“
+   *             ist der Personenbezug offen, dort gibt es keinen Widerspruch.
    */
   function widersprueche(a) {
     var w = [];
     if (a.F12 === NEIN && a.F8 === JA) w.push("W1");
     if (a.F23 === "lokal" && a.F15 === JA) w.push("W2 (F15)");
     if (a.F23 === "lokal" && a.F16 === JA) w.push("W2 (F16)");
+    if (a.F12 === JA && (a.F23 === "extern ohne" || a.F23 === "extern mit") && a.F15 === NEIN) w.push("W3");
     return w;
   }
 

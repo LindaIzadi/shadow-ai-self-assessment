@@ -56,7 +56,7 @@ Bewertungslogik. `inhalte.js` enthält die Fragen, Antwortmöglichkeiten, Hilfet
 | `css/stil.css` | Gestaltung für Bildschirm und Druck |
 | `css/schriften/` | Lokale Schriftdateien und Lizenztexte |
 | `test/testfaelle.json` | Dreizehn Testfälle mit unabhängig festgelegten Erwartungswerten |
-| `test/einzelpruefungen.json` | 14 ergänzende Einzelprüfungen |
+| `test/einzelpruefungen.json` | 16 ergänzende Einzelprüfungen |
 | `test/regeln.test.js` | Regeltests, Abgleich der Antwortcodes und ungültige Eingaben |
 | `test/konsistenz.test.js` | Systematische Prüfung der Bewertungslogik |
 | `test/browser.test.js` | Prüfung der Anwendung über die Browseroberfläche in Chromium, Firefox und WebKit |
@@ -90,8 +90,7 @@ Für die Anwendung genügt ein aktueller Webbrowser. Die folgenden Werkzeuge die
   untersagt Verbindungen zu anderen Adressen.
 - Verweise auf der Startseite und im Ergebnis führen zu externen Seiten, vor allem zu den
   Rechtstexten auf EUR-Lex. Sie öffnen sich nur auf Klick in einem neuen Fenster.
-- Das Repository enthält keine personenbezogenen Daten. Unterlagen der Evaluation
-  (Interviewaufzeichnung, Transkript) gehören nicht zum Repository.
+
 
 
 

@@ -110,12 +110,12 @@ function rKombinationen() {
   }
   return liste;
 }
-/** Alle Kombinationen des D-Pfads (F13 bis F17 erscheinen nur bei Personenbezug, F14 nur bei F13 „Ja“). */
+/** Alle Kombinationen des D-Pfads (F13 bis F17 erscheinen nur bei Personenbezug, F14 bei F12 „Ja“ oder F13 „Ja“). */
 function dKombinationen() {
   const liste = [{ F12: "Nein" }];
   for (const f12 of ["Unklar", "Ja"]) {
     for (const f13 of JNU) {
-      for (const f14 of f13 === "Ja" ? JNU : [undefined]) {
+      for (const f14 of f12 === "Ja" || f13 === "Ja" ? JNU : [undefined]) {
         for (const [f15, f16, f17] of kreuz(JNU, JNU, wahl("F17"))) {
           liste.push({ F12: f12, F13: f13, F14: f14, F15: f15, F16: f16, F17: f17 });
         }

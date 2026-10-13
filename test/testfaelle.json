@@ -104,7 +104,7 @@
    "luecken": [],
    "empfehlungen": [
     [
-     "E3",
+     "E1",
      "vorhanden"
     ]
    ],
@@ -133,6 +133,7 @@
    "F4": "bekannt, nicht freigegeben",
    "F12": "Ja",
    "F13": "Nein",
+   "F14": "Nein",
    "F15": "Ja",
    "F16": "Unklar",
    "F17": "Keine",
@@ -225,6 +226,7 @@
    "F9": "Keine",
    "F12": "Ja",
    "F13": "Nein",
+   "F14": "Nein",
    "F15": "Ja",
    "F16": "Ja",
    "F17": [
@@ -507,7 +509,7 @@
    ],
    "empfehlungen": [
     [
-     "E3",
+     "E1",
      "vorhanden"
     ],
     [
@@ -624,6 +626,7 @@
    "F4": "bekannt, nicht freigegeben",
    "F12": "Ja",
    "F13": "Nein",
+   "F14": "Nein",
    "F15": "Ja",
    "F16": "Unklar",
    "F17": "Keine",
@@ -658,10 +661,6 @@
    "empfehlungen": [
     [
      "E1",
-     "vorhanden"
-    ],
-    [
-     "E3",
      "vorhanden"
     ],
     [
@@ -807,10 +806,6 @@
      "fehlt"
     ],
     [
-     "E3",
-     "vorhanden"
-    ],
-    [
      "E5a",
      "unklar"
     ],
@@ -855,6 +850,7 @@
    "F22": "ja",
    "F23": "lokal",
    "F13": "Nein",
+   "F14": "Ja",
    "F15": "Ja",
    "F16": "Ja",
    "F17": "Keine"

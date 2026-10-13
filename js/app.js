@@ -501,9 +501,8 @@
     anhaengen(kartenKopf, symbol("dokument"), kartenText);
     var aufgabeFeld = textfeld("aufgabe", E.aufgabeTitel, E.aufgabeHinweis, E.aufgabeFehlt,
       aufgabe, function (w) { aufgabe = w; zeigeFallwechsel(); }, startFehler && !aufgabe.trim());
-    // Das Beispiel steht als Platzhalter im Feld, der Hinweis darunter wird nur vorgelesen.
+    // Die Beispiele stehen als Platzhalter im Feld, der Hinweis darunter ist sichtbar.
     aufgabeFeld.querySelector("input").placeholder = E.aufgabePlatzhalter;
-    aufgabeFeld.querySelector(".feld-hinweis").className = "feld-hinweis nur-vorlesen";
     anhaengen(feld,
       kartenKopf,
       dienst,
@@ -658,11 +657,19 @@
   /**
    * Inhalt eines Hilfetexts. Jeder Eintrag ist ein Absatz. Beginnt ein Eintrag mit einer
    * Kurzbezeichnung und Doppelpunkt, wird sie zur Zwischenüberschrift über dem Absatz.
+   * Aufeinanderfolgende Einträge, die mit „- “ beginnen, bilden eine Aufzählung.
    */
   function hilfeAbsaetze(ziel, texte) {
     // Ein Absatz ohne Begriff nach Begriffsabsätzen ist ein Zusatzhinweis und steht kursiv.
     var nachBegriff = false;
+    var liste = null;
     (Array.isArray(texte) ? texte : [texte]).forEach(function (t) {
+      if (t.indexOf("- ") === 0) {
+        if (!liste) liste = ziel.appendChild(el("ul", "hilfe-liste"));
+        liste.appendChild(el("li", "", t.slice(2)));
+        return;
+      }
+      liste = null;
       var pos = t.indexOf(": "), punkt = t.indexOf(". ");
       // Mit „_“ beginnender Absatz: Querverweis oder Zusatzhinweis, kursiv ohne Begriff
       if (t.charAt(0) === "_") {
@@ -772,6 +779,7 @@
   }
 
   /** Bedingte Fragen je auslösender Frage (Fragenführung nach Tabelle A.1). */
+  // F14 entfällt über F13 nur, wenn F12 „Unklar“ ist. Bei F12 „Ja“ wird F14 immer gestellt.
   var ENTFAELLT = { F7: ["F8", "F9"], F12: ["F13", "F14", "F15", "F16", "F17"], F13: ["F14"] };
 
   /** Blendet bedingte Fragen ein oder aus und verwirft Antworten ausgeblendeter Fragen. */
@@ -1092,7 +1100,7 @@
 
   /** Satz dazu, welcher Bereich das Gesamtergebnis bestimmt (Tabelle B.1). */
   function herkunftGesamt(e) {
-    var namen = e.bestimmend.map(function (p) { return I.BEREICHE[p]; });
+    var namen = e.bestimmend.map(function (p) { return "„" + I.BEREICHE[p] + "“"; });
     if (namen.length === 1) return fuelle(I.FEST.gesamtEinBereich, { bereiche: namen[0] });
     var liste = namen.slice(0, -1).join(", ") + T.aufzaehlungUnd + namen[namen.length - 1];
     return fuelle(I.FEST.gesamtMehrereBereiche, { bereiche: liste });
@@ -1128,11 +1136,19 @@
     return p;
   }
 
-  /** Wortlaut einer Handlungsempfehlung je nach Stand der Schutzmaßnahme (Tabelle B.5). */
-  function empfehlungsText(name, zustand) {
-    var texte = I.EMPFEHLUNGEN[name];
-    if (zustand === null) return texte.text;
-    return zustand === R.ZUSTAND.VORHANDEN ? texte.vorhanden : texte.fehlt;
+  /**
+   * Fassung je Stand der Schutzmaßnahme (Tabelle B.5). Für „unklar“ gilt eine eigene Fassung,
+   * falls es sie gibt, sonst die für „fehlt“. Ohne Schutzmaßnahme (E7 bis E9) gilt die Fassung
+   * zum Anlass, falls es sie gibt (E7 je Angabe in F3, E8 je Antwort auf F22), sonst „text“.
+   */
+  function nachZustand(texte, zustand, anlass) {
+    if (zustand === null) return (anlass && (texte[anlass.fassung] || texte[anlass.grund])) || texte.text;
+    if (zustand === R.ZUSTAND.VORHANDEN) return texte.vorhanden;
+    return zustand === R.ZUSTAND.UNKLAR && texte.unklar ? texte.unklar : texte.fehlt;
+  }
+  /** Wortlaut einer Handlungsempfehlung je nach Stand der Schutzmaßnahme. */
+  function empfehlungsText(name, zustand, anlass) {
+    return nachZustand(I.EMPFEHLUNGEN[name], zustand, anlass);
   }
 
   function zeichneErgebnis() {
@@ -1282,7 +1298,7 @@
   function zeichneGesamt(e) {
     var gesamt = el("section", "gesamt stufe-rahmen-" + e.gesamt + " gesamt-farbe-" + e.gesamt);
     var gesamtText = el("div", "gesamt-text");
-    var bedeutung = el("p", "gesamt-bedeutung", I.STUFEN[e.gesamt].bedeutung);
+    var bedeutung = el("p", "gesamt-bedeutung", I.gesamtBeschreibung(e.gesamt, antworten.F4));
     anhaengen(gesamtText,
       el("h2", "gesamt-titel", T.gesamtTitel),
       zeichneGesamtStufe(e),
@@ -1411,24 +1427,25 @@
    * Platzhalter {stufe} steht für den Namen des Gesamtergebnisses.
    */
   function anlassText(anlass, e) {
+    if (anlass.grund === "richtlinie") return I.begruendungE1(anlass);
     return fuelle(I.EMPFEHLUNG_GRUND[anlass.grund], { stufe: I.STUFEN[e.gesamt].name });
   }
 
   /** Symbol je Maßnahme */
-  var EMPFEHLUNG_SYMBOL = { E1: "buch", E2: "hut", E3: "zahnrad", E4: "lupe", E5a: "gebaeude", E5b: "haken", E6: "tausch", E7: "schloss", E8: "stift" };
+  var EMPFEHLUNG_SYMBOL = { E1: "buch", E2: "hut", E3: "zahnrad", E4: "lupe", E5a: "gebaeude", E5b: "haken", E6: "tausch", E7: "schloss", E8: "stift", E9: "kreuz" };
 
   /**
    * Eine Maßnahme als Karte: Symbol, Titel, Text und Stand der Schutzmaßnahme. Rechts oben öffnet
    * ein Pfeil die Begründung, die unter einer Trennlinie über die volle Breite der Karte folgt.
    */
-  function zeichneEmpfehlung(m, e) {
+  function zeichneEmpfehlung(m, e, ohneListe) {
     var li = el("li", "empfehlung");
     li.setAttribute("data-kennung", m.kennung);
     var inhalt = el("div", "empfehlung-inhalt");
     var kopfzeile = el("div", "empfehlung-kopf");
     var titel = I.EMPFEHLUNG_TITEL[m.kennung];
     // Ohne Nummern: Die Maßnahmen geben keine Reihenfolge der Umsetzung vor.
-    anhaengen(kopfzeile, el("h3", "empfehlung-titel", m.zustand === null ? titel.text : m.zustand === R.ZUSTAND.VORHANDEN ? titel.vorhanden : titel.fehlt));
+    anhaengen(kopfzeile, el("h3", "empfehlung-titel", nachZustand(titel, m.zustand, m.anlass)));
     var fuss = el("div", "empfehlung-fuss");
     if (m.zustand !== null) {
       var marke = el("span", "zustand zustand-" + m.zustand,
@@ -1439,57 +1456,61 @@
       // Empfehlung ohne Schutzmaßnahme (E7, E8): Das Etikett nennt den Anlass.
       fuss.appendChild(el("span", "anlass-marke", fuelle(T.etikettAnlass[m.kennung] || "{massnahme}", { massnahme: I.ANLASS_MARKE[m.anlass.grund] || I.MASSNAHMEN[m.kennung] })));
     }
-    anhaengen(inhalt, kopfzeile, textMitVerweisen("empfehlung-text", empfehlungsText(m.kennung, m.zustand)));
+    anhaengen(inhalt, kopfzeile, textMitVerweisen("empfehlung-text", empfehlungsText(m.kennung, m.zustand, m.anlass)));
     m.zusaetze.forEach(function (name) {
       inhalt.appendChild(textMitVerweisen("empfehlung-zusatz", empfehlungsText(name, m.zustand)));
     });
-    // Freigabe, Alternative und Unternehmenszugang: kurze Erklärung des Unterschieds
-    // Begriff normal, die Erklärung dahinter kursiv
-    // Die Erklärung der Alternative (E6) erscheint nur, wenn es eine freigegebene Alternative gibt.
-    var erklaerung = I.EMPFEHLUNG_ERKLAERUNG[m.kennung];
-    if (m.kennung === "E6" && m.zustand !== R.ZUSTAND.VORHANDEN) erklaerung = null;
-    if (erklaerung) {
-      var trenner = erklaerung.indexOf(": ");
-      var absatzErkl = el("p", "empfehlung-erklaerung");
-      if (trenner > 0) anhaengen(absatzErkl, document.createTextNode(erklaerung.slice(0, trenner + 2)), el("em", "", erklaerung.slice(trenner + 2)));
-      else absatzErkl.appendChild(el("em", "", erklaerung));
-      inhalt.appendChild(absatzErkl);
-    }
     inhalt.appendChild(fuss);
 
-    // Begründung: eingeklappt, der Pfeil steht rechts oben in der Karte.
+    // Begründung: eingeklappt, der Pfeil steht rechts oben in der Karte. Sie entfällt, wenn der
+    // Text der Empfehlung den Anlass schon nennt oder dieselbe Begründung bei einer Karte davor steht.
+    var begruendung = I.OHNE_BEGRUENDUNG.indexOf(m.kennung) === -1 ? grundAbsaetze(m.anlass, e, ohneListe) : [];
+    if (!begruendung.length) {
+      anhaengen(li, symbol(EMPFEHLUNG_SYMBOL[m.kennung] || "liste"), inhalt);
+      return li;
+    }
     var grund = el("details", "empfehlung-grund");
     grund.addEventListener("toggle", ordneEmpfehlungen);
     var zusammenfassung = el("summary", "");
     zusammenfassung.setAttribute("title", T.warum);
     anhaengen(zusammenfassung, el("span", "nur-vorlesen", T.warum), symbol("winkel"));
     anhaengen(grund, zusammenfassung, el("p", "grund-titel", T.warum));
-    zeichneGrund(m.anlass, e, grund);
+    begruendung.forEach(function (absatz) { grund.appendChild(absatz); });
     anhaengen(li, symbol(EMPFEHLUNG_SYMBOL[m.kennung] || "liste"), inhalt, grund);
     return li;
   }
 
   /**
-   * Begründung als zusammenhängender Text. Sachverhalte zu Risikofaktoren stehen ohne Vorspann.
-   * Beim Gesamtergebnis und bei der zuständigen Stelle folgt auf den Anlass „Ausschlaggebend dafür:“,
-   * bei einem Sachverhalt im selben Absatz, bei mehreren als Liste.
+   * Sätze zu den auslösenden Sachverhalten, bezogen auf die Antworten der Person (inhalte.js).
+   * Die auslösenden Fragen stammen aus den Treffern von regeln.js. Gleiche Sätze erscheinen nur
+   * einmal, etwa wenn S1 und S4 beide auf F23 beruhen.
    */
-  function zeichneGrund(anlass, e, ziel) {
-    var saetze = anlass.sachverhalte.map(function (k) { return I.SACHVERHALT_KURZ[k]; });
-    if (anlass.grund === "sachverhalteRisiko") {
-      ziel.appendChild(el("p", "grund-text", saetze.join(" ")));
-      return;
-    }
+  function sachverhaltSaetze(sachverhalte, e) {
+    var saetze = [];
+    sachverhalte.forEach(function (kennung) {
+      var treffer = e.treffer.filter(function (t) { return t.kennung === kennung; })[0];
+      I.sachverhaltSaetze(kennung, treffer ? treffer.fragen : [], antworten).forEach(function (satz) {
+        if (saetze.indexOf(satz) === -1) saetze.push(satz);
+      });
+    });
+    return saetze;
+  }
+
+  /**
+   * Absätze der Begründung: Anlass und die ausschlaggebenden Angaben, ein Satz im selben Absatz,
+   * mehrere als Liste. Beim Gesamtergebnis, bei der zuständigen Stelle und bei Risikofaktoren ist
+   * der Anlass leer, die Angaben folgen direkt auf „Ausschlaggebend dafür sind Ihre Angaben:“.
+   * ohneListe: Dieselbe Liste steht schon bei einer Maßnahme davor. Leer, wenn nichts zu sagen ist.
+   */
+  function grundAbsaetze(anlass, e, ohneListe) {
+    var saetze = ohneListe ? [] : sachverhaltSaetze(anlass.sachverhalte, e);
     var text = anlassText(anlass, e);
-    if (!saetze.length) { ziel.appendChild(el("p", "grund-text", text)); return; }
-    if (saetze.length === 1) {
-      ziel.appendChild(el("p", "grund-text", text + " " + I.EMPFEHLUNG_GRUND.sachverhalte + " " + saetze[0]));
-      return;
-    }
-    ziel.appendChild(el("p", "grund-text", text + " " + I.EMPFEHLUNG_GRUND.sachverhalte));
+    if (!saetze.length) return text ? [el("p", "grund-text", text)] : [];
+    var einleitung = text ? text + " " + I.EMPFEHLUNG_GRUND.sachverhalte : I.EMPFEHLUNG_GRUND.sachverhalte;
+    if (saetze.length === 1) return [el("p", "grund-text", einleitung + " " + saetze[0])];
     var ul = el("ul", "grund-liste");
     saetze.forEach(function (satz) { ul.appendChild(el("li", "", satz)); });
-    ziel.appendChild(ul);
+    return [el("p", "grund-text", einleitung), ul];
   }
 
   function zeichneEmpfehlungen(e) {
@@ -1498,7 +1519,15 @@
     var emp = el("section", "empfehlungen");
     emp.appendChild(ergebnisAbschnittKopf("liste", T.empfehlungenTitel, e.empfehlungen.length === 1 ? I.FEST.empfehlungenEinleitungEins : I.FEST.empfehlungenEinleitung, null));
     var liste = el("ul", "empfehlungen-liste" + (e.empfehlungen.length === 1 ? " eine" : ""));
-    e.empfehlungen.forEach(function (m) { liste.appendChild(zeichneEmpfehlung(m, e)); });
+    // Gesamtergebnis (E1) und zuständige Stelle (E5a) nennen oft dieselben Sachverhalte. Die Liste
+    // steht dann nur bei der ersten dieser Maßnahmen.
+    var gezeigt = [];
+    e.empfehlungen.forEach(function (m) {
+      var schluessel = m.anlass.grund === "sachverhalteRisiko" || m.anlass.grund === "richtlinie" ? "" : m.anlass.sachverhalte.join(",");
+      var doppelt = schluessel !== "" && gezeigt.indexOf(schluessel) !== -1;
+      if (schluessel) gezeigt.push(schluessel);
+      liste.appendChild(zeichneEmpfehlung(m, e, doppelt));
+    });
     emp.appendChild(liste);
     return emp;
   }

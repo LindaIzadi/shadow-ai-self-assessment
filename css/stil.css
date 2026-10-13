@@ -1075,7 +1075,6 @@ details.empfehlung-grund > p { margin-top: .3rem; padding-left: 1.05rem; color: 
 }
 /* Handlungsempfehlungen: neutraler Stand der Schutzmaßnahme, Erklärung, auslösende Sachverhalte */
 .zustand, .zustand-vorhanden, .zustand-fehlt, .zustand-unklar { color: #34465c; background: #eef1f5; font-weight: 600; box-shadow: inset 0 0 0 1px #d8dfe8; }
-.empfehlung-erklaerung { margin-top: .4rem; font-size: .86rem; color: var(--tinte-leise); max-width: 75ch; }
 .grund-liste { margin: .3rem 0 0 1.05rem; padding-left: 1rem; list-style: disc; color: var(--tinte-leise); max-width: 75ch; }
 .grund-liste li + li { margin-top: .15rem; }
 .empfehlung-zusatz { font-size: .92rem; padding: .55rem .8rem; }
@@ -1161,7 +1160,6 @@ body.druck .feld-zeile, body.druck .regel-kopf { gap: 1mm; padding: .5mm 0; grid
 body.druck .stufe, body.druck .stufe.klein, body.druck .pfad-s .pfad-kopf .stufe { padding: .3mm 1.6mm .3mm 1.2mm; }
 body.druck .stufe-zahl, body.druck .stufe.klein .stufe-zahl, body.druck .pfad-s .pfad-kopf .stufe-zahl { width: 1.6mm; height: 1.6mm; font-size: 0; }
 body.druck body.druck details.empfehlung-grund { display: none; }
-body.druck .empfehlung-erklaerung { display: none; }
 
 /* ---------------------------------------------------------------- Ergebnisseite: Aufbau */
 main > section {
@@ -1306,7 +1304,7 @@ body.druck .empfehlungen-liste > .empfehlung { margin-bottom: 0; }
 .empfehlung-kopf .info-text { flex: 0 0 100%; max-width: 100%; margin-top: 0; grid-column: 1 / -1; }
 .empfehlung-titel { font-weight: 700; margin-right: auto; margin: 0; font-size: 1rem; line-height: 1.3; }
 .empfehlung-text { max-width: 60rem; margin-top: .55rem !important; font-size: .93rem; color: #2a3646; }
-.empfehlung > .empfehlung-zusatz, .empfehlung > .empfehlung-erklaerung { font-size: .86rem; }
+.empfehlung > .empfehlung-zusatz { font-size: .86rem; }
 /* Organisatorische Einordnung */
 .einordnung-kopf > .symbol { width: 2.6rem; height: 2.6rem; background: var(--petrol-hell); color: var(--petrol-tief); }
 .einordnung-kopf > .symbol svg { width: 1.3rem; height: 1.3rem; }
@@ -1385,7 +1383,8 @@ summary.pfad-kopf:focus-visible { outline: 2px solid var(--petrol); outline-offs
   .abschnitt-kopf { grid-template-columns: auto minmax(0, 1fr); }
   .abschnitt-kopf > .alle-oeffnen { grid-column: 1 / -1; justify-self: start; }
   summary.pfad-kopf { grid-template-columns: auto minmax(0, 1fr) auto; }
-  summary.pfad-kopf > .stufe { grid-column: 2; grid-row: 2; justify-self: start; }
+  /* Die Markierung darf auf schmalen Bildschirmen umbrechen, statt über den Rand zu ragen. */
+  summary.pfad-kopf > .stufe { grid-column: 2; grid-row: 2; justify-self: start; white-space: normal; }
   .detail-inhalt { margin: 0 .5rem .5rem; padding: .9rem; }
 }
 /* Druck: ohne Bedienelemente, alle Bereiche ausgeklappt */
@@ -1734,6 +1733,7 @@ body.druck .hilfe-feld { display: none !important; }
 .hilfe-feld .hilfe-titel { display: inline; font-weight: 700; font-size: inherit; color: var(--petrol-tief); }
 @media (max-width: 40rem) { .hilfe-feld { padding: 12px 14px; } }
 .hilfe-feld .hilfe-zusatz { font-style: italic; }
+.hilfe-feld .hilfe-liste { margin: -.2rem 0 0; padding-left: 1.2rem; list-style: disc; }
 /* Druck: Kopf jedes Bereichs mit Name in der ersten und Stufe in der zweiten Zeile, damit lange
    Stufennamen den Namen nicht verdrängen. Zeilen ohne Befund brechen die Stufe bei Platzmangel um. */
 body.druck summary.pfad-kopf { padding: 1mm 1.5mm; gap: 2mm; display: grid; grid-template-columns: auto minmax(0, 1fr); row-gap: .8mm; align-items: center; }

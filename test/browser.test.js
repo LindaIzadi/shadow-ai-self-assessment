@@ -46,7 +46,7 @@ async function durchlauf(page, a) {
       if (sichtbar && a[f] !== undefined) await antworte(page, f, a[f]);
     }
     // Hinweis auf entfallende Fragen erscheint genau dann, wenn die abhängigen Fragen ausgeblendet sind
-    const entfaellt = { F7: a.F7 === "Keine", F12: a.F12 === "Nein", F13: a.F13 !== undefined && a.F13 !== "Ja" };
+    const entfaellt = { F7: a.F7 === "Keine", F12: a.F12 === "Nein", F13: a.F13 !== undefined && a.F13 !== "Ja" && a.F12 !== "Ja" };
     for (const [k, soll] of Object.entries(entfaellt)) {
       if (!BLOECKE[b].includes(Number(k.slice(1)))) continue;
       const ist = await page.locator("#entfaellt-" + k).isVisible();
@@ -124,7 +124,8 @@ const EIN = { "keine Shadow AI": "Keine Shadow AI laut Angaben", "keine Shadow A
       const empSoll = []; e.empfehlungen.forEach(([n, z]) => { if (n.includes("Zusatz")) { const l = empSoll[empSoll.length - 1].split("|"); l[2] = "1"; empSoll[empSoll.length - 1] = l.join("|"); } else empSoll.push(n + "|" + (z === "-" ? "-" : "Maßnahme " + z) + "|0"); });
       ok(JSON.stringify(r.emp) === JSON.stringify(empSoll), name + " empfehlungen " + r.emp + " soll " + empSoll);
       const e6 = page.locator('.empfehlung[data-kennung="E6"]');
-      if (await e6.count()) ok((await e6.locator(".empfehlung-erklaerung").count()) === (e.empfehlungen.some(([k, z]) => k === "E6" && z === "vorhanden") ? 1 : 0), name + " Erklärung der Alternative nur, wenn eine vorhanden ist");
+      // E6: Text nach der Antwort auf F30 (vorhanden, fehlt, unklar), ohne zusätzliche Erklärung
+      if (await e6.count()) ok((await e6.locator(".empfehlung-text").textContent()) === I.EMPFEHLUNGEN.E6[e.empfehlungen.find(([k]) => k === "E6")[1]], name + " Text E6 nach F30");
       ok(r.kopf.includes("Prüfhinweis") && r.kopf.includes("keine Aussage über die Rechtskonformität"), name + " Kopftext");
       if (name === "T5" && SHOTS) await page.screenshot({ path: path.join(SHOTS, "ergebnis_T5.png"), fullPage: true });
       if (name === "T8" && SHOTS) await page.screenshot({ path: path.join(SHOTS, "ergebnis_T8.png"), fullPage: true });
@@ -175,6 +176,12 @@ const EIN = { "keine Shadow AI": "Keine Shadow AI laut Angaben", "keine Shadow A
     }
     ok(r.gesamt.startsWith("Stufe " + p.erwartet.gesamt + " von 4"), p.nr + " Gesamtstufe " + r.gesamt);
     ok(JSON.stringify(r.luecken) === JSON.stringify(p.erwartet.luecken), p.nr + " luecken " + r.luecken);
+    if (p.erwartet.empfehlungen) {
+      ok(JSON.stringify(r.emp.map((x) => x.split("|")[0])) === JSON.stringify(p.erwartet.empfehlungen.map((x) => x[0])), p.nr + " Empfehlungen " + r.emp);
+    }
+    if (p.antworten.F4 === "abgelehnt") {
+      ok((await page.locator('.empfehlung[data-kennung="E9"] details').count()) === 0, p.nr + " „Nutzung einstellen“ ohne „Warum diese Empfehlung?“");
+    }
     console.log("  " + p.nr + ": " + (fehler === vorher ? "stimmt" : "ABWEICHUNG"));
   }
 
@@ -239,7 +246,9 @@ const EIN = { "keine Shadow AI": "Keine Shadow AI laut Angaben", "keine Shadow A
   await antworte(page, "F13", "Ja");
   ok(await page.locator("#frage-F14").isVisible(), "F14 bei F13 Ja");
   await antworte(page, "F13", "Unklar");
-  ok(!(await page.locator("#frage-F14").isVisible()), "F14 bei F13 Unklar verborgen");
+  ok(!(await page.locator("#frage-F14").isVisible()), "F14 bei F12 Unklar und F13 Unklar verborgen");
+  await antworte(page, "F12", "Ja");
+  ok(await page.locator("#frage-F14").isVisible(), "F14 bei F12 Ja, auch ohne besondere Kategorien");
   await antworte(page, "F12", "Nein");
   ok(!(await page.locator("#frage-F13").isVisible()) && !(await page.locator("#frage-F17").isVisible()), "F13-F17 bei F12 Nein verborgen");
   await page.locator("#weiter").click();
@@ -273,7 +282,7 @@ const EIN = { "keine Shadow AI": "Keine Shadow AI laut Angaben", "keine Shadow A
   ok(await page.locator(".empfehlung .grund-text").first().isVisible(), "Pfeil öffnet die Begründung");
   const danebenNachher = await karte(1);
   ok(danebenNachher === daneben, "Begründung öffnen verändert die Karte daneben nicht " + daneben + " -> " + danebenNachher);
-  ok((await page.locator(".empfehlung .grund-text").first().textContent()).length > 20 && !(await page.locator(".empfehlung").first().textContent()).includes("Festgestellt wurde"), "Begründung als Satz ohne Vorspann");
+  ok((await page.locator(".empfehlung .grund-text").first().textContent()).length > 20 && (await page.locator("section.empfehlungen").textContent()).includes("Ausschlaggebend dafür sind Ihre Angaben"), "Begründung nennt die ausschlaggebenden Angaben");
   await page.locator(".empfehlung details summary").first().click();
   ok((await page.locator(".fall-zeile").first().textContent()) === "KI-Dienst: ChatGPTNutzung: Kundenmails zusammenfassenKategorie: Texte erstellen oder überarbeiten", "Nutzungsfall mit Kategorie im Ergebnis");
   ok(r.emp.some((x) => x.startsWith("E5a|Maßnahme vorhanden")) && r.emp.some((x) => x.startsWith("E5b|Maßnahme fehlt")), "F29 nur Stelle: E5a vorhanden, E5b fehlt: " + r.emp);
