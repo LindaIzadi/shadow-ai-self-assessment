@@ -159,7 +159,7 @@
         "Ihr Unternehmen kann unter bestimmten Voraussetzungen selbst als Anbieter des KI-Dienstes gelten. Die Aussagen beschreiben solche Fälle.",
         "Unter eigenem Namen oder in eigenem Angebot: Ihr Unternehmen stellt den KI-Dienst anderen unter eigenem Namen oder eigener Marke zur Verfügung, zum Beispiel als Chatbot auf der eigenen Website.",
         "Wesentlich verändert: Ihr Unternehmen hat den KI-Dienst über die vom Anbieter vorgesehenen Einstellungen hinaus verändert, zum Beispiel durch eigenes Nachtrainieren.",
-        "Anderer Zweck: Eine Nutzung für einen Zweck, den der Anbieter in seinen Nutzungsbedingungen oder seiner Beschreibung nicht vorsieht oder ausschließt. Die übliche Verwendung eines allgemeinen KI-Chatdienstes für Texte, Übersetzungen oder Recherchen fällt normalerweise nicht darunter.",
+        "Anderer Zweck: Eine Nutzung für einen sensiblen Zweck, den der Anbieter in seinen Bedingungen nicht vorsieht oder ausschließt (z. B. Einsatz eines allgemeinen Chatbots für Personalentscheidungen). Die übliche Verwendung für Texte, Übersetzungen oder Recherchen fällt nicht darunter.",
         "Die Frage erfasst nur Hinweise auf eine Anbieterrolle und entscheidet nicht über die rechtliche Rolle."
       ],
       optionen: nummeriert([
