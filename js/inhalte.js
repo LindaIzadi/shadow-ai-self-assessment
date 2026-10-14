@@ -423,7 +423,7 @@
     3: { name: "Prüfbedarf", bedeutung: "Ihre Angaben weisen auf einen möglichen Prüfbedarf hin. Ihre zuständige Stelle im Unternehmen sollte den Sachverhalt genauer prüfen.",
       gesamt: "Ihre Angaben weisen auf rechtliche oder organisatorische Fragen hin, die noch zu klären sind. Bitte wenden Sie sich an die zuständige Stelle in Ihrem Unternehmen, um gemeinsam zu prüfen, unter welchen Voraussetzungen die Nutzung möglich ist." },
     4: { name: "Eskalation", bedeutung: "Der Fall sollte der zuständigen Stelle vorrangig vorgelegt werden.",
-      gesamt: "Ihre Antworten weisen auf einen Sachverhalt hin, der eine besonders sorgfältige Prüfung erfordert. Bitte wenden Sie sich an die zuständige Stelle in Ihrem Unternehmen, um das weitere Vorgehen gemeinsam abzustimmen. Bis zur Klärung sollte die betroffene KI-Nutzung nicht fortgesetzt werden." }
+      gesamt: "Ihre Antworten weisen auf einen Sachverhalt hin, der eine besonders sorgfältige Prüfung erfordert. Die Einstufung beschreibt die Dringlichkeit dieser Prüfung und ist keine Bewertung Ihres Verhaltens. Bitte wenden Sie sich an die zuständige Stelle in Ihrem Unternehmen, um das weitere Vorgehen gemeinsam abzustimmen. Bis zur Klärung sollte die betroffene KI-Nutzung nicht fortgesetzt werden." }
   };
 
   // ------------------------------------------------------------ Tabelle B.1: feste Texte

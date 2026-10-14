@@ -750,5 +750,109 @@
     "W3"
    ]
   }
+ },
+ {
+  "nr": "P17",
+  "text": "Transparenzpflichten ueber F10: taeuschend echte KI-Inhalte",
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": "Keine",
+   "F10": "Ja",
+   "F11": "Nein",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Ja",
+   "F26": "Ja",
+   "F27": "Ja",
+   "F28": "Ja",
+   "F29": [
+    "Stelle",
+    "Verfahren"
+   ],
+   "F30": "Ja",
+   "F3": "Unternehmen",
+   "F4": "freigegeben",
+   "F12": "Nein",
+   "F18": "oeffentlich",
+   "F20": "gering",
+   "F22": "ja",
+   "F23": "extern ohne"
+  },
+  "erwartet": {
+   "gesamt": 3,
+   "R": 3,
+   "D": 1,
+   "S": 1,
+   "freigabezusatz": true,
+   "regeln_mit": [
+    "R5"
+   ],
+   "regeln_ohne": [
+    "R3",
+    "R4"
+   ],
+   "empfehlungen": [
+    [
+     "E5a",
+     "vorhanden"
+    ]
+   ]
+  }
+ },
+ {
+  "nr": "P18",
+  "text": "Transparenzpflichten ueber F11: KI-generierte Texte von oeffentlichem Interesse",
+  "antworten": {
+   "F1": "Texte",
+   "F2": "Ja",
+   "F5": "Keine",
+   "F6": "Keine",
+   "F7": "Keine",
+   "F10": "Nein",
+   "F11": "Ja",
+   "F19": "Vorschlag",
+   "F21": "immer",
+   "F24": "manuell",
+   "F25": "Ja",
+   "F26": "Ja",
+   "F27": "Ja",
+   "F28": "Ja",
+   "F29": [
+    "Stelle",
+    "Verfahren"
+   ],
+   "F30": "Ja",
+   "F3": "Unternehmen",
+   "F4": "freigegeben",
+   "F12": "Nein",
+   "F18": "oeffentlich",
+   "F20": "gering",
+   "F22": "ja",
+   "F23": "extern ohne"
+  },
+  "erwartet": {
+   "gesamt": 3,
+   "R": 3,
+   "D": 1,
+   "S": 1,
+   "freigabezusatz": true,
+   "regeln_mit": [
+    "R5"
+   ],
+   "regeln_ohne": [
+    "R3",
+    "R4"
+   ],
+   "empfehlungen": [
+    [
+     "E5a",
+     "vorhanden"
+    ]
+   ]
+  }
  }
 ]

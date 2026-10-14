@@ -56,7 +56,7 @@ Bewertungslogik. `inhalte.js` enthält die Fragen, Antwortmöglichkeiten, Hilfet
 | `css/stil.css` | Gestaltung für Bildschirm und Druck |
 | `css/schriften/` | Lokale Schriftdateien und Lizenztexte |
 | `test/testfaelle.json` | Dreizehn Testfälle mit unabhängig festgelegten Erwartungswerten |
-| `test/einzelpruefungen.json` | 16 ergänzende Einzelprüfungen |
+| `test/einzelpruefungen.json` | 18 ergänzende Einzelprüfungen |
 | `test/regeln.test.js` | Regeltests, Abgleich der Antwortcodes und ungültige Eingaben |
 | `test/konsistenz.test.js` | Systematische Prüfung der Bewertungslogik |
 | `test/browser.test.js` | Prüfung der Anwendung über die Browseroberfläche in Chromium, Firefox und WebKit |
