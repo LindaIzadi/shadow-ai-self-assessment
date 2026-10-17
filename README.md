@@ -17,7 +17,7 @@ Das Ergebnis dient der ersten Orientierung und trifft keine Aussage über die Re
 - **Wissenschaftliche Methode:** Design Science Research. Das Artefakt umfasst das Bewertungsmodell und dessen Umsetzung als webbasierten Prototyp. 
   Fragenkatalog und Regelbasis werden in Kapitel 5 hergeleitet.
 - **Forschungsdaten:** Das Repository enthält keine empirisch erhobenen Forschungsdaten. Die Testfälle in `test/`
-  sind konstruierte Nutzungsfälle und in Anhang C sowie im Begleitdokument zur Testdokumentation dokumentiert.
+  sind konstruierte Nutzungsfälle und in Anhang C sowie im im Ordner Testdokumentation dokumentiert.
 
 ## 2 Urheberschaft (Wer?)
 
@@ -65,7 +65,7 @@ Bewertungslogik. `inhalte.js` enthält die Fragen, Antwortmöglichkeiten, Hilfet
 | `.github/workflows/pipeline.yml` | Automatische Prüfung und Veröffentlichung |
 | `.gitignore`, `.gitattributes`, `.editorconfig` | Einstellungen für Git und Dateiformatierung |
 | `LICENSE` | Nutzungsbedingungen des eigenen Codes |
-| Testdokumentation | Enthält die Testdokumentation der Testfälle |
+| `Testdokumentation` | Enthält die Testdokumentation der Testfälle |
 
 
 ## 6 Werkzeuge

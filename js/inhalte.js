@@ -3,7 +3,7 @@
  *
  * Die Datei enthält keine Logik. Fragen, Antwortoptionen, Auswahllisten und
  * Hilfetexte entsprechen Anhang A der Arbeit, die Ausgabetexte Anhang B und
- * die Bedeutung der Reaktionsstufen Tabelle 13. Wer einen Wortlaut ändern
+ * die Bedeutung der Reaktionsstufen Tabelle 12. Wer einen Wortlaut ändern
  * will, ändert ihn nur hier.
  *
  * „wert“ ist der interne Code einer Antwort, den regeln.js auswertet.
@@ -56,7 +56,7 @@
     fallHinweis: "Beide Angaben dienen nur der Orientierung und beeinflussen die Bewertung nicht."
   };
 
-  // ------------------------------------------------------------ Tabelle 7: Blöcke
+  // ------------------------------------------------------------ Tabelle 6: Blöcke
   var BLOECKE = [
     // beschreibung: Satz unter der Blocküberschrift
     { id: "1", titel: "Nutzungsfall und Vorprüfung", fragen: ["F1", "F2", "F3", "F4", "F5"],
@@ -98,7 +98,7 @@
     return liste.map(function (t, i) { return { wert: i + 1, text: t }; });
   }
 
-  // ------------------------------------------------------------ Tabelle A.1: Fragenkatalog
+  // ------------------------------------------------------------ Tabelle A.2: Fragenkatalog
   // typ: "einfach" (Einfachauswahl) oder "mehrfach" (Mehrfachauswahl)
   // keine: Wortlaut der ausschließenden Option, etwa „Keine der genannten Aussagen trifft zu“
   var FRAGEN = {
@@ -412,7 +412,7 @@
     F30: { typ: "einfach", frage: "Steht in Ihrem Unternehmen für diese Aufgabe eine freigegebene KI-Alternative zur Verfügung?", optionen: JA_NEIN_UNKLAR }
   };
 
-  // ------------------------------------------------------------ Tabelle 13: Reaktionsstufen
+  // ------------------------------------------------------------ Tabelle 12: Reaktionsstufen
   // bedeutung: Erklärung der Stufe eines Bereichs (EU AI Act, Datenschutz) in den Detailergebnissen
   // gesamt:    Text unter der Überschrift des Gesamtergebnisses
   var STUFEN = {
@@ -543,7 +543,7 @@
     "K2": "Ihre Angaben weisen darauf hin, dass Fehler in den KI-Ergebnissen spürbare oder erhebliche Folgen haben können. Gleichzeitig bestehen Einschränkungen bei der Prüfung der Ergebnisse, der Freigabe der KI-Nutzung oder ihrer Nachvollziehbarkeit. Bitte wenden Sie sich an die zuständige Stelle in Ihrem Unternehmen, um gemeinsam geeignete Schutzmaßnahmen und das weitere Vorgehen zu klären."
   };
 
-  // Bezeichnungen der Regeln und Risikofelder (Tabelle 4 und Abschnitt 5.3.2)
+  // Bezeichnungen der Regeln und Risikofelder (Tabelle 3 und Abschnitt 5.3.2)
   var REGELNAMEN = {
     R1: "Mögliche Anbieterrolle", R2: "Verbotene KI-Praktiken", R3: "Mögliche Einstufung als Hochrisiko-KI-System",
     R4: "Betreiberpflichten", R5: "Transparenzpflichten",
@@ -562,8 +562,8 @@
     S: "Risikofaktoren der KI-Nutzung"
   };
 
-  // ------------------------------------------------------------ Tabelle B.5: Handlungsempfehlungen
-  // Bezeichnung der Schutzmaßnahme, auf die sich eine Empfehlung bezieht (Tabelle 18)
+  // ------------------------------------------------------------ Tabelle B.7: Handlungsempfehlungen
+  // Bezeichnung der Schutzmaßnahme, auf die sich eine Empfehlung bezieht (Tabelle 17)
   // Stand einer Schutzmaßnahme, wie er im Etikett einer Empfehlung erscheint
   // Etikett einer Empfehlung ohne Schutzmaßnahme, je Anlass: die Angabe aus F3 oder F4
   var ANLASS_MARKE = { privat: "Privater Zugang", ohneAnmeldung: "Ohne Anmeldung oder Benutzerkonto", abgelehnt: "Nutzung abgelehnt" };
@@ -643,7 +643,7 @@
     "E9": { text: "Nach Ihren Angaben hat Ihr Unternehmen diese KI-Nutzung abgelehnt. Bitte verwenden Sie den KI-Dienst für diese Aufgabe nicht weiter." }
   };
 
-  // Kurztitel der Handlungsempfehlungen, je nach Stand der Schutzmaßnahme (Tabelle 18)
+  // Kurztitel der Handlungsempfehlungen, je nach Stand der Schutzmaßnahme (Tabelle 17)
   var EMPFEHLUNG_TITEL = {
     "E1": { vorhanden: "Bestehende KI-Richtlinie anwenden", fehlt: "Nutzungsregeln klären" },
     "E2": { fehlt: "Schulung zum Umgang mit KI", unklar: "KI-Kompetenz klären" },
@@ -656,7 +656,7 @@
     "E8": { teilweise: "Nachvollziehbarkeit verbessern", nein: "Nachvollziehbarkeit ermöglichen", Unklar: "Nachvollziehbarkeit klären" },
     "E9": { text: "Nutzung einstellen" }
   };
-  // Begründung „Warum diese Empfehlung?“: nennt den Anlass nach Tabelle 18 in Alltagssprache.
+  // Begründung „Warum diese Empfehlung?“: nennt den Anlass nach Tabelle 17 in Alltagssprache.
   // {…} sind Platzhalter. Die genauen Regeln stehen in den aufklappbaren Sachverhalten.
   var EMPFEHLUNG_GRUND = {
     // Gesamtergebnis, zuständige Stelle und Risikofaktoren: Es folgen nur die ausschlaggebenden

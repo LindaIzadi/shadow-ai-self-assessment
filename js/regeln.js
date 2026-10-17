@@ -4,13 +4,13 @@
  * Die Datei enthält ausschließlich die Bewertungslogik. Sie kennt weder Texte
  * noch die Oberfläche. Jede Funktion entspricht einer Tabelle aus Abschnitt 5.3:
  *
- *   einordnung()      Tabelle 14  Einordnung als Shadow AI
- *   rPfad()           Tabelle 15  Regeln des regulatorischen Pfads
- *   dPfad()           Tabelle 16  Regeln des datenschutzrechtlichen Pfads
- *   s1() bis s4()     Tabelle 17  Regeln der Risikofelder im S-Pfad
+ *   einordnung()      Tabelle 13  Einordnung als Shadow AI
+ *   rPfad()           Tabelle 14  Regeln des regulatorischen Pfads
+ *   dPfad()           Tabelle 15  Regeln des datenschutzrechtlichen Pfads
+ *   s1() bis s4()     Tabelle 16  Regeln der Risikofelder im S-Pfad
  *   sPfad()           Ersatzwerte für „Unklar“ und Kombinationsregeln K1, K2
- *   empfehlungen()    Tabelle 18  Regeln für die Handlungsempfehlungen
- *   widersprueche()   Widersprüchliche Angaben (Abschnitt 5.3.4), ohne Wirkung auf die Stufe
+ *   empfehlungen()    Tabelle 17  Regeln für die Handlungsempfehlungen
+ *   widersprueche()   Widersprüchliche Angaben (Abschnitt 5.3.5), ohne Wirkung auf die Stufe
  *   auswerten()       Gesamtergebnis (höchste Stufe der drei Teilergebnisse)
  *   protokoll()       Ergebnis in der Schreibweise von Anhang C (für die Prüfung)
  *
@@ -174,7 +174,7 @@
     }
   }
 
-  // ---------------------------------------------------------------- Tabelle 14
+  // ---------------------------------------------------------------- Tabelle 13
   function einordnung(f2, f4) {
     if (f2 === NEIN) return EINORDNUNG.ABSCHLUSS;
     if (f4 === "freigegeben") return EINORDNUNG.KEINE;
@@ -228,7 +228,7 @@
     return oeffentlich || kreditVersicherung;
   }
 
-  // ---------------------------------------------------------------- Tabelle 15
+  // ---------------------------------------------------------------- Tabelle 14
   function rPfad(a) {
     var p = neuerPfad("R");
     if (a.F5 !== KEINE) p.greift("R1", 3, ["F5"], "R1", a.F5 === UNKLAR ? "R1 bei F5 Unklar" : "R1");
@@ -255,7 +255,7 @@
     return { stufe: p.stufe, treffer: p.treffer, r3: r3 };
   }
 
-  // ---------------------------------------------------------------- Tabelle 16
+  // ---------------------------------------------------------------- Tabelle 15
   function dPfad(a) {
     var p = neuerPfad("D");
     if (a.F12 === NEIN) return { stufe: p.stufe, treffer: p.treffer };
@@ -266,13 +266,25 @@
     // nur, dass eine Prüfung und Freigabe nicht bestätigt ist.
     var hinweisD1 = a.F12 === UNKLAR ? "D1 bei F12 Unklar" : a.F14 === JA ? "D1 bei F14 Ja" : "D1 bei F14 Nein oder Unklar";
     p.greift("D1", 3, ["F12"], "D1", hinweisD1);
+    
     if (a.F13 === JA) {
       // Tabelle B.3 nennt für D2 mit Prüfbedarf zwei Hinweise, je nach auslösender Antwort.
-      if (a.F14 === JA) p.greift("D2", 3, ["F13", "F14"], "D2 (Pruefbedarf)", "D2 (Pruefbedarf) bei F14 Ja");
-      else p.greift("D2", 4, ["F13", "F14"], "D2 (Eskalation)");
+      if (a.F14 === JA) 
+        p.greift(
+          "D2", 3, ["F13", "F14"], 
+          "D2 (Pruefbedarf)", 
+          "D2 (Pruefbedarf) bei F14 Ja"
+        );
+      else 
+        p.greift("D2", 4, ["F13", "F14"], "D2 (Eskalation)");
     } else if (a.F13 === UNKLAR) {
-      p.greift("D2", 3, ["F13"], "D2 (Pruefbedarf)", "D2 (Pruefbedarf) bei F13 Unklar");
+      p.greift(
+        "D2", 3, ["F13"], 
+        "D2 (Pruefbedarf)", 
+        "D2 (Pruefbedarf) bei F13 Unklar");
     }
+
+
     // D3 bis D5: Bei „Unklar“ nennt der Hinweis die ungeklärte Angabe, sonst den angegebenen Sachverhalt.
     // F17 „Keine“ löst D5 nicht aus. Das Assessment schließt damit nicht aus, dass eine
     // Datenschutz-Folgenabschätzung erforderlich ist (siehe Hilfetext zu F17).
@@ -282,7 +294,7 @@
     return { stufe: p.stufe, treffer: p.treffer };
   }
 
-  // ---------------------------------------------------------------- Tabelle 17
+  // ---------------------------------------------------------------- Tabelle 16
   /** Ersatzwerte für „Unklar“ im S-Pfad: nie die günstigste Option. */
   var ERSATZ = {
     F4: "bekannt, nicht freigegeben", F18: "intern", F19: "massgeblich", F20: "spuerbar",
@@ -374,14 +386,14 @@
     return { stufe: p.stufe, felder: felder, treffer: p.treffer };
   }
 
-  // ---------------------------------------------------------------- Tabelle 18
+  // ---------------------------------------------------------------- Tabelle 17
   /**
    * Handlungsempfehlungen in der Form { kennung, zustand, zusaetze, anlass }.
    * zustand  Stand der zugehörigen Schutzmaßnahme. null bei einer Empfehlung ohne
    *          Schutzmaßnahme (E7, E8).
    * zusaetze Namen ergänzender Empfehlungstexte (Tabelle B.5)
    * anlass   Warum die Empfehlung ausgegeben wird: { grund, sachverhalte }.
-   *          grund nennt den Anlass nach Tabelle 18 (Schlüssel der Texte in inhalte.js),
+   *          grund nennt den Anlass nach Tabelle 17 (Schlüssel der Texte in inhalte.js),
    *          sachverhalte die Kennungen der auslösenden Regeln. Die Oberfläche zeigt den
    *          Anlass unter „Warum diese Empfehlung?“ an.
    */
@@ -477,7 +489,7 @@
 
   // ---------------------------------------------------------------- Widersprüchliche Angaben
   /**
-   * Angaben, die einander nach ihrem Wortlaut ausschließen (Abschnitt 5.3.4).
+   * Angaben, die einander nach ihrem Wortlaut ausschließen (Abschnitt 5.3.5).
    * Sie werden im Ergebnis ausgewiesen und verändern keine Reaktionsstufe.
    *   W1        keine personenbezogenen Daten (F12), aber Profiling (F8)
    *   W2 (F15)  Verarbeitung nur auf eigenen Systemen (F23), aber externe Verarbeitung (F15)

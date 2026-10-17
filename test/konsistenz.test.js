@@ -17,7 +17,7 @@
  *   Monotonie             Eine ungünstigere Antwort führt bei sonst gleichen Angaben nie zu
  *                         einer niedrigeren Stufe (Duijm 2015, S. 22, 24).
  *
- * Dazu kommen zwei Prüfungen für die Antwort „Unklar“ im S-Pfad (Abschnitt 5.3.3).
+ * Dazu kommen zwei Prüfungen für die Antwort „Unklar“ im S-Pfad (Abschnitt 5.3.4).
  *
  * Zum Umfang: Die drei Pfade werden über alle ihre Kombinationen einzeln durchlaufen. Die Zahl
  * der Kombinationen aller drei Pfade zusammen wird aus diesen Verteilungen berechnet und nicht
@@ -82,7 +82,7 @@ function stufeVon(funktion, antworten, pfad) {
 }
 
 // ================================================================ 1. Einordnung als Shadow AI
-console.log("== Einordnung als Shadow AI (Tabelle 14) ==");
+console.log("== Einordnung als Shadow AI (Tabelle 13) ==");
 const F2 = R.ANTWORTEN.F2.werte, F4 = R.ANTWORTEN.F4.werte;
 const einordnungen = kreuz(F2, F4).map(([f2, f4]) => R.einordnung(f2, f4));
 einordnungen.forEach((e) => { if (!Object.values(R.EINORDNUNG).includes(e)) fehler.push("Einordnung unvollständig: " + e); });
@@ -155,7 +155,7 @@ console.log("  Teilmengen gegen ihre Klasse geprüft:", teilmengenGeprueft);
 // Gezählt wird wie in Anhang D über die Klassen der Mehrfachauswahlen. Bei F6 und F7 gehen
 // die Vertreter einzeln in die Monotonie ein, für die Zählung werden sie zur Klasse
 // „Auswahl“ zusammengefasst.
-console.log("== R-Pfad (Tabelle 15) ==");
+console.log("== R-Pfad (Tabelle 14) ==");
 const rStufe = new Map();
 for (const k of rk) rStufe.set(k, stufeVon(R.rPfad, k, "R-Pfad"));
 const rKlassen = new Map();
@@ -194,7 +194,7 @@ for (const x of rk) {
 console.log("  Monotonie: geprüfte Paare", rPaare);
 
 // ================================================================ 4. D-Pfad
-console.log("== D-Pfad (Tabelle 16) ==");
+console.log("== D-Pfad (Tabelle 15) ==");
 const dStufe = new Map();
 for (const k of dk) dStufe.set(k, stufeVon(R.dPfad, k, "D-Pfad"));
 console.log("  Kombinationen:", dk.length, "Stufen:", zaehle([...dStufe.values()]));
@@ -227,8 +227,8 @@ for (const x of dk) {
 console.log("  Monotonie: geprüfte Paare", dPaare);
 
 // ================================================================ 5. S-Pfad
-// Die Antwortoptionen sind von der günstigsten zur ungünstigsten geordnet (Tabelle 17).
-console.log("== S-Pfad (Tabelle 17) ==");
+// Die Antwortoptionen sind von der günstigsten zur ungünstigsten geordnet (Tabelle 16).
+console.log("== S-Pfad (Tabelle 16) ==");
 const S_FRAGEN = ["F4", "F18", "F19", "F20", "F21", "F22", "F23", "F24"];
 const ordnung = (f) => R.ANTWORTEN[f].werte.filter((w) => w !== "Unklar");
 const sOptionen = S_FRAGEN.map((f) => ordnung(f).concat(["Unklar"]));

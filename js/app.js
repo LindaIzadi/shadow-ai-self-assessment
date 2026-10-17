@@ -778,7 +778,7 @@
     aktualisiereSichtbarkeit(blockZu(schritt));
   }
 
-  /** Bedingte Fragen je auslösender Frage (Fragenführung nach Tabelle A.1). */
+  /** Bedingte Fragen je auslösender Frage (Fragenführung nach Tabelle A.2). */
   // F14 entfällt über F13 nur, wenn F12 „Unklar“ ist. Bei F12 „Ja“ wird F14 immer gestellt.
   var ENTFAELLT = { F7: ["F8", "F9"], F12: ["F13", "F14", "F15", "F16", "F17"], F13: ["F14"] };
 
@@ -1026,7 +1026,7 @@
     return abschnitt;
   }
 
-  /** Regeln von EU AI Act und Datenschutz in der Reihenfolge von Abschnitt 5.3.2 */
+  /** Regeln von EU AI Act und Datenschutz in der Reihenfolge der Abschnitte 5.3.2 und 5.3.3 */
   var PFAD_REGELN = { R: ["R1", "R2", "R3", "R4", "R5"], D: ["D1", "D2", "D3", "D4", "D5"] };
 
   function zeichnePfadInhalt(e, pfad, treffer, abschnitt) {
@@ -1137,7 +1137,7 @@
   }
 
   /**
-   * Fassung je Stand der Schutzmaßnahme (Tabelle B.5). Für „unklar“ gilt eine eigene Fassung,
+   * Fassung je Stand der Schutzmaßnahme (Tabelle B.7). Für „unklar“ gilt eine eigene Fassung,
    * falls es sie gibt, sonst die für „fehlt“. Ohne Schutzmaßnahme (E7 bis E9) gilt die Fassung
    * zum Anlass, falls es sie gibt (E7 je Angabe in F3, E8 je Antwort auf F22), sonst „text“.
    */
@@ -1405,7 +1405,7 @@
     return offeneGruppe("luecken", "dokument", T.lueckenTitel, e.luecken.length, I.FEST.luecken, [ul]);
   }
 
-  /** Widersprüchliche Angaben (Abschnitt 5.3.4). Erscheinen nur, wenn welche vorliegen. */
+  /** Widersprüchliche Angaben (Abschnitt 5.3.5). Erscheinen nur, wenn welche vorliegen. */
   function zeichneWidersprueche(e) {
     if (!e.widersprueche.length) return null;
     var ul = el("ul", "widerspruch-liste");
@@ -1423,7 +1423,7 @@
   }
 
   /**
-   * Text zum Anlass einer Empfehlung. Den Anlass selbst bestimmt regeln.js (Tabelle 18).
+   * Text zum Anlass einer Empfehlung. Den Anlass selbst bestimmt regeln.js (Tabelle 17).
    * Platzhalter {stufe} steht für den Namen des Gesamtergebnisses.
    */
   function anlassText(anlass, e) {
