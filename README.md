@@ -65,6 +65,7 @@ Bewertungslogik. `inhalte.js` enthält die Fragen, Antwortmöglichkeiten, Hilfet
 | `.github/workflows/pipeline.yml` | Automatische Prüfung und Veröffentlichung |
 | `.gitignore`, `.gitattributes`, `.editorconfig` | Einstellungen für Git und Dateiformatierung |
 | `LICENSE` | Nutzungsbedingungen des eigenen Codes |
+| Testdokumentation | Enthält die Testdokumentation der Testfälle |
 
 
 ## 6 Werkzeuge
